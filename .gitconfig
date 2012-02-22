@@ -1,0 +1,20 @@
+[user]
+	email = simon.schiele@ypsilon.net
+	name = Simon Schiele
+[alias]
+    lastlog = log --color -n 20 --pretty=tformat:\"%h - %an, %ar : %s\" HEAD^1..HEAD
+    plog = log --pretty=tformat:\"%h - %an, %ar : %s\"
+    lastdiff = difftool HEAD^1..HEAD
+    changed = diff --stat HEAD..origin/HEAD
+    rollback = checkout HEAD^1
+    backup = push backup --all
+    sdiff = diff --cached
+    glog = log --graph
+    co = checkout
+    ci = commit
+    merge = merge --ff
+    pull = pull --ff
+[merge]
+    tool = vimdiff
+[color]
+    ui = true
