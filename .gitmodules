@@ -1,0 +1,6 @@
+[submodule ".vim"]
+	path = .vim
+	url = http://simon.psaux.de/git/dot.vim.git
+[submodule ".config/awesome"]
+	path = .config/awesome
+	url = http://simon.psaux.de/git/awesome.git
