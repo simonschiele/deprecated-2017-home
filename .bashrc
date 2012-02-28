@@ -164,45 +164,46 @@ unset color_prompt force_color_prompt
 # }}}
 
 # {{{* nodejs
+if [ -d $HOME/local/node/ ]
+then
+    ###-begin-npm-completion-###
+    COMP_WORDBREAKS=${COMP_WORDBREAKS/=/}
+    COMP_WORDBREAKS=${COMP_WORDBREAKS/@/}
+    export COMP_WORDBREAKS
 
-###-begin-npm-completion-###
-COMP_WORDBREAKS=${COMP_WORDBREAKS/=/}
-COMP_WORDBREAKS=${COMP_WORDBREAKS/@/}
-export COMP_WORDBREAKS
-
-if complete &>/dev/null; then
-  _npm_completion () {
-    local si="$IFS"
-    IFS=$'\n' COMPREPLY=($(COMP_CWORD="$COMP_CWORD" \
-                           COMP_LINE="$COMP_LINE" \
-                           COMP_POINT="$COMP_POINT" \
-                           npm completion -- "${COMP_WORDS[@]}" \
+    if complete &>/dev/null; then
+      _npm_completion () {
+        local si="$IFS"
+        IFS=$'\n' COMPREPLY=($(COMP_CWORD="$COMP_CWORD" \
+                               COMP_LINE="$COMP_LINE" \
+                               COMP_POINT="$COMP_POINT" \
+                               npm completion -- "${COMP_WORDS[@]}" \
+                               2>/dev/null)) || return $?
+        IFS="$si"
+      }
+      complete -F _npm_completion npm
+    elif compctl &>/dev/null; then
+      _npm_completion () {
+        local cword line point words si
+        read -Ac words
+        read -cn cword
+        let cword-=1
+        read -l line
+        read -ln point
+        si="$IFS"
+        IFS=$'\n' reply=($(COMP_CWORD="$cword" \
+                           COMP_LINE="$line" \
+                           COMP_POINT="$point" \
+                           npm completion -- "${words[@]}" \
                            2>/dev/null)) || return $?
-    IFS="$si"
-  }
-  complete -F _npm_completion npm
-elif compctl &>/dev/null; then
-  _npm_completion () {
-    local cword line point words si
-    read -Ac words
-    read -cn cword
-    let cword-=1
-    read -l line
-    read -ln point
-    si="$IFS"
-    IFS=$'\n' reply=($(COMP_CWORD="$cword" \
-                       COMP_LINE="$line" \
-                       COMP_POINT="$point" \
-                       npm completion -- "${words[@]}" \
-                       2>/dev/null)) || return $?
-    IFS="$si"
-  }
-  compctl -K _npm_completion npm
+        IFS="$si"
+      }
+      compctl -K _npm_completion npm
+    fi
+    ###-end-npm-completion-###
+    export PATH=$HOME/local/node/bin:$PATH
+    export NODE_PATH=$HOME/local/node:$HOME/local/node/lib/node_modules
 fi
-###-end-npm-completion-###
-export PATH=$HOME/local/node/bin:$PATH
-export NODE_PATH=$HOME/local/node:$HOME/local/node/lib/node_modules
-
 # }}}
 
 [[ -n  "$( ls ~/.fonts/*-Powerline.* 2>/dev/null )" ]] && export POWERLINE_FONT="true" || export POWERLINE_FONT="false"
