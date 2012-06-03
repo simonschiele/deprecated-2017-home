@@ -111,6 +111,8 @@ alias show_colors="for i in \`seq 1 7 ; seq 30 48 ; seq 90 107\` ; do echo -e \"
 alias clive_mp3="clive --exec='/usr/bin/ffmpeg -y -ab 256k -i %i %o'"
 alias patch_from_diff="patch -Np0 -i"
 alias speedtest="wget -O- http://cachefly.cachefly.net/200mb.test >/dev/null"
+alias pidgin_lastlog="find ~/.purple/logs/ -type f -mtime -1 | xargs tail -n 5"
+
 
 alias t='true'
 alias f='false'
