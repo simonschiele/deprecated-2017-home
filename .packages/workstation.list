@@ -1,0 +1,48 @@
+. minimal.list
+
+# ------------------------------------------------------------------------
+# X11
+WindowManager: awesome
+Browser: iceweasel 
+Communication: icedove pidgin pidgin-otr
+Viewer: evince geeqie libreoffice
+System: gnome-keyring network-manager network-manager-gnome network-manager-openvpn network-manager-openvpn-gnome 
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+# Development
+Editor: vim-nox exuberant-ctags
+Shells: zsh bash
+Sourceverwaltung: bzr subversion git mercurial
+Interpreter und Compiler: ipython erlang gcc g++ php5-cli erlang
+Build tools: build-essential make cmake automake1.9 rake 
+Libs: python-twisted python-scrapy smarty3
+Database: sqlite3 python-sqlite php5-pgsql php5-mysql 
+Webserver: apache2
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+# System 
+Status: htop dstat iotop iptraf
+Security: snort nmap telnet wireshark tcpdump python-scapy
+Network: ssh netcat vinagre grdesktop
+Filesystems: mtpfs gphotofs sshfs smbfs btrfs-tools 
+Maintainance: etckeeper
+Compression: bzip2 p7zip unzip zip rar unrar 
+Tools: gtkterm hexedit thunar
+Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter 
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+# Multimedia
+Musik: audacity
+Video: mplayer vlc kino
+Images: gimp imagemagick inkscape agave 
+# ------------------------------------------------------------------------
+
+# Eigener Kram
+# initramfs-hooks.git
+# grub stuff
+# /home/
+# look & feel
+# eclipse + adk
