@@ -6,6 +6,7 @@ WindowManager: awesome
 Browser: iceweasel 
 Communication: icedove pidgin pidgin-otr
 Viewer: evince geeqie libreoffice
+Network: vinagre grdesktop
 System: gnome-keyring network-manager network-manager-gnome network-manager-openvpn network-manager-openvpn-gnome 
 # ------------------------------------------------------------------------
 
@@ -24,7 +25,7 @@ Webserver: apache2
 # System 
 Status: htop dstat iotop iptraf
 Security: snort nmap telnet wireshark tcpdump python-scapy
-Network: vinagre grdesktop
+Network: whois dnsutils traceroute wakeonlan
 Filesystems: mtpfs gphotofs sshfs smbfs btrfs-tools 
 Compression: p7zip unzip zip rar unrar 
 Tools: gtkterm thunar
