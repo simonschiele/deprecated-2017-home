@@ -105,6 +105,7 @@ alias silent='amixer -q sset "PCM" 0 ; amixer -q sset "MASTER" 0'
 alias unsilent='amixer -q sset "PCM" 96 ; amixer -q sset "MASTER" 96'
 alias scan_for_wlans="/sbin/iwlist scanning 2>/dev/null | grep -e 'Cell' -e 'Channel\:' -e 'Encryption' -e 'ESSID' -e 'WPA' | sed 's|Cell|\nCell|g'"
 alias scan_for_hosts="fping -a -g $(/sbin/ifconfig `/sbin/route -n | grep 'UG ' | head -n1 | awk {'print $8'}` | grep -i 'inet' | cut -f'2' -d':' | cut -f'1' -d' ' | cut -f'1-3' -d'.').1 $(/sbin/ifconfig `/sbin/route -n | grep 'UG '| head -n1 | awk {'print $8'}` | grep -i 'inet' | cut -f'2' -d':' | cut -f'1' -d' ' | cut -f'1-3' -d'.').254 2>/dev/null"
+alias whatsmyip="curl -s ip.nu | xargs | html_strip"
 alias html_umlaute="sed -e 's|ü|\&uuml;|g' -e 's|Ü|\&Uuml;|g' -e 's|ä|\&auml;|g' -e 's|Ä|\&Auml;|g' -e 's|ö|\&ouml;|g' -e 's|Ö|\&Ouml;|g' -e 's|ß|\&szlig;|g'"
 alias html_strip="sed -e 's|<[^>]*>||g'"
 alias show_colors="for i in \`seq 1 7 ; seq 30 48 ; seq 90 107\` ; do echo -e \"\e[\${i}mcolor \$i\e[0m\" ; done"
@@ -132,6 +133,7 @@ if ( grep -q work /etc/hostname )
 then
     alias scp='scp -l 25000'
     alias windows='rdesktop -kde -a 16 -g 1280x1024 -u sschiele 192.168.80.55'
+    alias start_windows='wakeonlan 00:1C:C0:8D:0C:73'
 else
     alias start_mediacenter="wakeonlan 00:01:2e:27:62:87"
 fi

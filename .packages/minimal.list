@@ -1,1 +1,20 @@
+. minimal.list
+
+# ------------------------------------------------------------------------
+# Development
+Editor: vim-nox exuberant-ctags
+Sourceverwaltung: git
+Shells: bash 
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+# System 
+Status: htop dstat iotop iptraf
+Filesystem: lsof
+Network: ssh netcat
+Filesystems: mtpfs gphotofs sshfs smbfs btrfs-tools 
+Maintainance: etckeeper
+Compression: bzip2 
+Tools: hexedit
+# ------------------------------------------------------------------------
 
