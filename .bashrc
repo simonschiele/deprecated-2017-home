@@ -113,7 +113,10 @@ alias clive_mp3="clive --exec='/usr/bin/ffmpeg -y -ab 256k -i %i %o'"
 alias patch_from_diff="patch -Np0 -i"
 alias speedtest="wget -O- http://cachefly.cachefly.net/200mb.test >/dev/null"
 alias pidgin_lastlog="find ~/.purple/logs/ -type f -mtime -1 | xargs tail -n 5"
-alias repo_http2ssh="sed -i 's|^\(.*url.*=\)[ ]*\(http://simon\.psaux\.de.*\)/\(.*\.git\)|\1 ssh://git@psaux.de/\3|g' $(find .git/ -name 'config' | xargs) .gitmodules 2>/dev/null"
+#alias repo_http2ssh="sed -i 's|^\(.*url.*=\)[ ]*\(http://simon\.psaux\.de.*\)/\(.*\.git\)|\1 ssh://git@psaux.de/\3|g' $(find .git/ -name 'config' | xargs) .gitmodules 2>/dev/null"
+
+alias permissions_normalize="find . -type f \! -perm -a+x -exec chmod 640 {} \; -o -type f -perm -a+x -exec chmod 750 {} \; -o -type d -exec chmod 750 {} \; ; chown ${SUDO_USER:-$USER}: . -R"
+alias permissions_web_normalize="chown ${SUDO_USER:-$USER}:www-data . -R ; find . -type f \! -perm -a+x -exec chmod 640 {} \; -o -type f -perm -a+x -exec chmod 750 {} \; -o -type d \( -iname 'log*' -o -iname 'cache' -o -iname 'templates_c' \) -exec chown www-data:${SUDO_USER:-$USER} {} -R \; -exec chmod 770 {} \; -o -type d -exec chmod 750 {} \;"
 
 alias packages_workstation="cat $( grep '^\.\ ' ~/.packages/workstation.list | sed 's|^\. *||g' | sed 's|^|\~/\.packages/|g' | xargs ) ~/.packages/workstation.list | sed -e '/^\.[ ]/d' -e '/^#/d' -e '/^[ ]*$/d' -e 's|^\(.*\):\(.*\)$|\2|g' -e 's|^[ ]*||g' | xargs"
 alias packages_laptop="cat $( grep '^\.\ ' ~/.packages/laptop.list | sed 's|^\. *||g' | sed 's|^|\~/\.packages/|g' | xargs ) ~/.packages/laptop.list | sed -e '/^\.[ ]/d' -e '/^#/d' -e '/^[ ]*$/d' -e 's|^\(.*\):\(.*\)$|\2|g' -e 's|^[ ]*||g' | xargs"
@@ -137,6 +140,16 @@ then
 else
     alias start_mediacenter="wakeonlan 00:01:2e:27:62:87"
 fi
+
+clive-wrapper-mp3() {
+    clive -f best --exec="( echo %f | grep -qi -e 'webm$' -e 'webm\"$' ) && ( ffmpeg -i %f %f.mp3 ; rm -f %f )" $@
+}
+alias youtube-mp3="clive-wrapper-mp3"
+
+clive-wrapper() {
+    clive -f best --exec="( echo %f | grep -qi -e 'webm$' -e 'webm\"$' ) && ( ffmpeg -i %f %f.mp4 ; rm -f %f )" $@
+}
+alias youtube="clive-wrapper"
 
 # {{{ Prompt
 
