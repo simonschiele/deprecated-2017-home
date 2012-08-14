@@ -112,7 +112,10 @@ alias show_colors="for i in \`seq 1 7 ; seq 30 48 ; seq 90 107\` ; do echo -e \"
 alias clive_mp3="clive --exec='/usr/bin/ffmpeg -y -ab 256k -i %i %o'"
 alias patch_from_diff="patch -Np0 -i"
 alias speedtest="wget -O- http://cachefly.cachefly.net/200mb.test >/dev/null"
+
 alias pidgin_lastlog="find ~/.purple/logs/ -type f -mtime -1 | xargs tail -n 5"
+alias sickbeard_skipped="sudo grep 'Found result' /var/log/sickbeard/sickbeard* | sed 's|\(.*\):\(.*[0-9]\:[0-9][0-9]\:[0-9][0-9]\).*\:\:\(.*\)\(at http.*\)|\2 - \3|g'"
+
 #alias repo_http2ssh="sed -i 's|^\(.*url.*=\)[ ]*\(http://simon\.psaux\.de.*\)/\(.*\.git\)|\1 ssh://git@psaux.de/\3|g' $(find .git/ -name 'config' | xargs) .gitmodules 2>/dev/null"
 
 alias permissions_normalize="find . -type f \! -perm -a+x -exec chmod 640 {} \; -o -type f -perm -a+x -exec chmod 750 {} \; -o -type d -exec chmod 750 {} \; ; chown ${SUDO_USER:-$USER}: . -R"
@@ -142,14 +145,15 @@ else
 fi
 
 clive-wrapper-mp3() {
-    clive -f best --exec="( echo %f | grep -qi -e 'webm$' -e 'webm\"$' ) && ( ffmpeg -i %f %f.mp3 ; rm -f %f )" $@
+    clive -f best --exec="( echo %f | grep -qi -e 'webm$' -e 'webm\"$' ) && ( ffmpeg -i %f -strict experimental %f.mp3 && rm -f %f )" $@
 }
 alias youtube-mp3="clive-wrapper-mp3"
 
 clive-wrapper() {
-    clive -f best --exec="( echo %f | grep -qi -e 'webm$' -e 'webm\"$' ) && ( ffmpeg -i %f %f.mp4 ; rm -f %f )" $@
+    clive -f best --exec="( echo %f | grep -qi -e 'webm$' -e 'webm\"$' ) && ( ffmpeg -i %f -strict experimental %f.mp4 && rm -f %f )" $@
 }
 alias youtube="clive-wrapper"
+
 
 # {{{ Prompt
 
