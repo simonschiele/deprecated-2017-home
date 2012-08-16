@@ -126,6 +126,13 @@ alias packages_laptop="cat $( grep '^\.\ ' ~/.packages/laptop.list | sed 's|^\. 
 alias packages_server="cat $( grep '^\.\ ' ~/.packages/server.list | sed 's|^\. *||g' | sed 's|^|\~/\.packages/|g' | xargs ) ~/.packages/server.list | sed -e '/^\.[ ]/d' -e '/^#/d' -e '/^[ ]*$/d' -e 's|^\(.*\):\(.*\)$|\2|g' -e 's|^[ ]*||g' | xargs"
 alias packages_minimal="cat $( grep '^\.\ ' ~/.packages/minimal.list | sed 's|^\. *||g' | sed 's|^|\~/\.packages/|g' | xargs ) ~/.packages/minimal.list | sed -e '/^\.[ ]/d' -e '/^#/d' -e '/^[ ]*$/d' -e 's|^\(.*\):\(.*\)$|\2|g' -e 's|^[ ]*||g' | xargs"
 
+convert2() { ext=${1} ; shift ; for file ; do echo -n ; [ -e "$file" ] && ( echo -e "\n\n[CONVERTING] ${file} ==> ${file%.*}.${ext}" && ffmpeg -loglevel error -i "${file}" -strict experimental "${file%.*}.${ext}" && echo rm -i "${file}" ) || echo "[ERROR] File not found: ${file}" ; done }
+alias convert2audio="convert2 mp3"
+alias youtube-mp3="clive -f best --exec=\"echo >&2; echo '[CONVERTING] %f ==> MP3' >&2 ; ffmpeg -loglevel error -i %f -strict experimental %f.mp3 && rm -i %f\""
+alias youtube="clive -f best --exec=\"( echo %f | grep -qi -e 'webm$' -e 'webm.$' ) && ( echo >&2 ; echo '[CONVERTING] %f ==> MP4' >&2 ; ffmpeg -loglevel error -i %f -strict experimental %f.mp4 && rm -f %f )\""
+
+hr="============================================================"
+alias hr="echo $hr"
 alias t='true'
 alias f='false'
 
@@ -143,17 +150,6 @@ then
 else
     alias start_mediacenter="wakeonlan 00:01:2e:27:62:87"
 fi
-
-clive-wrapper-mp3() {
-    clive -f best --exec="( echo %f | grep -qi -e 'webm$' -e 'webm\"$' ) && ( ffmpeg -i %f -strict experimental %f.mp3 && rm -f %f )" $@
-}
-alias youtube-mp3="clive-wrapper-mp3"
-
-clive-wrapper() {
-    clive -f best --exec="( echo %f | grep -qi -e 'webm$' -e 'webm\"$' ) && ( ffmpeg -i %f -strict experimental %f.mp4 && rm -f %f )" $@
-}
-alias youtube="clive-wrapper"
-
 
 # {{{ Prompt
 
