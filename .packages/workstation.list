@@ -1,13 +1,27 @@
 . minimal.list
 
 # ------------------------------------------------------------------------
+# System 
+Status: htop dstat iotop iptraf
+Security: snort nmap wireshark python-scapy
+Network: whois wakeonlan 
+Filesystems: mtpfs gphotofs cifs-utils ntfs-3g
+Compression: p7zip unzip zip rar unrar 
+Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter alsa-base alsa-utils 
+USB: usb-modeswitch
+Tools: bchunk 
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
 # X11
-WindowManager: awesome
+Base: xbase-clients awesome lightdm 
+Terminal: gnome-terminal
 Browser: iceweasel 
 Communication: icedove pidgin pidgin-otr
 Viewer: evince geeqie libreoffice
-Network: vinagre grdesktop
-System: gnome-keyring network-manager network-manager-gnome network-manager-openvpn network-manager-openvpn-gnome 
+Security: gksu gnome-keyring
+Network: vinagre grdesktop quicksynergy synergy network-manager network-manager-gnome network-manager-openvpn network-manager-openvpn-gnome
+Tools: gtkterm thunar scrot xsel xcalib debootstrap
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
@@ -19,23 +33,13 @@ Build tools: build-essential make cmake automake1.9 rake
 Libs: python-twisted python-scrapy smarty3
 Database: sqlite3 python-sqlite php5-pgsql php5-mysql 
 Webserver: apache2
-# ------------------------------------------------------------------------
-
-# ------------------------------------------------------------------------
-# System 
-Status: htop dstat iotop iptraf
-Security: snort nmap telnet wireshark tcpdump python-scapy
-Network: whois dnsutils traceroute wakeonlan
-Filesystems: mtpfs gphotofs sshfs smbfs btrfs-tools 
-Compression: p7zip unzip zip rar unrar 
-Tools: gtkterm thunar
-Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter 
+Tools: ack-grep
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
 # Multimedia
 Musik: audacity
-Video: mplayer vlc kino
-Images: gimp imagemagick inkscape agave 
+Video: mplayer vlc kino ffmpeg clive 
+Images: gimp inkscape agave imagemagick
 # ------------------------------------------------------------------------
 

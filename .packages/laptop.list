@@ -3,6 +3,7 @@
 
 # ------------------------------------------------------------------------
 # System
-Security: kismet aircrack-ng
-Wifi: wireless-tools 
+Security: kismet 
+Wifi: wireless-tools
+Tools: mosh 
 # ------------------------------------------------------------------------
