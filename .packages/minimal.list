@@ -4,17 +4,18 @@ Base: binutils
 Time: tzdata ntpdate
 Lang: locales kbd
 Status: htop dstat iotop iptraf lsof
+USB: usbutils
 Security: cryptsetup sudo openvpn
 Network: ssh netcat fping curl wget traceroute dnsutils telnet tcpdump
 Filesystems: btrfs-tools xfsprogs sshfs 
 Maintainance: etckeeper
 Compression: bzip2 
-Tools: hexedit less psmisc hdparm 
+Tools: hexedit less psmisc hdparm links
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
 # Development
-Editor: vim-nox exuberant-ctags
+Editor: vim-nox exuberant-ctags cscope
 Sourceverwaltung: git
 Shells: bash 
 Debug: strace

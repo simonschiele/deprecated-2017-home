@@ -1,15 +1,14 @@
 . minimal.list
 
 # ------------------------------------------------------------------------
-# System 
-Status: htop dstat iotop iptraf
-Security: snort nmap wireshark python-scapy
+# System  
+Security: snort nmap wireshark
 Network: whois wakeonlan 
 Filesystems: mtpfs gphotofs cifs-utils ntfs-3g
 Compression: p7zip unzip zip rar unrar 
 Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter alsa-base alsa-utils 
 USB: usb-modeswitch
-Tools: bchunk 
+Tools: bchunk debian-goodies colordiff debootstrap
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
@@ -19,19 +18,19 @@ Terminal: gnome-terminal
 Browser: iceweasel 
 Communication: icedove pidgin pidgin-otr
 Viewer: evince geeqie libreoffice
-Security: gksu gnome-keyring
+Security: gksu gnome-keyring xscreensaver
 Network: vinagre grdesktop quicksynergy synergy network-manager network-manager-gnome network-manager-openvpn network-manager-openvpn-gnome
-Tools: gtkterm thunar scrot xsel xcalib debootstrap
-# ------------------------------------------------------------------------
+Tools: gtkterm thunar scrot xsel xcalib gucharmap# ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
 # Development
 Shells: zsh
 Sourceverwaltung: bzr subversion mercurial
-Interpreter und Compiler: ipython erlang gcc g++ php5-cli erlang
+Interpreter und Compiler: ipython erlang gcc g++ php5-cli lua5.1
 Build tools: build-essential make cmake automake1.9 rake 
-Libs: python-twisted python-scrapy smarty3
-Database: sqlite3 python-sqlite php5-pgsql php5-mysql 
+Python Libs: python-twisted python-sqlite python-scrapy python-scapy python-web2py
+PHP Libs: smarty3 php5-pgsql php5-mysql 
+Database: sqlite3
 Webserver: apache2
 Tools: ack-grep
 # ------------------------------------------------------------------------
