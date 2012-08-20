@@ -111,7 +111,7 @@ alias debian_packages_list_unstable="aptitude -t unstable search -F '%p %?V %?v 
 alias debian_packages_list_testing="aptitude -t testing search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep testing| awk '{if( \$2 == \$3) print \$1}'"
 alias debian_packages_list_stable="aptitude -t stable search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep stable| awk '{if( \$2 == \$3) print \$1}'"
 
-alias hooks_run="eval $( grep ^systemtype= ~/.system.conf) find ~/.hooks/* | while read hook ; do if (( grep -iq -e ^hook_systemtype.*\${systemtype} \$hook ) && ( grep -iq ^hook_optional.*false \$hook )) ; then ~/.hooks/loader.sh \$hook ; fi ; done"
+alias hooks_run="eval \$( grep ^systemtype= ~/.system.conf ) find ~/.hooks/* | while read hook ; do if (( grep -iq -e ^hook_systemtype.*\${systemtype} \$hook ) && ( grep -iq ^hook_optional.*false \$hook )) ; then ~/.hooks/loader.sh \$hook ; fi ; done"
 
 alias permissions_normalize="find . -type f \! -perm -a+x -exec chmod 640 {} \; -o -type f -perm -a+x -exec chmod 750 {} \; -o -type d -exec chmod 750 {} \; ; chown ${SUDO_USER:-$USER}: . -R"
 alias permissions_normalize_web="chown ${SUDO_USER:-$USER}:www-data . -R ; find . -type f \! -perm -a+x -exec chmod 640 {} \; -o -type f -perm -a+x -exec chmod 750 {} \; -o -type d \( -iname 'log*' -o -iname 'cache' -o -iname 'templates_c' \) -exec chown www-data:${SUDO_USER:-$USER} {} -R \; -exec chmod 770 {} \; -o -type d -exec chmod 750 {} \;"
@@ -132,7 +132,6 @@ alias patch_from_diff="patch -Np0 -i"
 alias silent='amixer -q sset "PCM" 0 ; amixer -q sset "MASTER" 0'
 alias unsilent='amixer -q sset "PCM" 96 ; amixer -q sset "MASTER" 96'
 alias show_colors="for i in \`seq 1 7 ; seq 30 48 ; seq 90 107\` ; do echo -e \"\e[\${i}mcolor \$i\e[0m\" ; done"
-alias find_last_edited="find . -type f -printf \"%T@ %T+ %p\n\" | sort -n"
 alias screenshot="import -display :0 -window root screenshot-\$(date +%Y-%m-%d_%s).png"
 alias mplayer_left="mplayer -xineramascreen 0" 
 alias mplayer_right="mplayer -xineramascreen 1" 
@@ -145,6 +144,7 @@ alias youtube="clive -f best --exec=\"( echo %f | grep -qi -e 'webm$' -e 'webm.$
 alias whatsmyip="wget -O- -q ip.nu | xargs | html_strip"
 alias speedtest="wget -O- http://cachefly.cachefly.net/200mb.test >/dev/null"
 
+alias find_last_edited="find . -type f -printf \"%T@ %T+ %p\n\" | sort -n"
 alias pidgin_lastlog="find ~/.purple/logs/ -type f -mtime -1 | xargs tail -n 5"
 alias sickbeard_skipped="sudo grep 'Found result' /var/log/sickbeard/sickbeard* | sed 's|\(.*\):\(.*[0-9]\:[0-9][0-9]\:[0-9][0-9]\).*\:\:\(.*\)\(at http.*\)|\2 - \3|g'"
 
