@@ -1,5 +1,11 @@
 *
-!/.packages*
-!/.packages/*
 !/.icc*
 !/.icc/*
+!/.doc*
+!/.doc/*
+!/.lib*
+!/.lib/*
+!/.hooks*
+!/.hooks/*
+!/.packages*
+!/.packages/*
