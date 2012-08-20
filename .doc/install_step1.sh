@@ -9,11 +9,11 @@ BOOTSTRAP_MOUNT="/media/root"
 BOOTSTRAP_SWAP=true
 ### !!! CONFIG !!! ###
 
-# partition
-# MISSING
+# partitioning
 # /dev/sdx1 - /boot - at least 5gb
 # /dev/sdx2 - /     - 
 # /dev/sdx3 - swap  - 
+# MISSING
 
 # format
 mkfs.ext3 -L boot ${BOOTSTRAP_TARGET}1
@@ -44,17 +44,11 @@ mount -o bind /sys/ ${BOOTSTRAP_MOUNT}/sys/
 mount -o bind /proc/ ${BOOTSTRAP_MOUNT}/proc/
 
 # fstab
-echo -e "/dev/mapper/root\t/\tbtrfs\tautodefrag,noatime,rw,ssd,compress,thread_pool=32\t0 0" > ${BOOTSTRAP_MOUNT}/etc/fstab
-echo -e "${BOOTSTRAP_TARGET}1\t/boot\text3\tdefault\t0 0" >> ${BOOTSTRAP_MOUNT}/etc/fstab
+echo -e "${BOOTSTRAP_TARGET}1\t/boot\text3\tdefault\t0 0" > ${BOOTSTRAP_MOUNT}/etc/fstab
+echo -e "/dev/mapper/root\t/\tbtrfs\tautodefrag,noatime,rw,ssd,compress,thread_pool=32\t0 0" >> ${BOOTSTRAP_MOUNT}/etc/fstab
 
 # crypttab
 echo -e "root\t${BOOTSTRAP_TARGET}2\tnone\tluks" > ${BOOTSTRAP_MOUNT}/etc/crypttab
-
-# install grub & kernel
-# MISSING
-
-# initramfs
-# MISSING
 
 # moving step2 into chroot
 mkdir ${BOOTSTRAP_MOUNT}/installer/
