@@ -112,6 +112,8 @@ alias debian_packages_list_testing="aptitude -t testing search -F '%p %?V %?v %?
 alias debian_packages_list_stable="aptitude -t stable search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep stable| awk '{if( \$2 == \$3) print \$1}'"
 
 alias hooks_run="eval $( grep ^systemtype= ~/.system.conf) find ~/.hooks/* | while read hook ; do if (( grep -iq -e ^hook_systemtype.*\${systemtype} \$hook ) && ( grep -iq ^hook_optional.*false \$hook )) ; then ~/.hooks/loader.sh \$hook ; fi ; done"
+alias repo_compare="[ \"x\${repo}\" == \"x\" ] && ( echo 'Please export \$repo variable like:' ; echo 'export \$repo=\"dot.vim.git\"' ; exit 1 ) || ( mkdir \$repo/ ; cd \$repo ; git clone http://simon.psaux.de/git/\${repo} psaux/ ; git clone https://github.com/simonschiele/\${repo} github/ ; echo \"psaux\" ; cd psaux/ ; git plog | head -n 11 ; echo -e \"\ngithub\" ; cd ../github/ ; git plog | head -n 10 ; cd ../../ )"
+#alias repo_http2ssh="sed -i 's|^\(.*url.*=\)[ ]*\(http://simon\.psaux\.de.*\)/\(.*\.git\)|\1 ssh://git@psaux.de/\3|g' $(find .git/ -name 'config' | xargs) .gitmodules 2>/dev/null"
 
 alias permissions_normalize="find . -type f \! -perm -a+x -exec chmod 640 {} \; -o -type f -perm -a+x -exec chmod 750 {} \; -o -type d -exec chmod 750 {} \; ; chown ${SUDO_USER:-$USER}: . -R"
 alias permissions_normalize_web="chown ${SUDO_USER:-$USER}:www-data . -R ; find . -type f \! -perm -a+x -exec chmod 640 {} \; -o -type f -perm -a+x -exec chmod 750 {} \; -o -type d \( -iname 'log*' -o -iname 'cache' -o -iname 'templates_c' \) -exec chown www-data:${SUDO_USER:-$USER} {} -R \; -exec chmod 770 {} \; -o -type d -exec chmod 750 {} \;"
@@ -164,7 +166,6 @@ else
 fi
 
 alias route_via_wlan="for i in \`seq 1 10\` ; do route del default 2>/dev/null ; done ; route add default eth0 ; route add default wlan0 ; route add default gw \"\$( /sbin/ifconfig wlan0 | grep_ip | head -n 1 | cut -f'1-3' -d'.' ).1\""
-#alias repo_http2ssh="sed -i 's|^\(.*url.*=\)[ ]*\(http://simon\.psaux\.de.*\)/\(.*\.git\)|\1 ssh://git@psaux.de/\3|g' $(find .git/ -name 'config' | xargs) .gitmodules 2>/dev/null"
 #nrg2iso() { dd bs=1k if="$1" of="$2" skip=300 }
 
 # {{{ Prompt
