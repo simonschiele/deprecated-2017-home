@@ -9,15 +9,25 @@ fi
 eval $( grep ^BOOTSTRAP_ ./install_step1.sh )
 BOOTSTRAP_HOME="/home/${BOOTSTRAP_USERNAME}"
 
+# setup apt
+echo 'deb http://security.debian.org/ testing/updates main contrib non-free' > /etc/apt/sources.list
+echo 'deb http://ftp2.de.debian.org/debian testing main contrib non-free' >> /etc/apt/sources.list
+apt-get update
+
+# setup debconf
+dpkg-reconfigure debconf
+
 # create default user
 adduser ${BOOTSTRAP_USERNAME}
 passwd ${BOOTSTRAP_USERNAME}
+passwd root
 
 # get sane homedir
-rm -rf /home/${BOOTSTRAP_USERNAME}/ 
-git clone --recursive http://simon.psaux.de/git/home.git /home/${BOOTSTRAP_USERNAME}
+rm -rf ${BOOTSTRAP_HOME} 
+git clone --recursive http://simon.psaux.de/git/home.git ${BOOTSTRAP_HOME}
 chown ${BOOTSTRAP_USERNAME}: ${BOOTSTRAP_HOME}/ -R
-. /home/${BOOTSTRAP_USERNAME}/.bashrc
+. ${BOOTSTRAP_HOME}/.bashrc
+mkdir ${BOOTSTRAP_HOME}/Downloads
 
 # write system.conf 
 system_conf=${BOOTSTRAP_HOME}/.system.conf
@@ -27,12 +37,15 @@ echo -e "systemtype=\"${BOOTSTRAP_SYSTEMTYPE}\"" >> "$system_conf"
 echo -e "username=\"${BOOTSTRAP_USERNAME}\"" >> "$system_conf"
 
 # link a few files to /root/
-rm -rf /root/.bash* /root/.profile /root/.xsession /root/.vim/ /root/.gitconfig 2>/dev/null
-ln -s /home/${BOOTSTRAP_USERNAME}/.bashrc /root/.bashrc
-ln -s /home/${BOOTSTRAP_USERNAME}/.vim /root/.vim
+rm -rf /root/.bashrc /root/.profile /root/.xsession /root/.vim/ /root/.gitconfig 2>/dev/null
+ln -s ${BOOTSTRAP_HOME}/.bashrc /root/.bashrc
+ln -s ${BOOTSTRAP_HOME}/.vim /root/.vim
 ln -s /root/.vim/vimrc /root/.vimrc
-ln -s /home/${BOOTSTRAP_USERNAME}/.gitconfig /root/.gitconfig
-ln -s /home/${BOOTSTRAP_USERNAME}/.profile /root/.profile
+ln -s ${BOOTSTRAP_HOME}/.gitconfig /root/.gitconfig
+ln -s ${BOOTSTRAP_HOME}/.profile /root/.profile
+
+# install kernel + bootloader
+apt-get install grub2 linux-image-2.6-686-pae linux-headers-2.6-686-pae firmware-linux-free firmware-linux-nonfree firmware-realtek firmware-iwlwifi
 
 # install packages
 apt-get install $( cat $( grep '^\.\ ' ./packages/${BOOTSTRAP_SYSTEMTYPE}.list | sed 's|^\. *||g' | sed 's|^|./|g' | xargs ) ./packages/${BOOTSTRAP_SYSTEMTYPE}.list | sed -e '/^\.[ ]/d' -e '/^#/d' -e '/^[ ]*$/d' -e 's|^\(.*\):\(.*\)$|\2|g' -e 's|^[ ]*||g' -e 's|[ ]|\n|g' | sed '/^$/d' | sort -u | xargs )
@@ -53,7 +66,8 @@ do
 done
 
 # set permissions
-# MISSING
+chown ${BOOTSTRAP_USERNAME}: ${BOOTSTRAP_HOME} -R
+find /home/* /root -maxdepth 0 -type d -exec chmod 700 {} \;
 
 # finished
 echo
