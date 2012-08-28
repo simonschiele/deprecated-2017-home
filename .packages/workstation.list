@@ -7,7 +7,8 @@ Network: whois wakeonlan
 Filesystems: mtpfs gphotofs cifs-utils ntfs-3g
 Compression: p7zip unzip zip rar unrar 
 Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter alsa-base alsa-utils 
-USB: usb-modeswitch
+USB: usb-modeswitch 
+Webcam: guvcview
 Tools: bchunk debian-goodies colordiff debootstrap
 # ------------------------------------------------------------------------
 
