@@ -6,7 +6,7 @@ Lang: locales kbd
 Status: htop dstat iotop iptraf lsof
 USB: usbutils
 Security: cryptsetup sudo openvpn
-Network: ssh netcat fping curl wget traceroute dnsutils telnet tcpdump
+Network: ethtool ssh netcat fping curl wget traceroute dnsutils telnet tcpdump
 Filesystems: btrfs-tools xfsprogs sshfs 
 Maintainance: etckeeper
 Compression: bzip2 

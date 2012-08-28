@@ -4,3 +4,6 @@
 [submodule ".config/awesome"]
 	path = .config/awesome
 	url = http://simon.psaux.de/git/awesome.git
+[submodule ".lib/TickTick"]
+	path = .lib/TickTick
+	url = https://github.com/kristopolous/TickTick
