@@ -137,6 +137,8 @@ alias show_colors="for i in \`seq 1 7 ; seq 30 48 ; seq 90 107\` ; do echo -e \"
 alias screenshot="import -display :0 -window root screenshot-\$(date +%Y-%m-%d_%s).png"
 alias mplayer_left="mplayer -xineramascreen 0" 
 alias mplayer_right="mplayer -xineramascreen 1" 
+alias keycodes="sudo showkey -k"
+# alias vlc_flash=vlc $(for f in /proc/$(pgrep -f libflashplayer.so |head -n 1)/fd/*; do ;if  $(file ${f} |grep -q "broken symbolic link to \`/tmp/FlashXX"); then echo  ${f};fi;done)
 
 convert2() { ext=${1} ; shift ; for file ; do echo -n ; [ -e "$file" ] && ( echo -e "\n\n[CONVERTING] ${file} ==> ${file%.*}.${ext}" && ffmpeg -loglevel error -i "${file}" -strict experimental "${file%.*}.${ext}" && echo rm -i "${file}" ) || echo "[ERROR] File not found: ${file}" ; done }
 alias convert2audio="convert2 mp3"
