@@ -8,11 +8,10 @@ then
     exit 1
 fi
 
-mv installer-home.git/.hooks/bootstrap*.sh .
+mv installer-home.git/.bin/bootstrap*.sh .
 mv installer-home.git/.hooks/ hooks/
 mv installer-home.git/.packages/ packages/
 chmod +x bootstrap*sh
-mkdir -p log/
 
 rm -rf installer-home.git 
 
@@ -29,6 +28,6 @@ echo "export BOOTSTRAP_SSD=true"
 echo "export BOOTSTRAP_PACKAGES=\"vim-nox,git,sudo,etckeeper,locales,kbd,keyboard-configuration,tzdata\""
 echo ""
 echo "run installer:"
-echo "date ./bootstrap1.sh | tee -a log/step1.log"
+echo "time ./bootstrap1.sh"
 echo ""
 

@@ -99,8 +99,8 @@ then
     do 
         if (( grep -iq ^hook_systemtype.*${BOOTSTRAP_SYSTEMTYPE} $hook ) && ( grep -iq ^hook_optional.*false $hook ))
         then 
-            echo ">>> Executing './hooks/loader.sh ${hook}'"
-            ./hooks/loader.sh $hook
+            echo ">>> Executing './${hook}'"
+            ./${hook}
         fi
     done
 fi
