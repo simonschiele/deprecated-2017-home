@@ -3,27 +3,32 @@
 RED="\e[31m"
 GREEN="\e[32m"
 
+pwlist="/share/projects/password lists/archive_passwords.txt"
+pwcount=$( wc -l "$pwlist" | awk {'print $1'} )
 file=$@
 
-if ( unrar l ${file} 2>/dev/null >&2 )
+if ( unrar l -p- ${file} 2>/dev/null >&2 )
 then
     echo -e "${GREEN}RAR IS UNPROTECTED${NORMAL}"
     exit 0
 fi
 
-passwords=$( grep -v "^$" /share/projects/password\ lists/archive_passwords.txt )
+echo    
+echo "Trying to crack rar file '${file}'"
+echo "Using wordlist '${pwlist}' (${pwcount} entries)"
+echo    
+
+passwords=$( grep -v "^$" "${pwlist}" | tac )
 for pw in $passwords
 do 
     echo "Trying password '$pw'"
-    echo "unrar -p${pw} l ${file} 2>/dev/null >&2"
-    false
-    if [ $? == 0 ]
+    if ( unrar l -p${pw} ${file} 2>/dev/null >&2 )
     then
-        echo -e "${GREEN}PASSWORD FOUND: ${pw}${NORMAL}"
+        echo -e "\n${GREEN}PASSWORD FOUND: ${pw}${NORMAL}\n"
         exit 0
     fi
 done
 
-echo -e "${RED}PASSWORD NOT FOUND${NORMAL}"
+echo -e "\n${RED}PASSWORD NOT FOUND${NORMAL}\n"
 exit 1
 
