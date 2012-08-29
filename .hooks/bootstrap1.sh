@@ -6,7 +6,7 @@
 # export BOOTSTRAP_HOSTNAME="virt12.cnet.loc"
 # export BOOTSTRAP_TARGET="/dev/sda"
 # export BOOTSTRAP_SYSTEMTYPE="workstation"
-# ./install_step1.sh
+# ./bootstrap1.sh
 #
 
 BOOTSTRAP_HOSTNAME=${BOOTSTRAP_HOSTNAME:-"test.cnet.loc"}
@@ -137,7 +137,7 @@ echo -e "root\t${BOOTSTRAP_TARGET}2\tnone\tluks" > ${BOOTSTRAP_MOUNT}/etc/cryptt
 
 echo ">>> Copy installer, hooks and packagelists to ${BOOTSTRAP_MOUNT}/installer/ for step2"
 mkdir ${BOOTSTRAP_MOUNT}/installer/
-cp install_step*.sh ${BOOTSTRAP_MOUNT}/installer/
+cp bootstrap*.sh ${BOOTSTRAP_MOUNT}/installer/
 if [ -r ../hooks/loader.sh ]
 then
     cp -r ../hooks/ ${BOOTSTRAP_MOUNT}/installer/hooks/
@@ -176,5 +176,5 @@ echo "BOOTSTRAP_SSD=${BOOTSTRAP_SSD}" >> ${BOOTSTRAP_MOUNT}/installer/settings.s
 echo "BOOTSTRAP_PACKAGES=${BOOTSTRAP_PACKAGES}" >> ${BOOTSTRAP_MOUNT}/installer/settings.sh
 
 echo ">>> Starting step2 via chroot"
-chroot ${BOOTSTRAP_MOUNT} /bin/bash /installer/install_step2.sh 
+chroot ${BOOTSTRAP_MOUNT} /bin/bash /installer/bootstrap2.sh 
 

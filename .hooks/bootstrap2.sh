@@ -7,7 +7,7 @@ fi
 
 if [ ! -r ./settings.sh ]
 then
-    echo "[ERROR] Could not find 'settings.sh' while executing 'install_step2.sh'"
+    echo "[ERROR] Could not find 'settings.sh' while executing 'bootstrap2.sh'"
     exit 1
 fi
 
