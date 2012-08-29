@@ -270,6 +270,8 @@ then
 fi
 # }}}
 
+export PATH=~/.bin:$PATH
+
 [[ -n  "$( ls ~/.fonts/*-Powerline.* 2>/dev/null )" ]] && export POWERLINE_FONT="true" || export POWERLINE_FONT="false"
 
 #[[ $- == *i* ]]   &&   . ~/.lib/git-prompt/git-prompt.sh
