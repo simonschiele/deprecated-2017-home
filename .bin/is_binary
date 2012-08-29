@@ -1,0 +1,17 @@
+#!/bin/bash
+LANG=C 
+
+if [ -f "$@" ]
+then
+    if grep . "$@" | head -n1 | grep -s -q "^Binary .* matches"
+    then
+        exit 0 
+    fi
+else
+    echo "File $@ not found" >&2 
+    echo "Please use script like this:" >&2 
+    echo "is_binary filename_or_path" >&2 
+fi
+
+exit 1
+

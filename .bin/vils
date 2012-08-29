@@ -1,0 +1,92 @@
+#!/bin/zsh -
+#
+#   Oliver Fromme  <olli@fromme.com>
+#
+#   BSD-style copyright and standard disclaimer applies.
+#
+#   This little script enables you to ``edit an ls'',
+#   i.e. it will load a list of filenames into your
+#   favourite editor (presumably vi).  Any changes to
+#   the filenames will result in renaming the respective
+#   files.
+#
+#   Notes:
+#    - Do not change the numbers in the first column,
+#      unless you know exactly what you're doing.
+#    - If you remove an entire line, the corresponding
+#      file will _not_ be deleted.  It just remains
+#      untouched.
+#    - You can use any character in filenames, with one
+#      special case:  backslashes have to be specified
+#      twice.
+#    - If there are any filename collisions, you will
+#      be asked if overwriting the first file is OK.
+#    - Do not try to exchange the filenames of two or
+#      more files.  It won't work.
+#    - If you want to edit the filenames of certain
+#      files only, you can specify them on the command
+#      line (the default is ``*'').
+#
+
+if [[ "$VISUAL" != "" ]]; then
+	VICMD="$VISUAL"
+elif [[ "$EDITOR" != "" ]]; then
+	VICMD="$EDITOR"
+else
+	VICMD="/usr/bin/vi"
+fi
+
+if [[ "x$1" == "x--" ]]; then
+	shift
+elif expr "x$1" : 'x-' >/dev/null; then
+	echo "Usage: ${0:t} [file ...]" >&2
+	exit 1
+fi
+
+#   Do not use a publicly writable directory such as /tmp,
+#   which would be a security hole because of possible
+#   race conditions!
+TMP="$HOME/.${0:t}.$$.tmp"
+Cleanup()
+{
+	rm -f "$TMP" "$TMP".new
+	exit 1
+}
+trap Cleanup 1 2 3 15
+
+if [[ $# -gt 0 ]]; then
+	ls -d -- "$@" | awk '{printf "%04d %s\n", NR, $0}' > "$TMP"
+else
+	ls > "$TMP" | awk '{printf "%04d %s\n", NR, $0}' > "$TMP"
+fi
+cp "$TMP" "$TMP".new
+
+$VICMD "$TMP".new
+
+(
+	cat "$TMP"
+	echo "xxx"
+	cat "$TMP".new
+) \
+| awk '{
+	if ($1 == "xxx")
+		new=1;
+	else if (!new)
+		old[$1] = substr($0, 6);
+	else {
+		new = substr($0, 6);
+		if (old[$1] && new && old[$1] != new)
+			printf "%s/%s\n", old[$1], new;
+	}
+}' \
+| (
+	IFS='/'
+	while read OLD NEW; do
+		mv -i -- "$OLD" "$NEW"
+	done
+)
+
+rm -f "$TMP" "$TMP".new
+exit 0
+
+#-- 

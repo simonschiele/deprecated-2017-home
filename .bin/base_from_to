@@ -1,0 +1,20 @@
+#!/bin/sh
+LANG=C
+
+if [ -z "$3" ] || [ -n "$( echo "$@" | grep -q -i -e "help" -e "[-]h" )" ]
+then
+    echo "Pleasy call like this:"
+    echo "base_from_to FROM TO NUMBER"
+    echo "Example Base10 to Base2 for 123890873"
+    echo 'base_from_to 10 2 1238908732189782710'
+    exit 1
+fi
+
+calc=`echo ${1} i ${2} o ${3} p | dc`
+echo -n "Input: "
+echo -n "$3 "
+echo "(Base${1})"
+echo -n "Output: "
+echo -n "$calc "
+echo "(Base${2})"
+
