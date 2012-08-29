@@ -5,6 +5,8 @@
 !/.doc/*
 !/.lib*
 !/.lib/*
+!/.bin*
+!/.bin/*
 !/.hooks*
 !/.hooks/*
 !/.packages*
