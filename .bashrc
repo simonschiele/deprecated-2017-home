@@ -65,6 +65,25 @@ fi
 
 # }}}
 
+# {{{ Helper Functions
+
+convert2() {
+    ext=${1} ; shift ; for file ; do echo -n ; [ -e "$file" ] && ( echo -e "\n\n[CONVERTING] ${file} ==> ${file%.*}.${ext}" && ffmpeg -loglevel error -i "${file}" -strict experimental "${file%.*}.${ext}" && echo rm -i "${file}" ) || echo "[ERROR] File not found: ${file}" ; done
+}
+
+confirm() {
+    if [ -z ${@} ]
+    then
+        message="Are you sure you want to perform 'unknown action'?"
+    else
+        message="Are you sure you want to perform '${@}'?"
+    fi
+        
+    whiptail --yesno "${message}" 10 60
+}
+
+# }}}
+
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
@@ -137,10 +156,13 @@ alias show_colors="for i in \`seq 1 7 ; seq 30 48 ; seq 90 107\` ; do echo -e \"
 alias screenshot="import -display :0 -window root screenshot-\$(date +%Y-%m-%d_%s).png"
 alias mplayer_left="mplayer -xineramascreen 0" 
 alias mplayer_right="mplayer -xineramascreen 1" 
-alias keycodes="sudo showkey -k"
 # alias vlc_flash=vlc $(for f in /proc/$(pgrep -f libflashplayer.so |head -n 1)/fd/*; do ;if  $(file ${f} |grep -q "broken symbolic link to \`/tmp/FlashXX"); then echo  ${f};fi;done)
+alias keycodes="sudo showkey -k"
+alias list_sticks="udisks --dump | grep device-file | sed 's|^.*\:\ *\(.*\)|\1|g' | while read dev ; do if ( udisks --show-info \${dev} | grep -q \"removable.*1\" ) ; then echo \${dev} ; fi ; done"
+alias battery="upower -d | grep -e state -e percentage -e time | sed -e 's|^.*:\ *\(.*\)|\1|g' | sed 's|[ ]*$||g' | tr '\n' ' ' | sed -e 's|\ $|\n|g' | sed -e 's|^|(|g' -e 's|$|)|g'"
+alias vm_test="rm -i test.img ; [ -e ./test.img ] && echo 'reusing last image' || qemu-img create test.img 6G ; kvm -m 1024 -k de -boot d -cdrom grml96-full_2012.05.iso -hda test.img"
+alias filetypes_video="mp4 wmv flv 3gp mpeg mpg avi mkv webm"
 
-convert2() { ext=${1} ; shift ; for file ; do echo -n ; [ -e "$file" ] && ( echo -e "\n\n[CONVERTING] ${file} ==> ${file%.*}.${ext}" && ffmpeg -loglevel error -i "${file}" -strict experimental "${file%.*}.${ext}" && echo rm -i "${file}" ) || echo "[ERROR] File not found: ${file}" ; done }
 alias convert2audio="convert2 mp3"
 alias youtube-mp3="clive -f best --exec=\"echo >&2; echo '[CONVERTING] %f ==> MP3' >&2 ; ffmpeg -loglevel error -i %f -strict experimental %f.mp3 && rm -i %f\""
 alias youtube="clive -f best --exec=\"( echo %f | grep -qi -e 'webm$' -e 'webm.$' ) && ( echo >&2 ; echo '[CONVERTING] %f ==> MP4' >&2 ; ffmpeg -loglevel error -i %f -strict experimental %f.mp4 && rm -f %f )\""
