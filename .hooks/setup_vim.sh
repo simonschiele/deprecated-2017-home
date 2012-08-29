@@ -3,6 +3,8 @@ hook_name=setup_vim
 hook_systemtypes="minimal server workstation laptop"
 hook_optional=false
 hook_version=0.1
+[ -r ~/.hooks/helper.sh ] && . ~/.hooks/helper.sh || exit 3 
+###########################################################
 
 if ! [ -d ~/.vim/ ] || ! [ -e ~/.vim/.git ]
 then

@@ -3,6 +3,8 @@ hook_name=setup_initramfs-hooks
 hook_systemtypes="minimal server workstation laptop"
 hook_optional=false
 hook_version=0.0
+[ -r ~/.hooks/helper.sh ] && . ~/.hooks/helper.sh || exit 3 
+###########################################################
 
 rm -rf /etc/initramfs-tools/hooks/
 git clone http://simon.psaux.de/git/initramfs-hooks.git /etc/initramfs-tools/hooks

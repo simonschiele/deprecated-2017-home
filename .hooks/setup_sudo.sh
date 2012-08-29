@@ -3,6 +3,8 @@ hook_name=setup_sudo
 hook_systemtypes="minimal server workstation laptop"
 hook_optional=false
 hook_version=0.0
+[ -r ~/.hooks/helper.sh ] && . ~/.hooks/helper.sh || exit 3 
+###########################################################
 
 sudoers="/etc/sudoers"
 echo -e "Defaults\t\tenv_reset" > "${sudoers}"
