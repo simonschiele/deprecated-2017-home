@@ -84,6 +84,8 @@ confirm() {
 
 # }}}
 
+# {{{ General Settings
+
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
 shopt -s checkwinsize
@@ -96,17 +98,26 @@ if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
+if [ -n  "$( ls ~/.fonts/*-Powerline.* 2>/dev/null )" ]
+then
+    export POWERLINE_FONT="true"
+else
+    export POWERLINE_FONT="false"
+fi
+
 export PAGER=less
 export EDITOR="/usr/bin/vim"
 export HR="============================================================"
 
-if [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-fi
-
 export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
 export HISTCONTROL=ignoreboth
 shopt -s histappend
+
+export PATH=~/.bin:$PATH
+
+# }}}
+
+# {{{ alias 
 
 alias mv='mv -i'
 alias cp='cp -i'
@@ -191,40 +202,6 @@ fi
 
 alias route_via_wlan="for i in \`seq 1 10\` ; do route del default 2>/dev/null ; done ; route add default eth0 ; route add default wlan0 ; route add default gw \"\$( /sbin/ifconfig wlan0 | grep_ip | head -n 1 | cut -f'1-3' -d'.' ).1\""
 #nrg2iso() { dd bs=1k if="$1" of="$2" skip=300 }
-
-# {{{ Prompt
-
-force_color_prompt=yes
-if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] ; then #&& tput setf 1 >&/dev/null; then
-        # We have color support; assume it's compliant with Ecma-48
-        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-        # a case would tend to support setf rather than setaf.)
-        color_prompt=yes
-    else
-        color_prompt=
-    fi
-fi
-
-function prompt_func () {
-    lastret=$?
-    if [[ -e "${HOME}/.lib/git_ps1.sh" ]] && [[ -e "/usr/bin/timeout" ]]
-    then
-        GIT_PS1=$(timeout 1 ${HOME}/.lib/git_ps1.sh)
-    fi
-    PS1error=$( test $lastret -gt 0 && echo "${COLOR_BG_RED}[$lastret]${COLOR_NONE} ")
-    PS1user="$( test `whoami` == 'root' && echo ${RED})\u${COLOR_NONE}"
-    PS1color="$COLOR_BG_GRAY"
-    PS1="${PS1error}${COLOR_NONE}${PS1user}@\h $PS1color\w${COLOR_NONE}${GIT_PS1}${COLOR_NONE} > "
-}
-
-if [ "$color_prompt" = yes ]; then
-    PROMPT_COMMAND=prompt_func
-else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-fi
-
-unset color_prompt force_color_prompt
 # }}}
 
 # {{{* nodejs
@@ -270,11 +247,51 @@ then
 fi
 # }}}
 
-export PATH=~/.bin:$PATH
+# {{{ bash completion
 
-[[ -n  "$( ls ~/.fonts/*-Powerline.* 2>/dev/null )" ]] && export POWERLINE_FONT="true" || export POWERLINE_FONT="false"
+if [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi
+
+# }}}
+
+# {{{ Prompt
+
+force_color_prompt=yes
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] ; then #&& tput setf 1 >&/dev/null; then
+        # We have color support; assume it's compliant with Ecma-48
+        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+        # a case would tend to support setf rather than setaf.)
+        color_prompt=yes
+    else
+        color_prompt=
+    fi
+fi
+
+function prompt_func () {
+    lastret=$?
+    if [[ -e "${HOME}/.lib/git_ps1.sh" ]] && [[ -e "/usr/bin/timeout" ]]
+    then
+        GIT_PS1=$(timeout 1 ${HOME}/.lib/git_ps1.sh)
+    fi
+    PS1error=$( test $lastret -gt 0 && echo "${COLOR_BG_RED}[$lastret]${COLOR_NONE} ")
+    PS1user="$( test `whoami` == 'root' && echo ${RED})\u${COLOR_NONE}"
+    PS1color="$COLOR_BG_GRAY"
+    PS1="${PS1error}${COLOR_NONE}${PS1user}@\h $PS1color\w${COLOR_NONE}${GIT_PS1}${COLOR_NONE} > "
+}
+
+if [ "$color_prompt" = yes ]; then
+    PROMPT_COMMAND=prompt_func
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+
+unset color_prompt force_color_prompt
 
 #[[ $- == *i* ]]   &&   . ~/.lib/git-prompt/git-prompt.sh
+
+# }}}
 
 #trap "$HOME/.logout" 0
 
