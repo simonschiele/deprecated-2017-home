@@ -208,9 +208,9 @@ fi
 
 function prompt_func () {
     lastret=$?
-    if [[ -e "/usr/local/bin/git_ps1" ]] && [[ -e "/usr/bin/timeout" ]]
+    if [[ -e "${HOME}/.lib/git_ps1.sh" ]] && [[ -e "/usr/bin/timeout" ]]
     then
-        GIT_PS1=$(timeout 1 git_ps1)
+        GIT_PS1=$(timeout 1 ${HOME}/.lib/git_ps1.sh)
     fi
     PS1error=$( test $lastret -gt 0 && echo "${COLOR_BG_RED}[$lastret]${COLOR_NONE} ")
     PS1user="$( test `whoami` == 'root' && echo ${RED})\u${COLOR_NONE}"
