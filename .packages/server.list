@@ -3,4 +3,17 @@
 # ------------------------------------------------------------------------
 # System
 Network: mosh whois 
+Security: snort
+Compression: p7zip unzip zip rar unrar 
+Shells: zsh
+Tools: debian-goodies
 # ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+# Development
+Build tools: build-essential make cmake automake1.9 rake 
+Sourceverwaltung: bzr subversion mercurial
+Database: sqlite3
+Tools: ack-grep xmlstarlet
+# ------------------------------------------------------------------------
+

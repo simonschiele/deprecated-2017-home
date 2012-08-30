@@ -5,12 +5,12 @@ Time: tzdata ntpdate
 Lang: locales kbd
 Status: htop dstat iotop iptraf lsof
 USB: usbutils
-Security: cryptsetup sudo openvpn
+Security: iptables cryptsetup sudo openvpn
 Network: ethtool ssh netcat fping curl wget traceroute dnsutils telnet tcpdump pastebinit
 Filesystems: btrfs-tools xfsprogs sshfs 
 Maintainance: etckeeper
 Compression: bzip2 
-Tools: hexedit less psmisc hdparm links 
+Tools: hexedit less psmisc hdparm links xml2 colordiff
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
