@@ -34,7 +34,7 @@ Python Libs: python-twisted python-sqlite python-scrapy python-scapy python-web2
 PHP Libs: smarty3 php5-pgsql php5-mysql 
 Database: sqlite3
 Webserver: apache2
-Tools: ack-grep xmlstarlet
+Tools: xmlstarlet
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------

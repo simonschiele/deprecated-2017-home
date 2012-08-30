@@ -14,6 +14,6 @@ Tools: debian-goodies
 Build tools: build-essential make cmake automake1.9 rake 
 Sourceverwaltung: bzr subversion mercurial
 Database: sqlite3
-Tools: ack-grep xmlstarlet
+Tools: xmlstarlet
 # ------------------------------------------------------------------------
 

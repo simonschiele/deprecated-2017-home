@@ -1,0 +1,30 @@
+. minimal.list
+
+# ------------------------------------------------------------------------
+# System  
+Filesystems: cifs-utils ntfs-3g
+Shells: zsh
+Compression: p7zip unzip zip rar unrar 
+Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter alsa-base alsa-utils 
+Tools: debian-goodies 
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+# X11
+Base: xbase-clients awesome lightdm
+Terminal: gnome-terminal xterm
+Network: synergy
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+# Development
+Sourceverwaltung: bzr subversion mercurial
+Build tools: build-essential make cmake automake1.9 rake 
+# ------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------
+# Multimedia
+Video: ffmpeg clive
+Images: imagemagick
+# ------------------------------------------------------------------------
+

@@ -10,7 +10,7 @@ Network: ethtool ssh netcat fping curl wget traceroute dnsutils telnet tcpdump p
 Filesystems: btrfs-tools xfsprogs sshfs 
 Maintainance: etckeeper
 Compression: bzip2 
-Tools: hexedit less psmisc hdparm links xml2 colordiff
+Tools: hexedit less psmisc hdparm links xml2 colordiff 
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
@@ -19,5 +19,6 @@ Editor: vim-nox exuberant-ctags cscope
 Sourceverwaltung: git
 Shells: bash 
 Debug: strace
+Tools: ack-grep
 # ------------------------------------------------------------------------
 
