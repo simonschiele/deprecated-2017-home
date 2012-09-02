@@ -15,7 +15,6 @@ BOOTSTRAP_USERNAME=${BOOTSTRAP_USERNAME:-"simon"}
 BOOTSTRAP_TARGET=${BOOTSTRAP_TARGET:-"/dev/sdX"}
 BOOTSTRAP_MOUNT=${BOOTSTRAP_MOUNT:-"/media/root"}
 BOOTSTRAP_64=${BOOTSTRAP_64:-false}
-BOOTSTRAP_SWAP=${BOOTSTRAP_SWAP:-true}
 BOOTSTRAP_SSD=${BOOTSTRAP_SSD:-true}
 BOOTSTRAP_SUITE=${BOOTSTRAP_SUITE:-"testing"}
 BOOTSTRAP_MIRROR=${BOOTSTRAP_MIRROR:-"http://ftp2.de.debian.org/debian"}
@@ -44,7 +43,6 @@ echo -e "\tBOOTSTRAP_USERNAME\t\t(like \"simon\")"
 echo -e "\tBOOTSTRAP_TARGET\t\t(like \"/dev/sdc\")"
 echo -e "\tBOOTSTRAP_MOUNT\t\t\t(like \"/media/root\")"
 echo -e "\tBOOTSTRAP_64\t\t\t(like true|false)"
-echo -e "\tBOOTSTRAP_SWAP\t\t\t(like true|false)"
 echo -e "\tBOOTSTRAP_SSD\t\t\t(like true|false)"
 echo -e "\tBOOTSTRAP_SUITE\t\t\t(like \"testing\")"
 echo -e "\tBOOTSTRAP_MIRROR\t\t(like \"http://ftp2.de.debian.org/debian\")"
@@ -57,7 +55,6 @@ echo -e "\tdefault user: ${BOOTSTRAP_USERNAME}"
 echo -e "\tsuite: ${BOOTSTRAP_SUITE}"
 echo -e "\tmirror: ${BOOTSTRAP_MIRROR}"
 echo -e "\t64bit: ${BOOTSTRAP_64}"
-echo -e "\tSWAP: ${BOOTSTRAP_SWAP}"
 echo -e "\tSSD: ${BOOTSTRAP_SSD}"
 echo
 echo ">>> STARTING"
@@ -90,27 +87,48 @@ then
     exit 1 
 fi
 
-if [ $( get_size ${BOOTSTRAP_TARGET} | sed 's|[A-Za-z,\.]||g' ) -gt 20 ]
+SMALL=false
+if [ $( get_size ${DEV} | sed 's|[A-Za-z]||g' | cut -f'1' -d'.' | cut -f'1' -d',' ) -lt 25 ]
 then
-    echo "Target groesser als 20gb"
-else
-    echo "Target kleiner als 20gb"
+    message "error" "Device is only $( get_size ${DEV} ). Should be at least 25GB. Will do small partition type."
+    SMALL=true
 fi
 
 echo ">>> Partitioning Drive '${BOOTSTRAP_TARGET}'"
 echo "> Creating Partition Label"
 parted -s ${BOOTSTRAP_TARGET} mklabel msdos >> log/step1.log
 
-echo "> Creating '/boot' (${BOOTSTRAP_TARGET}1, 1024MB)"
-parted -s ${BOOTSTRAP_TARGET} mkpart primary 1M 1025M >> log/step1.log
-
-echo "> Creating '/' (${BOOTSTRAP_TARGET}2, 3072MB)"
-parted -s ${BOOTSTRAP_TARGET} mkpart primary 1024M 4096M >> log/step1.log
-
-if ( ${BOOTSTRAP_SWAP} )
+if ( ${SMALL} )
 then
-    echo "> Creating 'swap' (${BOOTSTRAP_TARGET}3, 512MB)"
-    parted -s ${BOOTSTRAP_TARGET} mkpart primary 4096M 4608M >> log/step1.log
+    echo "> Creating '/boot' (${BOOTSTRAP_TARGET}1, 1024MB)"
+    parted -s ${BOOTSTRAP_TARGET} mkpart primary 1M 1025M >> log/step1.log
+
+    if ( ${BOOTSTRAP_SSD} )
+    then
+        echo "> Creating '/' (${BOOTSTRAP_TARGET}2, )"
+        parted -s ${BOOTSTRAP_TARGET} mkpart primary 1025M $( get_size ${DEV} ) >> log/step1.log
+    else
+        echo "> Creating '/' (${BOOTSTRAP_TARGET}2, )"
+        parted -s ${BOOTSTRAP_TARGET} mkpart primary 1025M $( get_size ${DEV} ) >> log/step1.log
+    
+        echo "> Creating 'swap' (${BOOTSTRAP_TARGET}3, 512MB) (MISSING)"
+        #parted -s ${BOOTSTRAP_TARGET} mkpart primary 4096M 4608M >> log/step1.log
+    fi
+else
+    echo "> Creating '/boot' (${BOOTSTRAP_TARGET}1, 6145MB)"
+    parted -s ${BOOTSTRAP_TARGET} mkpart primary 1M 6145M >> log/step1.log
+
+    if ( ${BOOTSTRAP_SSD} )
+    then
+        echo "> Creating '/' (${BOOTSTRAP_TARGET}2, )"
+        parted -s ${BOOTSTRAP_TARGET} mkpart primary 1025M $( get_size ${DEV} ) >> log/step1.log
+    else
+        echo "> Creating '/' (${BOOTSTRAP_TARGET}2, )"
+        parted -s ${BOOTSTRAP_TARGET} mkpart primary 1025M $( get_size ${DEV} ) >> log/step1.log
+    
+        echo "> Creating 'swap' (${BOOTSTRAP_TARGET}3, 512MB) (MISSING)"
+        #parted -s ${BOOTSTRAP_TARGET} mkpart primary 4096M 4608M >> log/step1.log
+    fi
 fi
 
 echo ">>> Setup Luks for '/' on ${BOOTSTRAP_TARGET}2" 
@@ -132,10 +150,10 @@ mkfs.ext3 -q -L boot ${BOOTSTRAP_TARGET}1 >> log/step1.log
 echo "> Format '/dev/mapper/root' (${BOOTSTRAP_TARGET}2, btrfs)"
 mkfs.btrfs -L root /dev/mapper/root >> log/step1.log
 
-if ( ${BOOTSTRAP_SWAP} )
+if ! ( ${BOOTSTRAP_SSD} )
 then
-    echo "> Format 'swap' (${BOOTSTRAP_TARGET}3, swap)"
-    mkswap -L swap ${BOOTSTRAP_TARGET}3 >> log/step1.log
+    echo "> Format 'swap' (${BOOTSTRAP_TARGET}3, swap) (MISSING)"
+    #mkswap -L swap ${BOOTSTRAP_TARGET}3 >> log/step1.log
 
     echo ">>> Setting up random encrypted swap (MISSING)"
 fi
@@ -223,7 +241,6 @@ echo "BOOTSTRAP_MIRROR=${BOOTSTRAP_MIRROR}" >> ${BOOTSTRAP_MOUNT}/installer/sett
 echo "BOOTSTRAP_TARGET=${BOOTSTRAP_TARGET}" >> ${BOOTSTRAP_MOUNT}/installer/settings.sh
 echo "BOOTSTRAP_MOUNT=${BOOTSTRAP_MOUNT}" >> ${BOOTSTRAP_MOUNT}/installer/settings.sh
 echo "BOOTSTRAP_64=${BOOTSTRAP_64}" >> ${BOOTSTRAP_MOUNT}/installer/settings.sh
-echo "BOOTSTRAP_SWAP=${BOOTSTRAP_SWAP}" >> ${BOOTSTRAP_MOUNT}/installer/settings.sh
 echo "BOOTSTRAP_SSD=${BOOTSTRAP_SSD}" >> ${BOOTSTRAP_MOUNT}/installer/settings.sh
 echo "BOOTSTRAP_PACKAGES=${BOOTSTRAP_PACKAGES}" >> ${BOOTSTRAP_MOUNT}/installer/settings.sh
 
