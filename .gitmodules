@@ -7,3 +7,6 @@
 [submodule ".lib/TickTick"]
 	path = .lib/TickTick
 	url = https://github.com/kristopolous/TickTick
+[submodule ".lib/git-prompt"]
+	path = .lib/git-prompt
+	url = git://github.com/lvv/git-prompt.git
