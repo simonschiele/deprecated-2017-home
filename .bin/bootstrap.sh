@@ -27,7 +27,7 @@ errorexit() {
 }
 
 get_size() {
-    parted -m -l | grep "^${@}" | cut -f'2' -d':'
+    parted -s -m -l | grep "^${@}" | cut -f'2' -d':'
 }
 
 echo
