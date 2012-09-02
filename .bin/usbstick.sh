@@ -143,6 +143,19 @@ list_devices() {
     udisks --dump | grep device-file | sed 's|^.*\:\ *\(.*\)|\1|g' | while read dev ; do if ( udisks --show-info ${dev} | grep -q "removable.*1" ) ; then echo "${dev}" ; fi ; done
 }
 
+update_available() {
+    URL="${1:-'http://simon.psaux.de/git/home.git/plain/.bin/usbstick.sh'}"
+    FILE="${2:-${0}}"
+    REMOTE_CHECKSUM=$( wget -q -O- "${URL}" | md5sum | awk {'print $1'} )
+    LOCAL_CHECKSUM=$( md5sum "${FILE}" | awk {'print $1'} )
+    if [ ${REMOTE_CHECKSUM} != ${LOCAL_CHECKSUM} ]
+    then
+        return 0
+    else
+        return 1 
+    fi
+}
+
 check_checksum() {
     checksumstr="${1}"
     file="${2}"
@@ -222,6 +235,17 @@ else
 fi
 
 # }}}
+
+# {{{ Check for updates
+
+if ( update_available )
+then
+    message "info" "There is an update available for this script"\!\!\!
+fi
+
+# }}}
+
+
 
 # {{{ Check existing sticks
 devices=$( list_devices )
