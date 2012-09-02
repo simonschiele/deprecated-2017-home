@@ -71,6 +71,19 @@ convert2() {
     ext=${1} ; shift ; for file ; do echo -n ; [ -e "$file" ] && ( echo -e "\n\n[CONVERTING] ${file} ==> ${file%.*}.${ext}" && ffmpeg -loglevel error -i "${file}" -strict experimental "${file%.*}.${ext}" && echo rm -i "${file}" ) || echo "[ERROR] File not found: ${file}" ; done
 }
 
+debian_packages_list() {
+    type="${1}.list"
+    if ! [ -e ${HOME}/.packages/${type} ] || [ -z "${@}" ]
+    then
+        echo "Unknown Systemtype '${HOME}/.packages/${type}'"
+        return 1
+    fi
+    lists="$type $(grep ^[\.] ${HOME}/.packages/${type} | sed 's|^[\.]\ *||g')"
+    lists=$( echo $lists | sed 's|\([A-Za-z0-9]*\.list\)|${HOME}/.packages/\1|g' )
+    
+    sed -e '/^\ *$/d' -e '/^\ *#/d' -e '/^[\.]/d' $( eval echo $lists ) | cut -d':' -f'2-' | xargs
+}
+
 confirm() {
     if [ -z ${@} ]
     then
@@ -130,16 +143,13 @@ alias t="true"
 alias f="false"
 
 alias debian_version="lsb_release -a"
-alias debian_packages_minimal="cat \$( grep '^\.\ ' ~/.packages/minimal.list | sed 's|^\. *||g' | sed 's|^|\~/\.packages/|g' | xargs ) ~/.packages/minimal.list | sed -e '/^\.[ ]/d' -e '/^#/d' -e '/^[ ]*$/d' -e 's|^\(.*\):\(.*\)$|\2|g' -e 's|^[ ]*||g' | xargs"
-alias debian_packages_server="cat \$( grep '^\.\ ' ~/.packages/server.list | sed 's|^\. *||g' | sed 's|^|\~/\.packages/|g' | xargs ) ~/.packages/server.list | sed -e '/^\.[ ]/d' -e '/^#/d' -e '/^[ ]*$/d' -e 's|^\(.*\):\(.*\)$|\2|g' -e 's|^[ ]*||g' | xargs"
-alias debian_packages_workstation="cat \$( grep '^\.\ ' ~/.packages/workstation.list | sed 's|^\. *||g' | sed 's|^|\~/\.packages/|g' | xargs ) ~/.packages/workstation.list | sed -e '/^\.[ ]/d' -e '/^#/d' -e '/^[ ]*$/d' -e 's|^\(.*\):\(.*\)$|\2|g' -e 's|^[ ]*||g' | xargs"
-alias debian_packages_laptop="cat \$( grep '^\.\ ' ~/.packages/laptop.list | sed 's|^\. *||g' | sed 's|^|\~/\.packages/|g' | xargs ) ~/.packages/laptop.list | sed -e '/^\.[ ]/d' -e '/^#/d' -e '/^[ ]*$/d' -e 's|^\(.*\):\(.*\)$|\2|g' -e 's|^[ ]*||g' | xargs"
 alias debian_packages_list_by_size="dpkg-query -W --showformat='\${Installed-Size;10}\t\${Package}\n' | sort -k1,1n"
 alias debian_packages_list_configfiles="dpkg-query -f '\n\n\${Package} \n\${Conffiles}' -W"
 alias debian_packages_list_experimental='aptitude -t experimental search -F "%p %?V %?v %?t" --disable-columns .|grep -v none| grep experimental| awk "{if( \$2 == \$3) print \$1}"'
 alias debian_packages_list_unstable="aptitude -t unstable search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep unstable| awk '{if( \$2 == \$3) print \$1}'"
 alias debian_packages_list_testing="aptitude -t testing search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep testing| awk '{if( \$2 == \$3) print \$1}'"
 alias debian_packages_list_stable="aptitude -t stable search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep stable| awk '{if( \$2 == \$3) print \$1}'"
+alias debian_packages_list_my="debian_packages_list \$(grep ^systemtype ~/.system.conf | cut -f'2-' -d'=' | sed 's|[\"]||g')"
 
 alias hooks_run="eval \$( grep ^systemtype= ~/.system.conf ) find ~/.hooks/* | while read hook ; do if (( grep -iq -e ^hook_systemtype.*\${systemtype} \$hook ) && ( grep -iq ^hook_optional.*false \$hook )) ; then ~/.hooks/loader.sh \$hook ; fi ; done"
 alias repo_compare="[ \"x\${repo}\" == \"x\" ] && ( echo 'Please export \$repo variable like:' ; echo 'export \$repo=\"dot.vim.git\"' ; exit 1 ) || ( mkdir \$repo/ ; cd \$repo ; git clone http://simon.psaux.de/git/\${repo} psaux/ ; git clone https://github.com/simonschiele/\${repo} github/ ; echo \"psaux\" ; cd psaux/ ; git plog | head -n 11 ; echo -e \"\ngithub\" ; cd ../github/ ; git plog | head -n 10 ; cd ../../ )"
