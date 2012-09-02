@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------
 # System
 Network: mosh whois 
-Security: snort
+Security: snort openvpn
 Compression: p7zip unzip zip rar unrar 
 Shells: zsh
 Tools: debian-goodies
