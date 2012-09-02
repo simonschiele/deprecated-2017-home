@@ -81,16 +81,16 @@ echo ">>> Creating log/"
 mkdir -p log/
 
 echo ">>> Checking drive size"
-if ! [ "xGB" == "$( get_size ${BOOTSTRAP_TARGET} | sed 's|[0-9,\.]||g' )" ]
+if ! [ "xGB" == "x$( get_size ${BOOTSTRAP_TARGET} | sed 's|[0-9,\.]||g' )" ]
 then
     echo "Drive size not in GB. Can not continue."
     exit 1 
 fi
 
 SMALL=false
-if [ $( get_size ${DEV} | sed 's|[A-Za-z]||g' | cut -f'1' -d'.' | cut -f'1' -d',' ) -lt 25 ]
+if [ $( get_size ${BOOTSTRAP_TARGET} | sed 's|[A-Za-z]||g' | cut -f'1' -d'.' | cut -f'1' -d',' ) -lt 25 ]
 then
-    message "error" "Device is only $( get_size ${DEV} ). Should be at least 25GB. Will do small partition type."
+    message "error" "Device is only $( get_size ${BOOTSTRAP_TARGET} ). Should be at least 25GB. Will do small partition type."
     SMALL=true
 fi
 
@@ -106,10 +106,10 @@ then
     if ( ${BOOTSTRAP_SSD} )
     then
         echo "> Creating '/' (${BOOTSTRAP_TARGET}2, )"
-        parted -s ${BOOTSTRAP_TARGET} mkpart primary 1025M $( get_size ${DEV} ) >> log/step1.log
+        parted -s ${BOOTSTRAP_TARGET} mkpart primary 1025M $( get_size ${BOOTSTRAP_TARGET} ) >> log/step1.log
     else
         echo "> Creating '/' (${BOOTSTRAP_TARGET}2, )"
-        parted -s ${BOOTSTRAP_TARGET} mkpart primary 1025M $( get_size ${DEV} ) >> log/step1.log
+        parted -s ${BOOTSTRAP_TARGET} mkpart primary 1025M $( get_size ${BOOTSTRAP_TARGET} ) >> log/step1.log
     
         echo "> Creating 'swap' (${BOOTSTRAP_TARGET}3, 512MB) (MISSING)"
         #parted -s ${BOOTSTRAP_TARGET} mkpart primary 4096M 4608M >> log/step1.log
@@ -121,10 +121,10 @@ else
     if ( ${BOOTSTRAP_SSD} )
     then
         echo "> Creating '/' (${BOOTSTRAP_TARGET}2, )"
-        parted -s ${BOOTSTRAP_TARGET} mkpart primary 1025M $( get_size ${DEV} ) >> log/step1.log
+        parted -s ${BOOTSTRAP_TARGET} mkpart primary 1025M $( get_size ${BOOTSTRAP_TARGET} ) >> log/step1.log
     else
         echo "> Creating '/' (${BOOTSTRAP_TARGET}2, )"
-        parted -s ${BOOTSTRAP_TARGET} mkpart primary 1025M $( get_size ${DEV} ) >> log/step1.log
+        parted -s ${BOOTSTRAP_TARGET} mkpart primary 1025M $( get_size ${BOOTSTRAP_TARGET} ) >> log/step1.log
     
         echo "> Creating 'swap' (${BOOTSTRAP_TARGET}3, 512MB) (MISSING)"
         #parted -s ${BOOTSTRAP_TARGET} mkpart primary 4096M 4608M >> log/step1.log
