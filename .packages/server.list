@@ -6,7 +6,7 @@ Network: mosh whois
 Security: snort openvpn
 Compression: p7zip unzip zip rar unrar 
 Shells: zsh
-Tools: debian-goodies
+Tools: debian-goodies multitail
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
