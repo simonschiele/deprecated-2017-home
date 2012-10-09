@@ -9,7 +9,7 @@ Shells: zsh
 Compression: p7zip unzip zip rar unrar 
 Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter alsa-base alsa-utils 
 USB: usb-modeswitch 
-Tools: bchunk debian-goodies debootstrap
+Tools: bchunk debian-goodies debootstrap multitail
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
