@@ -118,6 +118,11 @@ else
     export POWERLINE_FONT="false"
 fi
 
+if [ -d ~/.lib/git-flow-completion/ ]
+then
+    source ~/.lib/git-flow-completion/git-flow-completion.bash 
+fi
+
 export PAGER=less
 export EDITOR="/usr/bin/vim"
 export HR="============================================================"

@@ -10,3 +10,6 @@
 [submodule ".lib/git-prompt"]
 	path = .lib/git-prompt
 	url = git://github.com/lvv/git-prompt.git
+[submodule ".lib/git-flow-completion"]
+	path = .lib/git-flow-completion
+	url = https://github.com/bobthecow/git-flow-completion.git
