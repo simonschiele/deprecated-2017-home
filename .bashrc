@@ -167,6 +167,7 @@ alias permissions_normalize_system="chown ${SUDO_USER:-$USER}: ~/ -R ; find /hom
 alias grep_ip='grep -o '"'"'\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}'"'"
 alias grep_urls="sed -e \"s|'|\\\"|g\" -e \"s|src|href|g\" | sed -e \"s|href|\nhref|g\" | grep -i -e \"href[ ]*=\" | sed 's/.*href[ ]*=[ ]*[\"]*\(.*\)[\"\ ].*/\1/g' | cut -f'1' -d'\"'"
 alias grep_year="grep -o '[1-2]\{1\}[0-9]\{3\}'"
+alias highlite="grep --color=auto -e ^ -e"
 alias random_password="openssl rand -base64 12"
 alias random_mac="openssl rand -hex 6 | sed 's/\(..\)/\1:/g; s/.$//'"
 alias random_ip="nmap -iR 1 -sL -n | grep_ip -o"
