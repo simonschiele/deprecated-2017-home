@@ -2,7 +2,7 @@
 # System 
 Base: binutils 
 Time: tzdata ntpdate
-Lang: locales kbd
+Lang: locales kbd keyboard-configuration
 Status: htop dstat iotop iptraf lsof
 USB: usbutils
 Security: iptables cryptsetup sudo
