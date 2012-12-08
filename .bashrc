@@ -2,7 +2,17 @@
 
 # {{{ Colors
 
-if [[ "$TERM" =~ "xterm" ]]; then
+if [ -x /usr/bin/tput ] && ( tput setf 1 >&/dev/null ) ; then
+    # We have color support; assume it's compliant with Ecma-48
+    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+    # a case would tend to support setf rather than setaf.)
+    color_support=true
+else
+    # We have color support; assume it's compliant with Ecma-48
+    color_support=false
+fi
+
+if ( $color_support ) && [[ "$TERM" =~ "xterm" ]]; then
     if [[ -n "$XTERM_VERSION" ]]; then
         # xterm
         COLORCOUNT="256"
@@ -274,41 +284,56 @@ fi
 
 # {{{ Prompt
 
-force_color_prompt=yes
-if [ -n "$force_color_prompt" ]; then
-    if [ -x /usr/bin/tput ] ; then #&& tput setf 1 >&/dev/null; then
-        # We have color support; assume it's compliant with Ecma-48
-        # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-        # a case would tend to support setf rather than setaf.)
-        color_prompt=yes
-    else
-        color_prompt=
-    fi
+prompt_colored=true
+prompt_git=true
+
+if ( ! $color_support ) 
+then
+    prompt_colored=false
 fi
 
 function prompt_func () {
     lastret=$?
-    if [[ -e "${HOME}/.lib/git_ps1.sh" ]] && [[ -e "/usr/bin/timeout" ]]
+    
+    if ( ${prompt_colored} )
     then
-        GIT_PS1=$(timeout 1 ${HOME}/.lib/git_ps1.sh)
+        PS1error=$( test $lastret -gt 0 && echo "${COLOR_BG_RED}[$lastret]${COLOR_NONE} ")
+        PS1user="$( test $( id -u ) -eq 0 && echo ${RED})\u${COLOR_NONE}"
+        PS1host="\h"
+        PS1path="${COLOR_BG_GRAY}\w${COLOR_NONE}"
+    else
+        PS1error=$( test $lastret -gt 0 && echo "[$lastret] ")
+        PS1user="\u"
+        PS1host="\h"
+        PS1path="\w"
     fi
-    PS1error=$( test $lastret -gt 0 && echo "${COLOR_BG_RED}[$lastret]${COLOR_NONE} ")
-    PS1user="$( test `whoami` == 'root' && echo ${RED})\u${COLOR_NONE}"
-    PS1color="$COLOR_BG_GRAY"
-    PS1="${PS1error}${COLOR_NONE}${PS1user}@\h $PS1color\w${COLOR_NONE}${GIT_PS1}${COLOR_NONE} > "
+
+    if ${prompt_git} && [[ -e "${HOME}/.lib/git_ps1.sh" ]] && [[ -n "$( which timeout )" ]]
+    then
+        PS1git=$( timeout 1 ${HOME}/.lib/git_ps1.sh ${prompt_colored} )
+    else
+        prompt_git=false
+        PS1git=
+    fi
+    
+    PS1chroot=
+    PS1prompt=" > "
+    
+    #PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+    PS1="${PS1error}${PS1chroot}${PS1user}@${PS1host} ${PS1path} ${PS1git}${PS1prompt}"
 }
 
-if [ "$color_prompt" = yes ]; then
-    PROMPT_COMMAND=prompt_func
-else
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-fi
-
-unset color_prompt force_color_prompt
+PROMPT_COMMAND=prompt_func
 
 #[[ $- == *i* ]]   &&   . ~/.lib/git-prompt/git-prompt.sh
 
 # }}}
 
-#trap "$HOME/.logout" 0
+if [ -e ${HOME}/.bash_logout ]
+then
+    trap "$HOME/.bash_logout" 0
+elif [ -e ${HOME}/.logout ]
+then
+    trap "$HOME/.logout" 0
+fi
 
