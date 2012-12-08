@@ -16,5 +16,6 @@ eval "$( gnome-keyring-daemon --start --components=keyring,pkcs11,ssh,secrets )"
 export GNOME_KEYRING_PID
 export GNOME_KEYRING_SOCKET
 
-exec ck-launch-session dbus-launch --sh-syntax --exit-with-session awesome 2>>${HOME}/.xsession-errors >&2
+#exec ck-launch-session dbus-launch --sh-syntax --exit-with-session awesome 2>>${HOME}/.xsession-errors >&2
+exec dbus-launch --exit-with-session awesome 2>>${HOME}/.xsession-errors >&2
 
