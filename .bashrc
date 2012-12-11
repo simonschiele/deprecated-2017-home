@@ -311,11 +311,7 @@ function prompt_func () {
         prompt_git=false
         PS1git=
     fi
-    
-    if [[ -n ${PS1git} ]]
-    then
-        PS1git=" ${PS1git}"
-    fi
+    PS1git=${PS1git:+ ${PS1git}}
     PS1chroot=
     PS1prompt=" > "
     
