@@ -312,11 +312,15 @@ function prompt_func () {
         PS1git=
     fi
     
+    if [[ -n ${PS1git} ]]
+    then
+        PS1git=" ${PS1git}"
+    fi
     PS1chroot=
     PS1prompt=" > "
     
     #PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
-    PS1="${PS1error}${PS1chroot}${PS1user}@${PS1host} ${PS1path} ${PS1git}${PS1prompt}"
+    PS1="${PS1error}${PS1chroot}${PS1user}@${PS1host} ${PS1path}${PS1git}${PS1prompt}"
 }
 
 PROMPT_COMMAND=prompt_func
