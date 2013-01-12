@@ -117,13 +117,20 @@ if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-if [ -n  "$( ls ~/.fonts/*-Powerline.* 2>/dev/null )" ]
+# check if powerline patched font for vim is available
+if [ -n  "$( ls ~/.fonts/*-owerline.* 2>/dev/null )" ]
 then
     export POWERLINE_FONT="true"
 else
     export POWERLINE_FONT="false"
 fi
 
+# bash_completion
+if [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi
+
+# git-flow-completion
 if [ -d ~/.lib/git-flow-completion/ ]
 then
     source ~/.lib/git-flow-completion/git-flow-completion.bash 
@@ -225,57 +232,6 @@ fi
 
 alias route_via_wlan="for i in \`seq 1 10\` ; do route del default 2>/dev/null ; done ; route add default eth0 ; route add default wlan0 ; route add default gw \"\$( /sbin/ifconfig wlan0 | grep_ip | head -n 1 | cut -f'1-3' -d'.' ).1\""
 #nrg2iso() { dd bs=1k if="$1" of="$2" skip=300 }
-# }}}
-
-# {{{* nodejs
-if [ -d $HOME/local/node/ ]
-then
-    ###-begin-npm-completion-###
-    COMP_WORDBREAKS=${COMP_WORDBREAKS/=/}
-    COMP_WORDBREAKS=${COMP_WORDBREAKS/@/}
-    export COMP_WORDBREAKS
-
-    if complete &>/dev/null; then
-      _npm_completion () {
-        local si="$IFS"
-        IFS=$'\n' COMPREPLY=($(COMP_CWORD="$COMP_CWORD" \
-                               COMP_LINE="$COMP_LINE" \
-                               COMP_POINT="$COMP_POINT" \
-                               npm completion -- "${COMP_WORDS[@]}" \
-                               2>/dev/null)) || return $?
-        IFS="$si"
-      }
-      complete -F _npm_completion npm
-    elif compctl &>/dev/null; then
-      _npm_completion () {
-        local cword line point words si
-        read -Ac words
-        read -cn cword
-        let cword-=1
-        read -l line
-        read -ln point
-        si="$IFS"
-        IFS=$'\n' reply=($(COMP_CWORD="$cword" \
-                           COMP_LINE="$line" \
-                           COMP_POINT="$point" \
-                           npm completion -- "${words[@]}" \
-                           2>/dev/null)) || return $?
-        IFS="$si"
-      }
-      compctl -K _npm_completion npm
-    fi
-    ###-end-npm-completion-###
-    export PATH=$HOME/local/node/bin:$PATH
-    export NODE_PATH=$HOME/local/node:$HOME/local/node/lib/node_modules
-fi
-# }}}
-
-# {{{ bash completion
-
-if [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-fi
-
 # }}}
 
 # {{{ Prompt
