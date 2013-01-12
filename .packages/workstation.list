@@ -31,6 +31,7 @@ Sourceverwaltung: bzr subversion mercurial
 Interpreter und Compiler: ipython erlang gcc g++ php5-cli lua5.1
 Build tools: build-essential make cmake automake1.9 rake 
 Python Libs: python-twisted python-sqlite python-scrapy python-scapy python-web2py
+lua Libs: liblua5.1-oocairo0
 PHP Libs: smarty3 php5-pgsql php5-mysql 
 Database: sqlite3
 Webserver: apache2
