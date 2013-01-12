@@ -71,6 +71,37 @@ fi
 
 # }}}
 
+# {{{ Path
+
+if [ -d ${HOME}/bin ]
+then
+    PATH="${HOME}/bin:$PATH"
+fi
+
+if [ -d ${HOME}/.bin ]
+then
+    PATH="${HOME}/.bin:$PATH"
+fi
+
+if [ -d ${HOME}/.hooks ]
+then
+    PATH="${HOME}/.hooks:$PATH"
+fi
+
+# }}}
+
+# {{{ logout 
+
+if [ -x ${HOME}/.bash_logout ]
+then
+    trap "$HOME/.bash_logout" 0
+elif [ -x ${HOME}/.logout ]
+then
+    trap "$HOME/.logout" 0
+fi
+
+# }}}
+
 # {{{ Helper Functions
 
 convert2() {
@@ -143,8 +174,6 @@ export HR="============================================================"
 export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
 export HISTCONTROL=ignoreboth
 shopt -s histappend
-
-export PATH=~/.bin:$PATH
 
 # }}}
 
@@ -280,12 +309,4 @@ PROMPT_COMMAND=prompt_func
 #[[ $- == *i* ]]   &&   . ~/.lib/git-prompt/git-prompt.sh
 
 # }}}
-
-if [ -e ${HOME}/.bash_logout ]
-then
-    trap "$HOME/.bash_logout" 0
-elif [ -e ${HOME}/.logout ]
-then
-    trap "$HOME/.logout" 0
-fi
 

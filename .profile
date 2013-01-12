@@ -1,7 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
-if [ -r ~/.bashrc ]
-then
-    . ~/.bashrc
+if [ -n "$BASH_VERSION" ]; then
+    if [ -f "$HOME/.bashrc" ]; then
+	. "$HOME/.bashrc"
+    fi
 fi
 
