@@ -1,6 +1,7 @@
 #!/bin/sh
 
-echo "[date] starting xorg" > $HOME/.xsession-errors
+cp -f ${HOME}/.xsession-errors ${HOME}/.xsession-errors.old 2>/dev/null >&2
+echo "[date] starting xorg > policy/key stuff > awesome" > ${HOME}/.xsession-errors
 
 for process in polkit-gnome-authentication-agent-1 gnome-keyring-daemon
 do
