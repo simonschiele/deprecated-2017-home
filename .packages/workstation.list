@@ -4,7 +4,7 @@
 # System  
 Network: whois wakeonlan 
 Security: snort nmap wireshark openvpn
-Filesystems: mtpfs gphotofs cifs-utils ntfs-3g
+Filesystems: gphotofs cifs-utils ntfs-3g
 Shells: zsh
 Compression: p7zip unzip zip rar unrar 
 Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter alsa-base alsa-utils 
