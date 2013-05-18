@@ -279,12 +279,18 @@ fi
 
 function prompt_func () {
     lastret=$?
+        
+    if [[ -n "$SSH_CLIENT$SSH2_CLIENT$SSH_TTY" ]] ; then
+        remote=true
+    else
+        remote=true
+    fi
     
     if ( ${prompt_colored} )
     then
         PS1error=$( test $lastret -gt 0 && echo "${COLOR_BG_RED}[$lastret]${COLOR_NONE} ")
         PS1user="$( test $( id -u ) -eq 0 && echo ${RED})\u${COLOR_NONE}"
-        PS1host="\h"
+        PS1host="$( test -n "$SSH_CLIENT$SSH2_CLIENT$SSH_TTY" && echo ${RED})\h${COLOR_NONE}"
         PS1path="${COLOR_BG_GRAY}\w${COLOR_NONE}"
     else
         PS1error=$( test $lastret -gt 0 && echo "[$lastret] ")
