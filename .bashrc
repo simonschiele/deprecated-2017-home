@@ -71,6 +71,37 @@ fi
 
 # }}}
 
+# {{{ Path
+
+if [ -d ${HOME}/bin ]
+then
+    PATH="${HOME}/bin:$PATH"
+fi
+
+if [ -d ${HOME}/.bin ]
+then
+    PATH="${HOME}/.bin:$PATH"
+fi
+
+if [ -d ${HOME}/.hooks ]
+then
+    PATH="${HOME}/.hooks:$PATH"
+fi
+
+# }}}
+
+# {{{ logout 
+
+if [ -x ${HOME}/.bash_logout ]
+then
+    trap "$HOME/.bash_logout" 0
+elif [ -x ${HOME}/.logout ]
+then
+    trap "$HOME/.logout" 0
+fi
+
+# }}}
+
 # {{{ Helper Functions
 
 convert2() {
@@ -117,13 +148,20 @@ if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
-if [ -n  "$( ls ~/.fonts/*-Powerline.* 2>/dev/null )" ]
+# check if powerline patched font for vim is available
+if [ -n  "$( ls ~/.fonts/*-owerline.* 2>/dev/null )" ]
 then
     export POWERLINE_FONT="true"
 else
     export POWERLINE_FONT="false"
 fi
 
+# bash_completion
+if [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+fi
+
+# git-flow-completion
 if [ -d ~/.lib/git-flow-completion/ ]
 then
     source ~/.lib/git-flow-completion/git-flow-completion.bash 
@@ -136,8 +174,6 @@ export HR="============================================================"
 export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
 export HISTCONTROL=ignoreboth
 shopt -s histappend
-
-export PATH=~/.bin:$PATH
 
 # }}}
 
@@ -195,7 +231,11 @@ alias keycodes="sudo showkey -k"
 alias list_sticks="udisks --dump | grep device-file | sed 's|^.*\:\ *\(.*\)|\1|g' | while read dev ; do if ( udisks --show-info \${dev} | grep -q \"removable.*1\" ) ; then echo \${dev} ; fi ; done"
 alias battery="upower -d | grep -e state -e percentage -e time | sed -e 's|^.*:\ *\(.*\)|\1|g' | sed 's|[ ]*$||g' | tr '\n' ' ' | sed -e 's|\ $|\n|g' | sed -e 's|^|(|g' -e 's|$|)|g'"
 alias vm_test="rm -i test.img ; [ -e ./test.img ] && echo 'reusing last image' || qemu-img create test.img 6G ; kvm -m 1024 -k de -boot d -cdrom grml96-full_2012.05.iso -hda test.img"
-alias filetypes_video="mp4 wmv flv 3gp mpeg mpg avi mkv webm"
+
+extensions_video="avi,mkv,mp4,mpg,mpeg,wmvlv,webm,3g"
+extensions_images="png,jpg,jpeg,gif,bmp,tiff,ico"
+alias find_videos="find . ! -type d $( echo ${extensions_video} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
+alias find_images="find . ! -type d $( echo ${extensions_images} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
 
 alias convert2audio="convert2 mp3"
 alias youtube-mp3="clive -f best --exec=\"echo >&2; echo '[CONVERTING] %f ==> MP3' >&2 ; ffmpeg -loglevel error -i %f -strict experimental %f.mp3 && rm -i %f\""
@@ -227,57 +267,6 @@ alias route_via_wlan="for i in \`seq 1 10\` ; do route del default 2>/dev/null ;
 #nrg2iso() { dd bs=1k if="$1" of="$2" skip=300 }
 # }}}
 
-# {{{* nodejs
-if [ -d $HOME/local/node/ ]
-then
-    ###-begin-npm-completion-###
-    COMP_WORDBREAKS=${COMP_WORDBREAKS/=/}
-    COMP_WORDBREAKS=${COMP_WORDBREAKS/@/}
-    export COMP_WORDBREAKS
-
-    if complete &>/dev/null; then
-      _npm_completion () {
-        local si="$IFS"
-        IFS=$'\n' COMPREPLY=($(COMP_CWORD="$COMP_CWORD" \
-                               COMP_LINE="$COMP_LINE" \
-                               COMP_POINT="$COMP_POINT" \
-                               npm completion -- "${COMP_WORDS[@]}" \
-                               2>/dev/null)) || return $?
-        IFS="$si"
-      }
-      complete -F _npm_completion npm
-    elif compctl &>/dev/null; then
-      _npm_completion () {
-        local cword line point words si
-        read -Ac words
-        read -cn cword
-        let cword-=1
-        read -l line
-        read -ln point
-        si="$IFS"
-        IFS=$'\n' reply=($(COMP_CWORD="$cword" \
-                           COMP_LINE="$line" \
-                           COMP_POINT="$point" \
-                           npm completion -- "${words[@]}" \
-                           2>/dev/null)) || return $?
-        IFS="$si"
-      }
-      compctl -K _npm_completion npm
-    fi
-    ###-end-npm-completion-###
-    export PATH=$HOME/local/node/bin:$PATH
-    export NODE_PATH=$HOME/local/node:$HOME/local/node/lib/node_modules
-fi
-# }}}
-
-# {{{ bash completion
-
-if [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-fi
-
-# }}}
-
 # {{{ Prompt
 
 prompt_colored=true
@@ -290,12 +279,18 @@ fi
 
 function prompt_func () {
     lastret=$?
+        
+    if [[ -n "$SSH_CLIENT$SSH2_CLIENT$SSH_TTY" ]] ; then
+        remote=true
+    else
+        remote=true
+    fi
     
     if ( ${prompt_colored} )
     then
         PS1error=$( test $lastret -gt 0 && echo "${COLOR_BG_RED}[$lastret]${COLOR_NONE} ")
         PS1user="$( test $( id -u ) -eq 0 && echo ${RED})\u${COLOR_NONE}"
-        PS1host="\h"
+        PS1host="$( test -n "$SSH_CLIENT$SSH2_CLIENT$SSH_TTY" && echo ${RED})\h${COLOR_NONE}"
         PS1path="${COLOR_BG_GRAY}\w${COLOR_NONE}"
     else
         PS1error=$( test $lastret -gt 0 && echo "[$lastret] ")
@@ -324,12 +319,4 @@ PROMPT_COMMAND=prompt_func
 #[[ $- == *i* ]]   &&   . ~/.lib/git-prompt/git-prompt.sh
 
 # }}}
-
-if [ -e ${HOME}/.bash_logout ]
-then
-    trap "$HOME/.bash_logout" 0
-elif [ -e ${HOME}/.logout ]
-then
-    trap "$HOME/.logout" 0
-fi
 
