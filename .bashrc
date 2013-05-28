@@ -83,6 +83,11 @@ then
     PATH="${HOME}/.bin:$PATH"
 fi
 
+if [ -d ${HOME}/.bin-yps ]
+then
+    PATH="${HOME}/.bin-yps:$PATH"
+fi
+
 if [ -d ${HOME}/.hooks ]
 then
     PATH="${HOME}/.hooks:$PATH"
