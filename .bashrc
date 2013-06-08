@@ -83,6 +83,11 @@ then
     PATH="${HOME}/.bin:$PATH"
 fi
 
+if [ -d ${HOME}/.bin-yps ]
+then
+    PATH="${HOME}/.bin-yps:$PATH"
+fi
+
 if [ -d ${HOME}/.hooks ]
 then
     PATH="${HOME}/.hooks:$PATH"
@@ -244,6 +249,7 @@ alias keycodes="sudo showkey -k"
 alias list_sticks="udisks --dump | grep device-file | sed 's|^.*\:\ *\(.*\)|\1|g' | while read dev ; do if ( udisks --show-info \${dev} | grep -q \"removable.*1\" ) ; then echo \${dev} ; fi ; done"
 alias battery="upower -d | grep -e state -e percentage -e time | sed -e 's|^.*:\ *\(.*\)|\1|g' | sed 's|[ ]*$||g' | tr '\n' ' ' | sed -e 's|\ $|\n|g' | sed -e 's|^|(|g' -e 's|$|)|g'"
 alias vm_test="rm -i test.img ; [ -e ./test.img ] && echo 'reusing last image' || qemu-img create test.img 6G ; kvm -m 1024 -k de -boot d -cdrom grml96-full_2012.05.iso -hda test.img"
+alias http_response="lwp-request -ds"
 
 extensions_video="avi,mkv,mp4,mpg,mpeg,wmvlv,webm,3g"
 extensions_images="png,jpg,jpeg,gif,bmp,tiff,ico"
@@ -292,12 +298,18 @@ fi
 
 function prompt_func () {
     lastret=$?
+        
+    if [[ -n "$SSH_CLIENT$SSH2_CLIENT$SSH_TTY" ]] ; then
+        remote=true
+    else
+        remote=true
+    fi
     
     if ( ${prompt_colored} )
     then
         PS1error=$( test $lastret -gt 0 && echo "${COLOR_BG_RED}[$lastret]${COLOR_NONE} ")
         PS1user="$( test $( id -u ) -eq 0 && echo ${RED})\u${COLOR_NONE}"
-        PS1host="\h"
+        PS1host="$( test -n "$SSH_CLIENT$SSH2_CLIENT$SSH_TTY" && echo ${RED})\h${COLOR_NONE}"
         PS1path="${COLOR_BG_GRAY}\w${COLOR_NONE}"
     else
         PS1error=$( test $lastret -gt 0 && echo "[$lastret] ")
