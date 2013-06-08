@@ -1,22 +1,29 @@
+[core]
+    quotepath = off
 [user]
 	email = simon.schiele@ypsilon.net
 	name = Simon Schiele
-[alias]
-    lastlog = log --color -n 20 --pretty=tformat:\"%h - %an, %ar : %s\" HEAD^1..HEAD
-    plog = log --pretty=tformat:\"%h - %an, %ar : %s\"
-    lastdiff = difftool HEAD^1..HEAD
-    changed = diff --stat HEAD..origin/HEAD
-    rollback = checkout HEAD^1
-    backup = push backup --all
-    sdiff = diff --cached
-    glog = log --graph
-    co = checkout
-    ci = commit
-    merge = merge --ff
-    pull = pull --ff
 [merge]
     tool = vimdiff
 [color]
-    ui = true
-[core]
-    quotepath = off
+    ui = auto
+    interactive = auto
+[alias]
+    lastdiff = difftool HEAD^1..HEAD
+    sdiff = diff --cached
+    changed = diff --stat HEAD..origin/HEAD
+    rollback = checkout HEAD^1
+    wipe = reset –hard HEAD
+    backup = push backup --all
+    praise = blame
+    merge = merge --ff
+    pull = pull --ff
+    find = "!git ls-files | grep -i"
+    grep = grep -Ii
+    stat = status -sb
+    ignore = !([ ! -r .gitignore ] && touch .gitignore) | echo $1 >>.gitignore
+    ignored = ls-files --others -i --exclude-standard
+    plog = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    glog = log --graph
+    lastlog = log --color -n 20 --pretty=tformat:\"%h - %an, %ar : %s\" HEAD^1..HEAD
+    filelog = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat 
