@@ -134,7 +134,29 @@ confirm() {
 
 # }}}
 
+# {{{ vim
+
+EDITOR=$( which vim.nox )
+EDITOR=${EDITOR:-$( which vim )}
+EDITOR=${EDITOR:-$( which nano )}
+export EDITOR
+
+alias vim.blank="${EDITOR} -N -u NONE -U NONE"
+
+# check if powerline patched font for vim is available
+if [ -n  "$( ls ~/.fonts/*-owerline* 2>/dev/null )" ]
+then
+    export POWERLINE_FONT="true"
+else
+    export POWERLINE_FONT="false"
+fi
+
+# }}}
+
 # {{{ General Settings
+
+# Vim navigation mode (use ESC)
+# set -o vi
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -146,14 +168,6 @@ shopt -s checkwinsize
 # set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
-fi
-
-# check if powerline patched font for vim is available
-if [ -n  "$( ls ~/.fonts/*-owerline.* 2>/dev/null )" ]
-then
-    export POWERLINE_FONT="true"
-else
-    export POWERLINE_FONT="false"
 fi
 
 # bash_completion
@@ -168,7 +182,6 @@ then
 fi
 
 export PAGER=less
-export EDITOR="/usr/bin/vim"
 export HR="============================================================"
 
 export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
