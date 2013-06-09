@@ -118,23 +118,12 @@ debian_packages_list() {
     fi
     lists="$type $(grep ^[\.] ${HOME}/.packages/${type} | sed 's|^[\.]\ *||g')"
     lists=$( echo $lists | sed 's|\([A-Za-z0-9]*\.list\)|${HOME}/.packages/\1|g' )
-    
+
     sed -e '/^\ *$/d' -e '/^\ *#/d' -e '/^[\.]/d' $( eval echo $lists ) | cut -d':' -f'2-' | xargs
 }
 
 convert2() {
     ext=${1} ; shift ; for file ; do echo -n ; [ -e "$file" ] && ( echo -e "\n\n[CONVERTING] ${file} ==> ${file%.*}.${ext}" && ffmpeg -loglevel error -i "${file}" -strict experimental "${file%.*}.${ext}" && echo rm -i "${file}" ) || echo "[ERROR] File not found: ${file}" ; done
-}
-
-confirm() {
-    if [ -z ${@} ]
-    then
-        message="Are you sure you want to perform 'unknown action'?"
-    else
-        message="Are you sure you want to perform '${@}'?"
-    fi
-        
-    whiptail --yesno "${message}" 10 60
 }
 
 function keyboard_kitt() {
@@ -157,6 +146,66 @@ function keyboard_kitt() {
 		setleds -L -caps;
 	done
 	resetleds
+}
+
+confirm() {
+    if [ "x${@}" == "x" ]
+    then
+        message="Are you sure you want to perform 'unknown action'?"
+    else
+        message="${@}"
+    fi
+
+    whiptail --yesno "${message}" 10 60
+}
+
+function spinner()
+{
+    local pid=$1
+    local delay=0.75
+    local spinstr='|/-\'
+    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+        local temp=${spinstr#?}
+        printf " [%c]  " "$spinstr"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+        printf "\b\b\b\b\b\b"
+    done
+    printf "    \b\b\b\b"
+}
+
+function silent_result() {
+    echo "$( echo ; date ) ==> ${@}" &>> ~/.bashrc_log
+    set +m
+    ( ${@} &>> ~/.bashrc_log & )
+    spinner $!
+    if [ $? -eq 0 ]
+    then
+        echo "SUCCESS"
+    else
+        echo "FAILED"
+    fi
+    set -m
+    #if ( ( ${@} &>> ~/.bashrc_log & ) )
+    #then
+        #echo "success" && return 0
+    #else
+        #echo "failed" && return 1
+    #fi
+}
+
+
+function good_morning() {
+    sudo echo -n
+    #( sleep 3 & )
+    #spinner $!
+    echo -n -e ">>> updating debian package lists: " && silent_result "sudo apt-get update"
+    #echo -e ">>> installing default packages: " #&& if [ -e ~/.system.conf ] ; then sudo apt-get install $( debian_packages_list $( grep -i systemtype .system.conf | sed -e 's|\(.*\)="\(.*\)"|\2|g' )) ; else echo -e "system.conf missing!" ; fi
+    #echo -e ">>> system upgrade: " #&& sudo apt-get dist-upgrade
+    #echo -n -e "\n>>> updating home: " && silent_result "cd /home/${SUDO_USER:-$USER}/ && git pull && git submodule init && git submodule update && cd ${OLDPWD}"
+    #echo -e ">>> system status: $( w )"
+    #echo && cal && echo -e "\nToday: $( date )\n"
+    #echo -e "\n\nGood Morning Simon! Have a wonderful day!\n\n"
 }
 
 # }}}
@@ -203,10 +252,14 @@ if [ -f /etc/bash_completion ]; then
 fi
 
 # git-flow-completion
-if [ -d ~/.lib/git-flow-completion/ ]
+if [ -e ~/.lib/git-flow-completion/ ]
 then
-    source ~/.lib/git-flow-completion/git-flow-completion.bash 
+    source ~/.lib/git-flow-completion/git-flow-completion.bash
 fi
+
+# applications
+export BROWSER=google-chrome
+export TERMINAL="gnome-terminal.wrapper --disable-factory"
 
 export PAGER=less
 export HR="============================================================"
