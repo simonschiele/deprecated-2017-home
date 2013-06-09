@@ -6,7 +6,7 @@ Lang: locales kbd keyboard-configuration
 Status: htop dstat iotop iptraf lsof
 USB: usbutils
 Security: iptables cryptsetup sudo
-Network: ethtool ssh netcat fping curl wget traceroute dnsutils telnet tcpdump pastebinit
+Network: ethtool ssh netcat fping curl wget traceroute dnsutils telnet tcpdump pastebinit rsync
 Filesystems: btrfs-tools xfsprogs sshfs 
 Maintainance: etckeeper
 Compression: bzip2 
