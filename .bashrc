@@ -216,6 +216,10 @@ alias debian_packages_list_testing="aptitude -t testing search -F '%p %?V %?v %?
 alias debian_packages_list_stable="aptitude -t stable search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep stable| awk '{if( \$2 == \$3) print \$1}'"
 alias debian_packages_list_my="debian_packages_list \$(grep ^systemtype ~/.system.conf | cut -f'2-' -d'=' | sed 's|[\"]||g')"
 
+alias screenshot="import -display :0 -window root ./screenshot-\$(date +%Y-%m-%d_%s).png"
+alias screendump="ffmpeg -f x11grab -s wxga -r 25 -i :0.0 -sameq ./screendump-\$(date +%Y-%m-%d_%s).mpg"
+alias screenvideo="screendump"
+
 alias hooks_run="eval \$( grep ^systemtype= ~/.system.conf ) find ~/.hooks/* | while read hook ; do if (( grep -iq -e ^hook_systemtype.*\${systemtype} \$hook ) && ( grep -iq ^hook_optional.*false \$hook )) ; then ~/.hooks/loader.sh \$hook ; fi ; done"
 alias repo_compare="[ \"x\${repo}\" == \"x\" ] && ( echo 'Please export \$repo variable like:' ; echo 'export \$repo=\"dot.vim.git\"' ; exit 1 ) || ( mkdir \$repo/ ; cd \$repo ; git clone http://simon.psaux.de/git/\${repo} psaux/ ; git clone https://github.com/simonschiele/\${repo} github/ ; echo \"psaux\" ; cd psaux/ ; git plog | head -n 11 ; echo -e \"\ngithub\" ; cd ../github/ ; git plog | head -n 10 ; cd ../../ )"
 #alias repo_http2ssh="sed -i 's|^\(.*url.*=\)[ ]*\(http://simon\.psaux\.de.*\)/\(.*\.git\)|\1 ssh://git@psaux.de/\3|g' $(find .git/ -name 'config' | xargs) .gitmodules 2>/dev/null"
@@ -241,7 +245,6 @@ alias patch_from_diff="patch -Np0 -i"
 alias silent='amixer -q sset "PCM" 0 ; amixer -q sset "MASTER" 0'
 alias unsilent='amixer -q sset "PCM" 96 ; amixer -q sset "MASTER" 96'
 alias show_colors="for i in \`seq 1 7 ; seq 30 48 ; seq 90 107\` ; do echo -e \"\e[\${i}mcolor \$i\e[0m\" ; done"
-alias screenshot="import -display :0 -window root screenshot-\$(date +%Y-%m-%d_%s).png"
 alias mplayer_left="mplayer -xineramascreen 0" 
 alias mplayer_right="mplayer -xineramascreen 1" 
 # alias vlc_flash=vlc $(for f in /proc/$(pgrep -f libflashplayer.so |head -n 1)/fd/*; do ;if  $(file ${f} |grep -q "broken symbolic link to \`/tmp/FlashXX"); then echo  ${f};fi;done)
