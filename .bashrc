@@ -164,6 +164,7 @@ function spinner()
     local pid=$1
     local delay=0.75
     local spinstr='|/-\'
+    echo "spinner: using $pid"
     while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
         local temp=${spinstr#?}
         printf " [%c]  " "$spinstr"
@@ -174,18 +175,45 @@ function spinner()
     printf "    \b\b\b\b"
 }
 
-function silent_result() {
-    echo "$( echo ; date ) ==> ${@}" &>> ~/.bashrc_log
-    set +m
-    ( ${@} &>> ~/.bashrc_log & )
-    spinner $!
-    if [ $? -eq 0 ]
-    then
-        echo "SUCCESS"
-    else
-        echo "FAILED"
-    fi
-    set -m
+function spinner_result() {
+    ( tmp_pid=$BASHPID ; spinner $tmp_pid & ${@} ; kill $tmp_pid ; wait $tmp_pid 2>/dev/null )
+    echo "ok"
+    #${@} &>> ~/.bashrc_log
+    #return
+    #${@} &
+    #xxx=$!
+    #export xxx
+    #echo "pid of bg job: $xxx"
+
+    #exec &>> ~/.bashrc_log
+    #echo "${@}" | at now &>> ~/.bashrc_log
+    #exec &>> ~/.bashrc_log
+    #echo "pid1: $!"
+    #echo "pid2: $$"
+    #echo "pid3: $BASHPID"
+    #echo
+
+    #( echo -e "pid1: $! \npid2: $$ \npid3: $BASHPID" && ${@} )
+    #echo
+
+    #( echo -e "pid1: $! \npid2: $$ \npid3: $BASHPID" && ${@} & )
+    #echo
+
+    #echo "spin: $tmp_spin"
+    #echo "spin2: $BASHPID"
+    #ret=$?
+    #pid=$!
+    #echo "pid of spinner_result: $$"
+    #( xxx "${@}" ) 2>/dev/null
+    #sleep 0.5
+    #echo "x $xxx"
+    #spinner $pid
+    #if [ $ret -eq 0 ]
+    #then
+        #echo "SUCCESS"
+    #else
+        #echo "FAILED"
+    #fi
     #if ( ( ${@} &>> ~/.bashrc_log & ) )
     #then
         #echo "success" && return 0
@@ -199,7 +227,7 @@ function good_morning() {
     sudo echo -n
     #( sleep 3 & )
     #spinner $!
-    echo -n -e ">>> updating debian package lists: " && silent_result "sudo apt-get update"
+    echo -n -e ">>> updating debian package lists: " && spinner_result "sudo apt-get update"
     #echo -e ">>> installing default packages: " #&& if [ -e ~/.system.conf ] ; then sudo apt-get install $( debian_packages_list $( grep -i systemtype .system.conf | sed -e 's|\(.*\)="\(.*\)"|\2|g' )) ; else echo -e "system.conf missing!" ; fi
     #echo -e ">>> system upgrade: " #&& sudo apt-get dist-upgrade
     #echo -n -e "\n>>> updating home: " && silent_result "cd /home/${SUDO_USER:-$USER}/ && git pull && git submodule init && git submodule update && cd ${OLDPWD}"
