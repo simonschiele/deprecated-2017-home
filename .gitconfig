@@ -13,8 +13,8 @@
     sdiff = diff --cached
     changed = diff --stat HEAD..origin/HEAD
     rollback = checkout HEAD^1
+    clone = clone --recursive
     wipe = reset –hard HEAD
-    backup = push backup --all
     praise = blame
     merge = merge --ff
     pull = pull --ff
