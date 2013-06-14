@@ -3,7 +3,7 @@ hook_name=setup_share
 hook_systemtypes="minimal server workstation laptop"
 hook_optional=true
 hook_version=0.0
-[ -r ~/.hooks/helper.sh ] && . ~/.hooks/helper.sh
+[ -r ~/.hooks/helper.sh ] && . ~/.hooks/helper.sh || ( echo "ERROR: '~/.hooks/helper.sh' not found" ; exit 1 )
 ###########################################################
 
 if [ ! -d /share/ ]
