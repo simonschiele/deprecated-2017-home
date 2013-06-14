@@ -280,7 +280,7 @@ if [ -f /etc/bash_completion ]; then
 fi
 
 # git-flow-completion
-if [ -e ~/.lib/git-flow-completion/ ]
+if [ ~/.lib/git-flow-completion/git-flow-completion.bash ]
 then
     source ~/.lib/git-flow-completion/git-flow-completion.bash
 fi
