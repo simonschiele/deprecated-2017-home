@@ -273,15 +273,20 @@ alias hr="for i in \$( seq 1 \$COLUMNS ) ; do echo -n '=' ; done ; echo"
 alias t="true"
 alias f="false"
 
+# root
+alias adduser_for_smb="sudo adduser --no-create-home --disabled-login --shell /bin/false"
+
 # package and system-config
 alias debian_version="lsb_release -a"
+alias debian_packages_list_my="debian_packages_list \$(grep ^systemtype ~/.system.conf | cut -f'2-' -d'=' | sed 's|[\"]||g')"
 alias debian_packages_list_by_size="dpkg-query -W --showformat='\${Installed-Size;10}\t\${Package}\n' | sort -k1,1n"
 alias debian_packages_list_configfiles="dpkg-query -f '\n\n\${Package} \n\${Conffiles}' -W"
 alias debian_packages_list_experimental='aptitude -t experimental search -F "%p %?V %?v %?t" --disable-columns .|grep -v none| grep experimental| awk "{if( \$2 == \$3) print \$1}"'
 alias debian_packages_list_unstable="aptitude -t unstable search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep unstable| awk '{if( \$2 == \$3) print \$1}'"
 alias debian_packages_list_testing="aptitude -t testing search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep testing| awk '{if( \$2 == \$3) print \$1}'"
 alias debian_packages_list_stable="aptitude -t stable search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep stable| awk '{if( \$2 == \$3) print \$1}'"
-alias debian_packages_list_my="debian_packages_list \$(grep ^systemtype ~/.system.conf | cut -f'2-' -d'=' | sed 's|[\"]||g')"
+
+# .hooks/
 alias hooks_run="eval \$(grep ^systemtype ~/.system.conf 2>/dev/null) find ~/.hooks/ ! -type d -executable | xargs grep -l \"^hook_systemtype.*\${systemtype}\" | xargs grep -l '^hook_optional=false' | while read exe ; do \"\${exe}\" ; done"
 
 # permission stuff
@@ -297,11 +302,11 @@ alias youtube="clive -f best --exec=\"( echo %f | grep -qi -e 'webm$' -e 'webm.$
 #nrg2iso() { dd bs=1k if="$1" of="$2" skip=300 }
 
 # find
-extensions_video="avi,mkv,mp4,mpg,mpeg,wmvlv,webm,3g"
-extensions_images="png,jpg,jpeg,gif,bmp,tiff,ico"
-alias find_videos="find . ! -type d $( echo ${extensions_video} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
-alias find_images="find . ! -type d $( echo ${extensions_images} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
 alias find_last_edited="find . -type f -printf \"%T@ %T+ %p\n\" | sort -n"
+extensions_video="avi,mkv,mp4,mpg,mpeg,wmvlv,webm,3g"
+alias find_videos="find . ! -type d $( echo ${extensions_video} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
+extensions_images="png,jpg,jpeg,gif,bmp,tiff,ico"
+alias find_images="find . ! -type d $( echo ${extensions_images} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
 
 # date
 alias date.format="date --help | sed -n '/^FORMAT/,/%Z/p'"
