@@ -22,7 +22,7 @@ Viewer: evince geeqie libreoffice
 Security: gksu gnome-keyring xscreensaver
 Network: vinagre grdesktop quicksynergy synergy network-manager network-manager-gnome network-manager-openvpn network-manager-openvpn-gnome
 Webcam: guvcview
-Tools: gtkterm thunar scrot xsel xcalib gucharmap
+Tools: gtkterm thunar scrot xsel xcalib gucharmap file-roller
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
