@@ -13,3 +13,6 @@
 [submodule ".lib/git-flow-completion"]
 	path = .lib/git-flow-completion
 	url = https://github.com/bobthecow/git-flow-completion.git
+[submodule ".lib/powerline-fonts"]
+	path = .lib/powerline-fonts
+	url = https://github.com/Lokaltog/powerline-fonts.git
