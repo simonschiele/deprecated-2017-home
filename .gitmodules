@@ -19,3 +19,6 @@
 [submodule ".lib/gitflow"]
 	path = .lib/gitflow
 	url = https://github.com/nvie/gitflow
+[submodule ".lib/Smyck-Color-Scheme"]
+	path = .lib/Smyck-Color-Scheme
+	url = https://github.com/hukl/Smyck-Color-Scheme/
