@@ -209,7 +209,7 @@ export EDITOR
 alias vim.blank="${EDITOR} -N -u NONE -U NONE"
 
 # check if powerline patched font for vim is available
-if [ -n  "$( ls ~/.fonts/*-owerline* 2>/dev/null )" ]
+if [ -n  "$( ls ~/.fonts/P*Pro/*owerline.ttf 2>/dev/null )" ]
 then
     export POWERLINE_FONT="true"
 else
