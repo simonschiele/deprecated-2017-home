@@ -357,6 +357,8 @@ alias show_tcp_stats='sudo netstat -st'
 alias show_udp='sudo netstat -aup'
 alias show_udp_stats='sudo netstat -su'
 alias show_open_ports="echo 'User:      Command:   Port:'; echo '----------------------------' ; lsof -i 4 -P -n | grep -i 'listen' | awk '{print \$3, \$1, \$9}' | sed 's/ [a-z0-9\.\*]*:/ /' | sort -k 3 -n |xargs printf '%-10s %-10s %-10s\n' | uniq"	# lsof (cleaned up for just open listening ports)
+alias ssh.untrusted='ssh -o "StrictHostKeyChecking no"'
+
 
 # host/setup specific
 if ( grep -q "minit" /proc/cmdline )
