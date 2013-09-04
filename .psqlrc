@@ -1,0 +1,16 @@
+\set PROMPT1 '%n@%m[%/]%# '
+\set PROMPT2 :PROMPT1
+\set PROMPT3 ''
+
+/* Don't use pager by default */
+\pset pager off
+
+/* Display null-values as "NULL" */
+\pset null 'NULL'
+
+/* Show timing for each query */
+\timing
+
+/* Set history-size to 2000 and don't save duplicated queries to the history */
+\set HISTSIZE 2000
+\set HISTCONTROL ignoredups
