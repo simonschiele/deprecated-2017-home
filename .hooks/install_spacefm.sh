@@ -3,7 +3,7 @@ hook_name=install_spacefm
 hook_systemtypes="workstation laptop"
 hook_optional=true
 hook_version=0.1
-[ -r ~/.hooks/helper.sh ] && . ~/.hooks/helper.sh
+[ -r ~/.hooks/helper.sh ] && . ~/.hooks/helper.sh || ( echo "ERROR: '~/.hooks/helper.sh' not found" ; exit 1 )
 ###########################################################
 
 cd ${HOME}/

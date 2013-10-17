@@ -1,0 +1,109 @@
+#!/bin/bash
+LANG=C
+
+usage() {
+    echo "usage: > unrar.dir file1.rar [file2.rar] [file3.rar] [...]"
+}
+
+list_archive() {
+    filename=$( basename "${1}" )
+    if [ "x${filename##*.}" == "xrar" ]
+    then
+        unrar v -o- -p- -kb -x*.URL -x*.url -x*.txt -x*.TXT "${1}" | sed -n '/---/,/---/!d;/.*/p' | grep -v "^\ \ " | tail -n +2 | head -n -1 | sed 's|^\ ||g' | grep "\."
+        return 0
+    else
+        echo "[ERROR] Unknown extension: '${filename##*.}'" >&2
+        return 1
+    fi
+}
+
+if [[ -z "${@}" ]]
+then
+    usage
+    exit 1
+fi
+
+success=""
+failed=""
+
+while (( "$#" ))
+do
+    subres=true
+    subdir=true
+    prefix=""
+    filename=$( basename "${1}" )
+
+    echo
+    echo "* ${1}"
+
+    if [ ! -e "${1}" ]
+    then
+        subres=false
+        failed="${failed}\n[WARNING] '${1}' is not existing: skipping"
+    fi
+
+    OLDIFS=$IFS
+    IFS=$'\n'
+    for file_in_rar in "$( list_archive ${1} )" #| while read file_in_rar
+    do
+        if ! ( echo "${file_in_rar}" | grep -q -i -e "\/" )
+        then
+            subdir=false
+            echo "[WARNING] something not in dir" #: '${file_in_rar}'"
+        fi
+    done
+    IFS=$OLDIFS
+
+    if ! ( ${subdir} )
+    then
+        echo "[WARNING] uncompressing to dir: ${filename%.*}"
+        if ! ( mkdir ${filename%.*} )
+        then
+            subres=false
+            failed="${failed}\n[WARNING] '${1}' could not create directory"
+            echo "[ERROR] couldn't create dir: skipping"
+        else
+            prefix="${filename%.*}"
+        fi
+    fi
+
+    if ( ${subres} )
+    then
+        echo -n -e "uncompressing..."
+        if ( unrar x -o- -p- -kb -x*.URL -x*.url -x*.txt -x*.TXT "${1}" ${prefix} 2>/dev/null >&2 )
+        then
+            echo -n -e "\t\tdone"
+            success="${success}\n'${1}' unpacked successfully"
+            rm -f "${1}"
+        else
+            echo -n -e "\t\tfailed"
+            subres=false
+            failed="${failed}\n[ERROR] '${1}' could not be uncompressed"
+        fi
+    fi
+
+    echo
+    shift
+done
+
+echo
+if [ -n "$failed" ]
+then
+    echo -e " !!! WARNING - SOME PACKAGES COULDN'T BE UNPACKED SUCCESSFULLY - WARNING !!! "
+    echo -e -n "\nUnpacked failed on:"
+    echo -e "${failed}\n"
+fi
+
+if [ -n "$success" ]
+then
+    echo -e -n "Unpacked successfully:"
+    echo -e "${success}\n"
+fi
+
+if [ -z "$failed" ]
+then
+    exit 0
+else
+    exit 1
+fi
+

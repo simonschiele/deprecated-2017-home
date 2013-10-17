@@ -13,3 +13,12 @@
 [submodule ".lib/git-flow-completion"]
 	path = .lib/git-flow-completion
 	url = https://github.com/bobthecow/git-flow-completion.git
+[submodule ".lib/powerline-fonts"]
+	path = .lib/powerline-fonts
+	url = https://github.com/Lokaltog/powerline-fonts.git
+[submodule ".lib/gitflow"]
+	path = .lib/gitflow
+	url = https://github.com/nvie/gitflow
+[submodule ".lib/Smyck-Color-Scheme"]
+	path = .lib/Smyck-Color-Scheme
+	url = https://github.com/hukl/Smyck-Color-Scheme/

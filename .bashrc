@@ -95,7 +95,7 @@ fi
 
 # }}}
 
-# {{{ logout 
+# {{{ logout
 
 if [ -x ${HOME}/.bash_logout ]
 then
@@ -164,7 +164,6 @@ function spinner()
     local pid=$1
     local delay=0.75
     local spinstr='|/-\'
-    echo "spinner: using $pid"
     while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
         local temp=${spinstr#?}
         printf " [%c]  " "$spinstr"
@@ -176,52 +175,14 @@ function spinner()
 }
 
 function spinner_result() {
-    ( tmp_pid=$BASHPID ; spinner $tmp_pid & ${@} ; kill $tmp_pid ; wait $tmp_pid 2>/dev/null )
-    echo "ok"
-    #${@} &>> ~/.bashrc_log
-    #return
-    #${@} &
-    #xxx=$!
-    #export xxx
-    #echo "pid of bg job: $xxx"
-
-    #exec &>> ~/.bashrc_log
-    #echo "${@}" | at now &>> ~/.bashrc_log
-    #exec &>> ~/.bashrc_log
-    #echo "pid1: $!"
-    #echo "pid2: $$"
-    #echo "pid3: $BASHPID"
-    #echo
-
-    #( echo -e "pid1: $! \npid2: $$ \npid3: $BASHPID" && ${@} )
-    #echo
-
-    #( echo -e "pid1: $! \npid2: $$ \npid3: $BASHPID" && ${@} & )
-    #echo
-
-    #echo "spin: $tmp_spin"
-    #echo "spin2: $BASHPID"
-    #ret=$?
-    #pid=$!
-    #echo "pid of spinner_result: $$"
-    #( xxx "${@}" ) 2>/dev/null
-    #sleep 0.5
-    #echo "x $xxx"
-    #spinner $pid
-    #if [ $ret -eq 0 ]
-    #then
-        #echo "SUCCESS"
-    #else
-        #echo "FAILED"
-    #fi
-    #if ( ( ${@} &>> ~/.bashrc_log & ) )
-    #then
-        #echo "success" && return 0
-    #else
-        #echo "failed" && return 1
-    #fi
+    (
+        tmp_pid=${BASHPID}
+        spinner ${tmp_pid} &
+        $( ${@} >/dev/null )
+        kill ${tmp_pid}
+        wait ${tmp_pid} 2>/dev/null
+    )
 }
-
 
 function good_morning() {
     sudo echo -n
@@ -248,7 +209,7 @@ export EDITOR
 alias vim.blank="${EDITOR} -N -u NONE -U NONE"
 
 # check if powerline patched font for vim is available
-if [ -n  "$( ls ~/.fonts/*-owerline* 2>/dev/null )" ]
+if [ -n  "$( ls ~/.fonts/P*Pro/*owerline.ttf 2>/dev/null )" ]
 then
     export POWERLINE_FONT="true"
 else
@@ -280,7 +241,7 @@ if [ -f /etc/bash_completion ]; then
 fi
 
 # git-flow-completion
-if [ -e ~/.lib/git-flow-completion/ ]
+if [ ~/.lib/git-flow-completion/git-flow-completion.bash ]
 then
     source ~/.lib/git-flow-completion/git-flow-completion.bash
 fi
@@ -299,9 +260,9 @@ shopt -s histappend
 
 # }}}
 
-# {{{ Aliases 
+# {{{ Aliases
 
-# default overwrites 
+# default overwrites
 alias mv='mv -i'
 alias cp='cp -i'
 alias rm='rm -i'
@@ -313,16 +274,21 @@ alias hr="for i in \$( seq 1 \$COLUMNS ) ; do echo -n '=' ; done ; echo"
 alias t="true"
 alias f="false"
 
+# root
+alias adduser_for_smb="sudo adduser --no-create-home --disabled-login --shell /bin/false"
+
 # package and system-config
 alias debian_version="lsb_release -a"
+alias debian_packages_list_my="debian_packages_list \$(grep ^systemtype ~/.system.conf | cut -f'2-' -d'=' | sed 's|[\"]||g')"
 alias debian_packages_list_by_size="dpkg-query -W --showformat='\${Installed-Size;10}\t\${Package}\n' | sort -k1,1n"
 alias debian_packages_list_configfiles="dpkg-query -f '\n\n\${Package} \n\${Conffiles}' -W"
 alias debian_packages_list_experimental='aptitude -t experimental search -F "%p %?V %?v %?t" --disable-columns .|grep -v none| grep experimental| awk "{if( \$2 == \$3) print \$1}"'
 alias debian_packages_list_unstable="aptitude -t unstable search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep unstable| awk '{if( \$2 == \$3) print \$1}'"
 alias debian_packages_list_testing="aptitude -t testing search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep testing| awk '{if( \$2 == \$3) print \$1}'"
 alias debian_packages_list_stable="aptitude -t stable search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep stable| awk '{if( \$2 == \$3) print \$1}'"
-alias debian_packages_list_my="debian_packages_list \$(grep ^systemtype ~/.system.conf | cut -f'2-' -d'=' | sed 's|[\"]||g')"
-alias hooks_run="eval \$( grep ^systemtype= ~/.system.conf ) find ~/.hooks/* | while read hook ; do if (( grep -iq -e ^hook_systemtype.*\${systemtype} \$hook ) && ( grep -iq ^hook_optional.*false \$hook )) ; then ~/.hooks/loader.sh \$hook ; fi ; done"
+
+# .hooks/
+alias hooks_run="eval \$(grep ^systemtype ~/.system.conf 2>/dev/null) find ~/.hooks/ ! -type d -executable | xargs grep -l \"^hook_systemtype.*\${systemtype}\" | xargs grep -l '^hook_optional=false' | while read exe ; do \"\${exe}\" ; done"
 
 # permission stuff
 alias permissions_normalize="find . -type f \! -perm -a+x -exec chmod 640 {} \; -o -type f -perm -a+x -exec chmod 750 {} \; -o -type d -exec chmod 750 {} \; ; chown ${SUDO_USER:-$USER}: . -R"
@@ -337,16 +303,16 @@ alias youtube="clive -f best --exec=\"( echo %f | grep -qi -e 'webm$' -e 'webm.$
 #nrg2iso() { dd bs=1k if="$1" of="$2" skip=300 }
 
 # find
-extensions_video="avi,mkv,mp4,mpg,mpeg,wmvlv,webm,3g"
-extensions_images="png,jpg,jpeg,gif,bmp,tiff,ico"
-alias find_videos="find . ! -type d $( echo ${extensions_video} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
-alias find_images="find . ! -type d $( echo ${extensions_images} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
 alias find_last_edited="find . -type f -printf \"%T@ %T+ %p\n\" | sort -n"
+extensions_video="avi,mkv,mp4,mpg,mpeg,wmvlv,webm,3g"
+alias find_videos="find . ! -type d $( echo ${extensions_video} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
+extensions_images="png,jpg,jpeg,gif,bmp,tiff,ico"
+alias find_images="find . ! -type d $( echo ${extensions_images} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
 
 # date
 alias date.format="date --help | sed -n '/^FORMAT/,/%Z/p'"
 alias date.timestamp='date +%s'
-alias date.week='date +%V' 
+alias date.week='date +%V'
 alias date.YY-mm-dd='date "+%Y-%m-%d"'
 alias date.YY-mm-dd_HH_MM='date "+%Y-%m-%d_%H-%M"'
 
@@ -374,8 +340,8 @@ alias keycodes="sudo showkey -k"
 alias stopwatch="time read"
 alias silent='amixer -q sset "PCM" 0 ; amixer -q sset "MASTER" 0'
 alias unsilent='amixer -q sset "PCM" 96 ; amixer -q sset "MASTER" 96'
-alias mplayer_left="mplayer -xineramascreen 0" 
-alias mplayer_right="mplayer -xineramascreen 1" 
+alias mplayer_left="mplayer -xineramascreen 0"
+alias mplayer_right="mplayer -xineramascreen 1"
 alias patch_from_diff="patch -Np0 -i"
 alias list_sticks="udisks --dump | grep device-file | sed 's|^.*\:\ *\(.*\)|\1|g' | while read dev ; do if ( udisks --show-info \${dev} | grep -q \"removable.*1\" ) ; then echo \${dev} ; fi ; done"
 alias whatsmyip="wget -O- -q ip.nu | xargs | html_strip"
@@ -383,7 +349,7 @@ alias speedtest="wget -O- http://cachefly.cachefly.net/200mb.test >/dev/null"
 alias route_via_wlan="for i in \`seq 1 10\` ; do route del default 2>/dev/null ; done ; route add default eth0 ; route add default wlan0 ; route add default gw \"\$( /sbin/ifconfig wlan0 | grep_ip | head -n 1 | cut -f'1-3' -d'.' ).1\""
 alias pidgin_lastlog="find ~/.purple/logs/ -type f -mtime -1 | xargs tail -n 5"
 alias sickbeard_skipped="sudo grep 'Found result' /var/log/sickbeard/sickbeard* | sed 's|\(.*\):\(.*[0-9]\:[0-9][0-9]\:[0-9][0-9]\).*\:\:\(.*\)\(at http.*\)|\2 - \3|g'"
-alias mirror_complete="wget --random-wait -r -p -e robots=off -U mozilla"           # mirror website with everything 
+alias mirror_complete="wget --random-wait -r -p -e robots=off -U mozilla"           # mirror website with everything
 alias mirror_images='wget -r -l1 --no-parent -nH -nd -P/tmp -A".gif,.jpg" "$1"'	    # download all images from a site
 alias show_colors="for i in \`seq 1 7 ; seq 30 48 ; seq 90 107\` ; do echo -e \"\e[\${i}mcolor \$i\e[0m\" ; done"
 alias show_window_class='xprop | grep CLASS'
@@ -392,6 +358,8 @@ alias show_tcp_stats='sudo netstat -st'
 alias show_udp='sudo netstat -aup'
 alias show_udp_stats='sudo netstat -su'
 alias show_open_ports="echo 'User:      Command:   Port:'; echo '----------------------------' ; lsof -i 4 -P -n | grep -i 'listen' | awk '{print \$3, \$1, \$9}' | sed 's/ [a-z0-9\.\*]*:/ /' | sort -k 3 -n |xargs printf '%-10s %-10s %-10s\n' | uniq"	# lsof (cleaned up for just open listening ports)
+alias ssh.untrusted='ssh -o "StrictHostKeyChecking no"'
+
 
 # host/setup specific
 if ( grep -q "minit" /proc/cmdline )
@@ -400,7 +368,7 @@ then
     alias halt="sudo minit-shutdown -h &"
 fi
 
-if ( grep -i -q work /etc/hostname ) 
+if ( grep -i -q work /etc/hostname )
 then
     alias scp='scp -l 25000'
     alias windows='rdesktop -kde -a 16 -g 1280x1024 -u sschiele 192.168.80.55'
@@ -416,20 +384,20 @@ fi
 prompt_colored=true
 prompt_git=true
 
-if ( ! $color_support ) 
+if ( ! $color_support )
 then
     prompt_colored=false
 fi
 
 function prompt_func () {
     lastret=$?
-        
+
     if [[ -n "$SSH_CLIENT$SSH2_CLIENT$SSH_TTY" ]] ; then
         remote=true
     else
         remote=true
     fi
-    
+
     if ( ${prompt_colored} )
     then
         PS1error=$( test $lastret -gt 0 && echo "${COLOR_BG_RED}[$lastret]${COLOR_NONE} ")
@@ -453,13 +421,14 @@ function prompt_func () {
     PS1git=${PS1git:+ ${PS1git}}
     PS1chroot=
     PS1prompt=" > "
-    
+
     #PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
     PS1="${PS1error}${PS1chroot}${PS1user}@${PS1host} ${PS1path}${PS1git}${PS1prompt}"
 }
 
 PROMPT_COMMAND=prompt_func
 
+# use prompt from gitpromt project
 #[[ $- == *i* ]]   &&   . ~/.lib/git-prompt/git-prompt.sh
 
 # }}}
