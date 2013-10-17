@@ -294,6 +294,7 @@ export HR="============================================================"
 
 export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
 export HISTCONTROL=ignoreboth
+export HISTSIZE=5000
 shopt -s histappend
 
 # }}}
