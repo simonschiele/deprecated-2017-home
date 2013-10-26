@@ -22,3 +22,6 @@
 [submodule ".lib/Smyck-Color-Scheme"]
 	path = .lib/Smyck-Color-Scheme
 	url = https://github.com/hukl/Smyck-Color-Scheme/
+[submodule ".lib/vils-ng"]
+	path = .lib/vils-ng
+	url = git@github.com:simonschiele/vils-ng.git
