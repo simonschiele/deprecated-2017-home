@@ -152,7 +152,9 @@ fi
 
 # applications
 export BROWSER=google-chrome
+export MAILER="icedove"
 export TERMINAL="gnome-terminal.wrapper --disable-factory"
+export OPEN="gnome-open"
 
 export PAGER=less
 export HR="================================================================================"
@@ -163,9 +165,12 @@ export HR="=====================================================================
 
 # default overwrites
 alias mv='mv -i'
-alias cp='cp -i'
+alias cp='cp -i -r'
 alias rm='rm -i'
 alias ll='ls -l'
+alias mkdir='mkdir -p'
+alias less='less -F'
+alias screen='screen -U'
 alias mr='mr -d /'
 
 # shorties
@@ -195,10 +200,14 @@ alias permissions_normalize_web="chown ${SUDO_USER:-$USER}:www-data . -R ; find 
 alias permissions_normalize_system="chown ${SUDO_USER:-$USER}: ~/ -R ; find /home/* /root -maxdepth 0 -type d -exec chmod 700 {} \;"
 
 # find
+extensions_video="avi,mkv,mp4,mpg,mpeg,wmv,wmvlv,webm,3g,mov"
+extensions_images="png,jpg,jpeg,gif,bmp,tiff,ico,lzw,raw,ppm,pgm,pbm,psd,img,xcf,psp,svg,ai"
+extensions_audio="flac,mp1,mp2,mp3,ogg,wav,aac,ac3,dts,m4a,mid,midi,mka,mod,oma,wma"
+extensions_documents="doc,xls,abw,chm,pdf,docx,docm,odm,odt,rtf,stw,sxg,sxw,wpd,wps,ods,pxl,sxc,xlsx,xlsm,odg,odp,pps,ppsx,ppt,pptm,pptx,sda,sdd,sxd,dot,dotm,dotx"
+extensions_archives="7z,ace,arj,bz,bz2,gz,lha,lzh,rar,tar,taz,tbz,tbz2,tgz,zip"
+crap=".DS_Store"
 alias find_last_edited="find . -type f -printf \"%T@ %T+ %p\n\" | sort -n"
-extensions_video="avi,mkv,mp4,mpg,mpeg,wmvlv,webm,3g"
 alias find_videos="find . ! -type d $( echo ${extensions_video} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
-extensions_images="png,jpg,jpeg,gif,bmp,tiff,ico"
 alias find_images="find . ! -type d $( echo ${extensions_images} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
 
 # date
