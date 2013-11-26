@@ -228,6 +228,11 @@ alias date.world=worldclock
 alias date.stopwatch=stopwatch
 alias stopwatch="time read -n 1"
 
+# compression
+alias zip.dir="compress zip"
+alias rar.dir="compress rar"
+alias tar.dir="compress targz"
+
 # mirror
 alias mirror.complete="wget --random-wait -r -p -e robots=off -U mozilla"           # mirror website with everything
 alias mirror.images='wget -r -l1 --no-parent -nH -nd -P/tmp -A".gif,.jpg" "$1"'	    # download all images from a site
@@ -359,6 +364,97 @@ PROMPT_COMMAND=prompt_func
 # }}}
 
 # {{{ Helper Functions
+
+compress() {
+    local OLDOPTIND=$OPTIND 
+    local HELP=false
+    local DATE=false
+    local VERBOSE=''
+    local ERROR='' 
+    
+    while getopts ":hdv" opt ; do
+        case $opt in
+            h)
+                HELP=true
+                ;;
+            d)
+                DATE=true
+                ;;
+            v)
+                VERBOSE=true
+                ;;
+            \?)
+                ERROR="Unknown Flag: -$OPTARG"
+                ;;
+        esac
+    done
+    shift $((OPTIND-1))
+    OPTIND=$OLDOPTIND
+   
+    ! ${HELP} && [ -z "${ERROR}" ] && ([ -z "${1}" ] || [ -z "${2}" ]) && \
+        ERROR="Please give at least a type of archive and what to compress"
+
+    $HELP || [ -n "${ERROR}" ] && \
+        echo "${FUNCNAME} [-h] [-d] <rar|zip|file.tar.gz> <dir/> [<data.txt|data2/>]"
+    
+    [ -n "$ERROR" ] && echo ${ERROR} && return 1
+    $HELP && return 0
+
+        ( [ -n "${ERROR}" ] && return 1 || return 0 )
+   
+    local target="${1}"
+    local content="${2}"
+    shift
+    
+    local archivetype="${target##*.}" 
+    local change_dir=false
+    
+    if [ "$( basename ${content} )" == "." ]
+    then
+        content=$( basename "$( pwd )" | sed 's|\ |\\ |g' )
+        change_dir=true
+    else
+        content="$@"
+    fi
+
+    [ $change_dir ] && cd ..
+
+    local status=true
+    case "${archivetype,,}" in
+        rar)
+            archivetype="rar"
+            local cmd="rar a -ol -r -ow -idc $( ! [ ${VERBOSE} ] && echo '-inul' ) --"
+            ;;
+        zip)
+            archivetype="zip"
+            local cmd="zip -r -y $( ! [ ${VERBOSE} ] && echo '-q' )"
+            ;;
+        bzip2|bz2)
+            archivetype="tar.bz2"
+            local cmd="tar cjf${VERBOSE:+v}"
+            ;;
+        tar|gz|targz|tgz)
+            archivetype="tar.gz"
+            local cmd="tar czf${VERBOSE:+v}"
+            ;;
+        *)
+            echo "Archivformat '${archivetype}' is not supported" && status=false
+            ;;
+    esac
+    
+    if [ "${archivetype}" == "${target}" ] || ! ( echo "$target" | grep -q "\." )
+    then
+        [ -n "${2}" ] && echo "Autonaming is only supported if you compress only one file or directory" && return 1
+        local cleancontent=$( basename ${content} | sed -e 's|^\.|dot.|g' )
+        target="${cleancontent%.*}.${archivetype}"
+    fi
+    
+    $status && $cmd $target $content
+    
+    [ $change_dir ] && cd "${OLDPWD}"
+
+    return $( $status )
+}
 
 worldclock() { 
     for tz in America/Los_Angeles America/Chicago America/Denver America/New_York Europe/Paris Europe/Berlin Europe/Moscow Asia/Hong_Kong
