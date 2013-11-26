@@ -151,7 +151,7 @@ then
 fi
 
 # applications
-export BROWSER=google-chrome
+export BROWSER="google-chrome"
 export MAILER="icedove"
 export TERMINAL="gnome-terminal.wrapper --disable-factory"
 export OPEN="gnome-open"
@@ -206,9 +206,17 @@ extensions_audio="flac,mp1,mp2,mp3,ogg,wav,aac,ac3,dts,m4a,mid,midi,mka,mod,oma,
 extensions_documents="doc,xls,abw,chm,pdf,docx,docm,odm,odt,rtf,stw,sxg,sxw,wpd,wps,ods,pxl,sxc,xlsx,xlsm,odg,odp,pps,ppsx,ppt,pptm,pptx,sda,sdd,sxd,dot,dotm,dotx"
 extensions_archives="7z,ace,arj,bz,bz2,gz,lha,lzh,rar,tar,taz,tbz,tbz2,tgz,zip"
 crap=".DS_Store"
-alias find_last_edited="find . -type f -printf \"%T@ %T+ %p\n\" | sort -n"
-alias find_videos="find . ! -type d $( echo ${extensions_video} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
-alias find_images="find . ! -type d $( echo ${extensions_images} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
+alias find.videos="find . ! -type d $( echo ${extensions_video} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
+alias find.images="find . ! -type d $( echo ${extensions_images} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
+alias find.audio="find . ! -type d $( echo ${extensions_audio} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
+alias find.documents="find . ! -type d $( echo ${extensions_documents} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
+alias find.archives="find . ! -type d $( echo ${extensions_archives} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
+alias find.dir="find . -type d"
+alias find.file="find . ! -type d"
+alias find.string=""
+alias find.exec=""
+alias find.last_edited="find . -type f -printf \"%T@ %T+ %p\n\" | sort -n"
+alias find.last_accessed=""
 
 # date
 alias date.format="date --help | sed -n '/^FORMAT/,/%Z/p'"
