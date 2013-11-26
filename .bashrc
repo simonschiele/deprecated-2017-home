@@ -128,6 +128,17 @@ if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
+# history
+export HISTCONTROL=ignoreboth
+export HISTFILESIZE=10000
+export HISTSIZE=10000
+export HISTIGNORE='&:clear:ls:cd:[bf]g:exit:[ t\]*'
+export HOSTFILE=$HOME/.hosts
+shopt -s histappend
+#shopt -s histappend histreedit histverify
+shopt -s cmdhist        # combine multiline
+export PROMPT_COMMAND='history -a; history -n; $PROMPT_COMMAND'
+
 # bash_completion
 if [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
@@ -145,11 +156,6 @@ export TERMINAL="gnome-terminal.wrapper --disable-factory"
 
 export PAGER=less
 export HR="================================================================================"
-
-export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
-export HISTCONTROL=ignoreboth
-export HISTSIZE=5000
-shopt -s histappend
 
 # }}}
 
