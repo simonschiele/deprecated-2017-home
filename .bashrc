@@ -218,12 +218,15 @@ alias find.exec=""
 alias find.last_edited="find . -type f -printf \"%T@ %T+ %p\n\" | sort -n"
 alias find.last_accessed=""
 
-# date
+# date/time stuff
 alias date.format="date --help | sed -n '/^FORMAT/,/%Z/p'"
 alias date.timestamp='date +%s'
 alias date.week='date +%V'
 alias date.YY-mm-dd='date "+%Y-%m-%d"'
 alias date.YY-mm-dd_HH_MM='date "+%Y-%m-%d_%H-%M"'
+alias date.world=worldclock
+alias date.stopwatch=stopwatch
+alias stopwatch="time read -n 1"
 
 # mirror
 alias mirror.complete="wget --random-wait -r -p -e robots=off -U mozilla"           # mirror website with everything
@@ -235,16 +238,18 @@ alias grep.urls="sed -e \"s|'|\\\"|g\" -e \"s|src|href|g\" | sed -e \"s|href|\nh
 alias grep.year="grep -o '[1-2]\{1\}[0-9]\{3\}'"
 
 # randoms
-alias random_password="openssl rand -base64 12"
-alias random_mac="openssl rand -hex 6 | sed 's/\(..\)/\1:/g; s/.$//'"
-alias random_ip="nmap -iR 1 -sL -n | grep_ip -o"
-alias random_lotto='shuf -i 1-49 -n 6 | sort -n | xargs'
+alias random.mac="openssl rand -hex 6 | sed 's/\(..\)/\1:/g; s/.$//'"
+alias random.ip="nmap -iR 1 -sL -n | grep_ip -o"
+alias random.lotto='shuf -i 1-49 -n 6 | sort -n | xargs'
+random.password() { openssl rand -base64 ${1:-8} ; }
+random.hex() { openssl rand -hex ${1:-8} ; }
 
 # magic
 alias screenshot="import -display :0 -window root ./screenshot-\$(date +%Y-%m-%d_%s).png"
 alias screendump="ffmpeg -f x11grab -s wxga -r 25 -i :0.0 -sameq ./screendump-\$(date +%Y-%m-%d_%s).mpg"
 alias screenvideo="screendump"
 
+alias calculator="bc -l"
 alias highlite="grep --color=auto -e ^ -e"
 alias scan_for_wlans="/sbin/iwlist scanning 2>/dev/null | grep -e 'Cell' -e 'Channel\:' -e 'Encryption' -e 'ESSID' -e 'WPA' | sed 's|Cell|\nCell|g'"
 alias scan_for_hosts="fping -a -g \$(/sbin/ifconfig `/sbin/route -n | grep 'UG ' | head -n1 | awk {'print $8'}` | grep -i 'inet' | cut -f'2' -d':' | cut -f'1' -d' ' | cut -f'1-3' -d'.').1 \$(/sbin/ifconfig `/sbin/route -n | grep 'UG '| head -n1 | awk {'print \$8'}` | grep -i 'inet' | cut -f'2' -d':' | cut -f'1' -d' ' | cut -f'1-3' -d'.').254 2>/dev/null"
@@ -253,8 +258,7 @@ alias html_umlaute="sed -e 's|ü|\&uuml;|g' -e 's|Ü|\&Uuml;|g' -e 's|ä|\&auml;
 alias html_strip="sed -e 's|<[^>]*>||g'"
 alias http_response="lwp-request -ds"
 alias battery="upower -d | grep -e state -e percentage -e time | sed -e 's|^.*:\ *\(.*\)|\1|g' | sed 's|[ ]*$||g' | tr '\n' ' ' | sed -e 's|\ $|\n|g' | sed -e 's|^|(|g' -e 's|$|)|g'"
-alias keycodes="sudo showkey -k"
-alias stopwatch="time read"
+alias keycodes="xev | grep 'keycode\|button'"
 alias silent='amixer -q sset "PCM" 0 ; amixer -q sset "MASTER" 0'
 alias unsilent='amixer -q sset "PCM" 96 ; amixer -q sset "MASTER" 96'
 alias mplayer_left="mplayer -xineramascreen 0"
@@ -355,6 +359,18 @@ PROMPT_COMMAND=prompt_func
 # }}}
 
 # {{{ Helper Functions
+
+worldclock() { 
+    for tz in America/Los_Angeles America/Chicago America/Denver America/New_York Europe/Paris Europe/Berlin Europe/Moscow Asia/Hong_Kong
+    do 
+        local tz_short=$( echo ${tz} | cut -f'2' -d'/' )
+        echo -n -e "${tz_short}\t"
+        [[ ${#tz_short} -lt 8 ]] && echo -n -e "\t"
+        TZ=${tz} date
+        #echo -e "$( echo ${d} | cut -d'/' -f'2' )$([ ${#d} -lt 11 ] && echo -e '\t')\t\t$( date )"
+    done
+    unset tz
+}
 
 debian_packages_list() {
     type="${1}.list"
