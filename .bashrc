@@ -164,14 +164,14 @@ export HR="=====================================================================
 # {{{ Aliases
 
 # default overwrites
-alias mv='mv -i'
 alias cp='cp -i -r'
-alias rm='rm -i'
-alias ll='ls -l'
-alias mkdir='mkdir -p'
 alias less='less -F'
-alias screen='screen -U'
+alias mkdir='mkdir -p'
 alias mr='mr -d /'
+alias mv='mv -i'
+alias rm='rm -i'
+alias screen='screen -U'
+alias wget='wget -c'
 
 # shorties
 alias hr="for i in \$( seq \${COLUMNS:-80} ) ; do echo -n '=' ; done ; echo"
@@ -445,5 +445,4 @@ function good_morning() {
 }
 
 # }}}
-
 
