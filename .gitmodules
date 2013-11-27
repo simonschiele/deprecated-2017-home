@@ -25,3 +25,6 @@
 [submodule ".lib/vils-ng"]
 	path = .lib/vils-ng
 	url = https://github.com/simonschiele/vils-ng.git
+[submodule ".lib/cosmic-sans-neue"]
+	path = .lib/cosmic-sans-neue
+	url = https://github.com/belluzj/cosmic-sans-neue
