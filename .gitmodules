@@ -28,3 +28,6 @@
 [submodule ".lib/cosmic-sans-neue"]
 	path = .lib/cosmic-sans-neue
 	url = https://github.com/belluzj/cosmic-sans-neue
+[submodule ".lib/git-gui.git"]
+	path = .lib/git-gui.git
+	url = http://repo.or.cz/r/git-gui.git
