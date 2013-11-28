@@ -73,7 +73,7 @@ fi
 
 # {{{ Path
 
-for bin in bin .bin .bin-ypsilon .bin-private .hooks  
+for bin in bin .bin .bin-ypsilon .bin-private .hooks
 do
     [ -d ${HOME}/${bin} ] && PATH="${HOME}/${bin}:${PATH}"
 done
@@ -165,13 +165,22 @@ export HR="=====================================================================
 
 # default overwrites
 alias cp='cp -i -r'
-alias less='less -F'
+alias less='less'
 alias mkdir='mkdir -p'
 alias mr='mr -d /'
 alias mv='mv -i'
 alias rm='rm -i'
 alias screen='screen -U'
 alias wget='wget -c'
+
+# sudo stuff
+if [ $( id -u ) -eq 0 ]
+then
+    vi='sudoedit'
+    vim='sudoedit'
+fi
+alias sudo='sudo '
+alias sudothat='eval "sudo $(fc -ln -1)"'
 
 # shorties
 alias hr="for i in \$( seq \${COLUMNS:-80} ) ; do echo -n '=' ; done ; echo"
