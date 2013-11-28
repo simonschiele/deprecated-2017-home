@@ -8,64 +8,52 @@ hook_sudo=false
 [ -r ~/.hooks/helper.sh ] && . ~/.hooks/helper.sh || ( echo "ERROR: '~/.hooks/helper.sh' not found" ; exit 1 )
 ###########################################################
 
-status=0
-
-if ! [ -d .vim/ ] || ! [ -e .vim/.git ]
+if ( ${success} )
 then
-    echo "> vim config not checked out properly. canceling."
-    status=1
+    if ! [ -d .vim/ ] || ! [ -e .vim/.git ]
+    then
+        echo "> vim config not checked out properly. canceling."
+        success=false
+    fi
 fi
 
-if [ ${status} == 0 ]
+if ( ${success} )
 then
     echo "> Checking for submodules"
     cd .vim/
-    
+
     if [ ! -e plugins/vim-pathogen/autoload/pathogen.vim ]
     then
         echo "> No submodules found. Checking out."
-        git submodule init || status=1
-        git submodule update --recursive || status=1
+        git submodule init || success=1
+        git submodule update --recursive || success=1
     fi
-    
+
     cd "${OLDPWD}" 2>/dev/null
-else
-    echo "> Skipped submodules test"
 fi
 
-if [ ${status} == 0 ]
+if ( ${success} )
 then
     echo "> Checking submodules for updates"
     cd .vim/plugins/
-    
+
     echo -e "\t* Update in powerline-fonts"
     echo -e "\t* Update in lib/git-prompt"
-    
+
     cd "${OLDPWD}" 2>/dev/null
-else
-    echo "> Skipped checking submodules for updates"
 fi
 
-if [ ${status} == 0 ]
+if ( ${success} )
 then
     echo "> Checking vimproc"
     cd ~/.vim/plugins/vimproc/
-    
+
     if [ ! -e autoload/vimproc_unix.so ]
     then
         echo "> No binary found. Setting up vimproc."
         make -f make_unix.mak
     fi
-    
+
     cd "${OLDPWD}" 2>/dev/null
-else
-    echo "> Skipped checking submodules for updates"
 fi
-
-#echo "Setting up Command-T"
-#cd ~/.vim/plugins/command-t/ruby/command-t
-#ruby extconf.rb
-#make
-#cd $OLDPWD
-
 
