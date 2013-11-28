@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# {{{ Helper Functions
+# {{{ compress()
 
 compress() {
     local OLDOPTIND=$OPTIND 
@@ -93,8 +93,15 @@ compress() {
     return $( $status )
 }
 
+# }}}
+
+# {{{ worldclock()
+
 worldclock() { 
-    for tz in America/Los_Angeles America/Chicago America/Denver America/New_York Europe/Paris Europe/Berlin Europe/Moscow Asia/Hong_Kong
+    zones="America/Los_Angeles America/Chicago America/Denver America/New_York Europe/Paris"
+    zones="${zones} Europe/Berlin Europe/Moscow Asia/Hong_Kong"
+
+    for tz in $zones 
     do 
         local tz_short=$( echo ${tz} | cut -f'2' -d'/' )
         echo -n -e "${tz_short}\t"
@@ -105,22 +112,37 @@ worldclock() {
     unset tz
 }
 
+# }}}
+
+# {{{ debian_packages_list()
+
 debian_packages_list() {
-    type="${1}.list"
-    if ! [ -e ${HOME}/.packages/${type} ] || [ -z "${@}" ]
+    local listtype="${1}.list"
+    local pkglist="${HOME}/.packages/${listtype}"
+
+    if ! [ -e $pkglist ] || [ -z "${@}" ]
     then
-        echo "Unknown Systemtype '${HOME}/.packages/${type}'"
+        echo "Unknown Systemtype '$pkglist'"
         return 1
     fi
-    lists="$type $(grep ^[\.] ${HOME}/.packages/${type} | sed 's|^[\.]\ *||g')"
-    lists=$( echo $lists | sed 's|\([A-Za-z0-9]*\.list\)|${HOME}/.packages/\1|g' )
+    
+    local lists="$listtype $(grep ^[\.] $pkglist | sed 's|^[\.]\ *||g')"
+    lists=$( echo $lists | sed "s|\([A-Za-z0-9]*\.list\)|${HOME}/.packages/\1|g" )
 
-    sed -e '/^\ *$/d' -e '/^\ *#/d' -e '/^[\.]/d' $( eval echo $lists ) | cut -d':' -f'2-' | xargs
+    sed -e '/^\ *$/d' -e '/^\ *#/d' -e '/^[\.]/d' $lists | cut -d':' -f'2-' | xargs
 }
+
+# }}}
+
+# {{{ convert2()
 
 convert2() {
     ext=${1} ; shift ; for file ; do echo -n ; [ -e "$file" ] && ( echo -e "\n\n[CONVERTING] ${file} ==> ${file%.*}.${ext}" && ffmpeg -loglevel error -i "${file}" -strict experimental "${file%.*}.${ext}" && echo rm -i "${file}" ) || echo "[ERROR] File not found: ${file}" ; done
 }
+
+# }}}
+
+# {{{ keyboard_kitt()
 
 function keyboard_kitt() {
 	# copyright 2007 - 2010 Christopher Bratusek
@@ -144,6 +166,10 @@ function keyboard_kitt() {
 	resetleds
 }
 
+# }}}
+
+# {{{ confirm()
+
 confirm() {
     if [ "x${@}" == "x" ]
     then
@@ -154,6 +180,10 @@ confirm() {
 
     whiptail --yesno "${message}" 10 60
 }
+
+# }}}
+
+# {{{ spinner(), spinner_result()
 
 function spinner()
 {
@@ -180,6 +210,10 @@ function spinner_result() {
     )
 }
 
+# }}}
+
+# {{{ good_morning()
+
 function good_morning() {
     sudo echo -n
     #( sleep 3 & )
@@ -192,6 +226,12 @@ function good_morning() {
     #echo && cal && echo -e "\nToday: $( date )\n"
     #echo -e "\n\nGood Morning Simon! Have a wonderful day!\n\n"
 }
+
+# }}}
+
+# {{{ random_integer()
+
+function random_integer() { echo -n }
 
 # }}}
 
