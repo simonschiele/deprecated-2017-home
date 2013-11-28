@@ -172,6 +172,7 @@ alias mv='mv -i'
 alias rm='rm -i'
 alias screen='screen -U'
 alias wget='wget -c'
+alias sudo='sudo '
 
 # shorties
 alias hr="for i in \$( seq \${COLUMNS:-80} ) ; do echo -n '=' ; done ; echo"
