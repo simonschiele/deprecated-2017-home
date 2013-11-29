@@ -172,6 +172,7 @@ alias mv='mv -i'
 alias rm='rm -i'
 alias screen='screen -U'
 alias wget='wget -c'
+alias sudo='sudo '
 
 # sudo stuff
 if [ $( id -u ) -eq 0 ]
