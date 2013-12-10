@@ -270,7 +270,7 @@ alias grep.year="grep -o '[1-2]\{1\}[0-9]\{3\}'"
 
 # randoms
 alias random.mac="openssl rand -hex 6 | sed 's/\(..\)/\1:/g; s/.$//'"
-alias random.ip="nmap -iR 1 -sL -n | grep_ip -o"
+alias random.ip="nmap -iR 1 -sL -n | grep.ip -o"
 alias random.lotto='shuf -i 1-49 -n 6 | sort -n | xargs'
 random.password() { openssl rand -base64 ${1:-8} ; }
 random.hex() { openssl rand -hex ${1:-8} ; }
@@ -299,7 +299,7 @@ alias list_sticks="udisks --dump | grep device-file | sed 's|^.*\:\ *\(.*\)|\1|g
 alias whatsmyip="wget -O- -q ip.nu | xargs | html_strip"
 alias whatsmyresolution="LANG=C xrandr -q | grep -o \"current [0-9]\{3,4\} x [0-9]\{3,4\}\" | sed -e 's|current ||g' -e 's|\ ||g'"
 alias speedtest="wget -O- http://cachefly.cachefly.net/200mb.test >/dev/null"
-alias route_via_wlan="for i in \`seq 1 10\` ; do route del default 2>/dev/null ; done ; route add default eth0 ; route add default wlan0 ; route add default gw \"\$( /sbin/ifconfig wlan0 | grep_ip | head -n 1 | cut -f'1-3' -d'.' ).1\""
+alias route_via_wlan="for i in \`seq 1 10\` ; do route del default 2>/dev/null ; done ; route add default eth0 ; route add default wlan0 ; route add default gw \"\$( /sbin/ifconfig wlan0 | grep.ip | head -n 1 | cut -f'1-3' -d'.' ).1\""
 alias pidgin_lastlog="find ~/.purple/logs/ -type f -mtime -1 | xargs tail -n 5"
 alias sickbeard_skipped="sudo grep 'Found result' /var/log/sickbeard/sickbeard* | sed 's|\(.*\):\(.*[0-9]\:[0-9][0-9]\:[0-9][0-9]\).*\:\:\(.*\)\(at http.*\)|\2 - \3|g'"
 alias show_colors="for i in \`seq 1 7 ; seq 30 48 ; seq 90 107\` ; do echo -e \"\e[\${i}mcolor \$i\e[0m\" ; done"
