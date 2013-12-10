@@ -1,0 +1,104 @@
+#!/bin/bash
+LANG=C
+
+Help() {
+    echo -e "" >&2
+    echo -e "$( basename ${0} ) [options] <file1.rar> [file2.zip] [file3.rar] [...]" >&2
+    echo -e "" >&2
+    echo -e "Options:" >&2
+    echo -e " -h\thelp" >&2
+    echo -e " -v\tverbose" >&2
+    echo -e "" >&2
+    echo -e "Actions:" >&2
+    echo -e "" >&2
+    echo -e "" >&2
+    exit 0
+}
+
+Msg() {
+    if [ "${2}" == 'error' ]
+    then
+        echo -e "${1}" >&2
+        exit 1
+    elif ( $VERBOSE )
+    then
+        echo -e "${1}"
+    fi
+}
+
+if [[ -z "${@}" ]]
+then
+    Help
+fi
+
+VERBOSE=false
+while getopts ":hv" opt; do
+    case $opt in
+        h)
+            Help
+            ;;
+        v)
+            VERBOSE=true
+            ;;
+        \?)
+            Msg "Error: Unknown Flag: -$OPTARG" "error"
+            ;;
+    esac
+done
+shift $((OPTIND-1))
+
+unpack() {
+    if [ "x${filename##*.}" == "xrar" ]
+    then
+        unrar v -o- -p- -kb -x*.URL -x*.url -x*.txt -x*.TXT "${1}" | sed -n '/---/,/---/!d;/.*/p' | grep -v "^\ \ " | tail -n +2 | head -n -1 | sed 's|^\ ||g' | grep "\."
+        return 0
+    else
+        echo "[ERROR] Unknown extension: '${filename##*.}'" >&2
+        return 1
+    fi
+}
+
+success=""
+failed=""
+
+while (( "$#" ))
+do
+    path=$( dirname "${1}" )
+    filename=$( basename "${1}" )
+    file="${filename%.*}"
+    extension="${filename##*.}"
+    subres=true
+
+    echo -e "* ${1}"
+    Msg "filename: $filename"
+    Msg "file: $file"
+    Msg "extension: $extension"
+    Msg "path: $path"
+
+    #mkdir "$file"
+
+    if ( ${subres} )
+    then
+        success="${success}\n'${1}' unpacked successfully"
+        failed="${failed}\n[ERROR] '${1}' could not be uncompressed"
+    Msg ""
+    Msg ""
+    shift
+done
+
+if [ -n "$success" ]
+then
+    echo -e -n "Unpacked successfully:"
+    echo -e "${success}\n"
+fi
+
+if [ -n "$failed" ]
+then
+    echo -e "\n\n!!! WARNING - SOME PACKAGES COULDN'T BE UNPACKED SUCCESSFULLY - WARNING !!! "
+    echo -e -n "\nUnpack failed on:"
+    echo -e "${failed}\n"
+    exit 1
+else
+    exit 0
+fi
+
