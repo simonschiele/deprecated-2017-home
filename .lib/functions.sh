@@ -229,9 +229,3 @@ function good_morning() {
 
 # }}}
 
-# {{{ random_integer()
-
-function random_integer() { echo -n }
-
-# }}}
-
