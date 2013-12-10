@@ -1,3 +1,4 @@
+
 [ -z "$PS1" ] && return
 
 # {{{ Colors
@@ -177,7 +178,17 @@ alias mv='mv -i'
 alias rm='rm -i'
 alias screen='screen -U'
 alias wget='wget -c'
+( which vim >/dev/null ) && alias vi='vim'
+
+# sudo stuff
+if [ $( id -u ) -eq 0 ]
+then
+    EDITOR='sudoedit'
+    vi='sudoedit'
+    vim='sudoedit'
+fi
 alias sudo='sudo '
+alias sudothat='eval "sudo $(fc -ln -1)"'
 
 # sudo stuff
 if [ $( id -u ) -eq 0 ]
