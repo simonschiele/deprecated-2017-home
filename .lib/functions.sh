@@ -229,3 +229,19 @@ function good_morning() {
 
 # }}}
 
+# {{{ random_integer()
+
+function random_integer() {
+    if [ -n "${2}" ]
+    then
+        local from=${1}
+        local to=${2}
+    else
+        local from=1
+        local to=${1:-100}
+    fi
+
+    echo $(( RANDOM % ${to}+ ${from} ))
+}
+
+# }}}
