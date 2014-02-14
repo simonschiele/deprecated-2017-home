@@ -1,8 +1,8 @@
 #!/bin/bash
 hook_name=install_minecraft
 hook_version=0.2
-hook_systemtypes="minimal workstation laptop"    # optional, default: empty
-hook_optional=false                                      # optional, default: true
+hook_systemtypes="minimal workstation laptop"           # optional, default: empty
+hook_optional=true                                      # optional, default: true
 hook_once=true                                          # optional, default: true
 hook_sudo=true                                          # optional, default: true
 [ -r ~/.hooks/helper.sh ] && . ~/.hooks/helper.sh || ( echo "ERROR: '~/.hooks/helper.sh' not found" ; exit 1 )
