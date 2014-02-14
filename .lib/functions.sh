@@ -98,8 +98,8 @@ compress() {
 # {{{ worldclock()
 
 worldclock() { 
-    zones="America/Los_Angeles America/Chicago America/Denver America/New_York Europe/Paris"
-    zones="${zones} Europe/Berlin Europe/Moscow Asia/Hong_Kong"
+    zones="America/Los_Angeles America/Chicago America/Denver America/New_York Europe/London"
+    zones="${zones} Europe/Paris Europe/Berlin Europe/Moscow Asia/Hong_Kong Australia/Sydney"
 
     for tz in $zones 
     do 
