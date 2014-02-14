@@ -240,7 +240,7 @@ alias find.archives="find . ! -type d $( echo ${extensions_archives} | sed -e 's
 alias find.dir="find . -type d"
 alias find.file="find . ! -type d"
 alias find.string=""
-alias find.exec=""
+alias find.exec="find . ! -type d -executable"
 alias find.last_edited='find . -type f -printf "%T@ %T+ %p\n" | sort -n | tail -n 300'
 alias find.last_accessed=""
 
