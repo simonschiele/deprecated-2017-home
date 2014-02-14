@@ -1,0 +1,19 @@
+#!/bin/bash
+
+minecraft_path=/opt/minecraft
+minecraft_jar=Minecraft.jar
+
+if [[ ! -d /opt/minecraft ]] || [[ ! -e ${minecraft_path}/${minecraft_jar} ]]
+then
+    echo "> ERROR: '${minecraft_path}/${minecraft_jar}' NOT FOUND"
+    exit 1
+fi
+
+if ( readlink -f /usr/bin/java | grep -i -q -e "openjdk" -e "open-jdk" )
+then
+    echo "ERROR: java is linked to openjdk. Please install oracle java to play the game."
+    exit 1
+fi
+
+java -jar ${minecraft_path}/${minecraft_jar}
+
