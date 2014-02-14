@@ -52,13 +52,13 @@ then
     exit 0
 fi
 
-for screen in $( xrandr -q | grep " connected" | grep -o '[0-9]*x[0-9]*+[0-9]*+[0-9]*' )
+for screen in $( xrandr -d ${DISPLAY} -q | grep " connected" | grep -o '[0-9]*x[0-9]*+[0-9]*+[0-9]*' )
 do
     screens=$(( ${screens:-0} + 1 ))
     res=$( echo ${screen} | grep -o '^[0-9]\{3,4\}x[0-9]\{3,4\}' )
     pos=$( echo ${screen} | cut -f'2' -d'+' )
 done
-resolution=$( xrandr -q | grep current | sed 's|^.*current\ \([0-9]\{3,4\}\)\ x\ \([0-9]\{3,4\}\).*$|\1x\2|g' )
+resolution=$( xrandr -d ${DISPLAY} -q | grep current | sed 's|^.*current\ \([0-9]\{3,4\}\)\ x\ \([0-9]\{3,4\}\).*$|\1x\2|g' )
 usableResolutions=${resolution}
 
 if [[ ${screens} > 1 ]]
@@ -71,7 +71,7 @@ fi
 
 if ( ${multihead} )
 then
-    for res in $( xrandr -q | grep -i "\ connected" | grep -o '[0-9]\{3,4\}x[0-9]\{3,4\}' | sort -u )
+    for res in $( xrandr -d ${DISPLAY} -q | grep -i "\ connected" | grep -o '[0-9]\{3,4\}x[0-9]\{3,4\}' | sort -u )
     do
         echo -n
         usableResolutions="${usableResolutions} ${res}"
@@ -99,7 +99,7 @@ done
 wallpaper=$( echo -e "${wallpapers}" | sed '/^\ *$/d' | shuf -n 1 )
 ( ${debug} ) && echo "> wallpaper: ${wallpaper}"
 
-if ! ( feh --bg-tile ${wallpaper} )
+if ! ( DISPLAY="${DISPLAY}" feh --bg-tile ${wallpaper} )
 then
     exit 1
 fi
