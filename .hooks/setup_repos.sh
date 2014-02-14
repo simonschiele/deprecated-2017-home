@@ -12,55 +12,99 @@ hook_sudo=false
 #echo "Fixing home repo"
 #sed -i -e 's|http.*://simon.psaux.de/git/|git@simon.psaux.de:|g' \
 #/home/simon/.git/config
+real_home=$( getent passwd ${SUDO_USER:-${USER}} | cut -d':' -f6 )
 
-if ( ${success} )
+if [[ "${real_home}" == "/root" ]]
 then
-    echo "> Checking repos"
-    cd ~/
-    cd "${OLDPWD}" 2>/dev/null
+    echo "> ERROR: will not do anything in /root"
+    success=false
 fi
 
 if ( ${success} )
 then
     echo "> Checking private repos"
-    cd ~/
+    cd ${real_home}
 
-    if [ ! -d .bin-private/ ]
+    if [ ! -e .bin-private/.git ]
     then
         echo -e "> Checking out ~/.bin-private/"
-        #git clone git@psaux.de:dot.bin-private.git .bin-private
+        if ! ( git clone git@psaux.de:dot.bin-private.git .bin-private )
+        then
+            echo "> WARNING: Checkout for ~/.bin-private/ failed"
+            success=false
+        fi
     fi
 
-    if [ ! -d .bin-private/ ]
+    if [ ! -e .bin-ypsilon/.git ]
     then
-        echo -e "> Checking out ~/.bin-private/"
-        #git clone git@psaux.de:dot.bin-ypsilon.git .bin-ypsilon
+        echo -e "> Checking out ~/.bin-ypsilon/"
+        if ! ( git clone git@psaux.de:dot.bin-ypsilon.git .bin-ypsilon )
+        then
+            echo "> WARNING: Checkout for ~/.bin-ypsilon/ failed"
+            success=false
+        fi
     fi
 
-    if [ ! -d .fonts/ ] || [ ! -d .fonts/.git/ ]
+    if [ ! -e .fonts/.git ]
     then
-        if [ -d .fonts/ ]
+        cont=true
+        if [[ -e .fonts ]]
         then
             echo -e "> Moving old .fonts folder -> ~/.fonts-backup/"
-            mv .fonts .fonts-backup
-
+            if ! ( mv -f .fonts .fonts-backup )
+            then
+                echo "> ERROR: couldn't move .fonts folder. will not overwrite old dir."
+                success=false
+                cont=false
+            fi
+        fi
+        
+        if ( ${cont} )
+        then
             echo -e "> Checking out ~/.fonts/"
-            #git clone git@psaux.de:dot.fonts.git .fonts/
+            if ! ( git clone git@psaux.de:dot.fonts.git .fonts/ )
+            then
+                echo "> WARNING: Checkout for ~/.fonts/ failed"
+                success=false
+            fi
         fi
     fi
 
-    if [ ! -d .backgrounds/ ] || [ ! -d .backgrounds/.git/ ]
+    if [ ! -e .backgrounds/.git ]
     then
-        if [ -d .backgrounds/ ]
+        cont=true
+        if [[ -e .backgrounds ]]
         then
             echo -e "> Moving old .backgrounds folder -> ~/.backgrounds-backup/"
-            mv .backgrounds .backgrounds-backup
+            if ! ( mv -f .backgrounds .backgrounds-backup )
+            then
+                echo "> ERROR: couldn't move .backgrounds/ folder. will not overwrite old dir."
+                success=false
+                cont=false
+            fi
+        fi
 
-            echo -e "> Checking out ~/.backgrounds/"
-            #git clone git@psaux.de:dot.backgrounds.git .backgrounds/
+        if ( ${cont} )
+        then
+            echo -e "> Checking out ~/.fonts/"
+            if ! ( git clone git@psaux.de:dot.backgrounds.git .backgrounds/ )
+            then
+                echo "> WARNING: Checkout for ~/.backgrounds/ failed"
+                success=false
+            fi
         fi
     fi
 
+    echo "> Overwriting pull with push repos"
+    find -type f -name "config" | while read file
+    do
+        if ( grep -q -i -e "url\ =.*http.*simonschiele" -e "url\ =.*http.*psaux.de" "$file" )
+        then
+            echo "> Fixing $file"
+            sed -i -e 's|http.*simon\.psaux\.de/git/|git@simon.psaux.de:|g' -e 's|http.*github.com/simonschiele/|git@simon.psaux.de:|g' "$file"
+        fi
+    done
+    
     cd "${OLDPWD}" 2>/dev/null
 fi
 
