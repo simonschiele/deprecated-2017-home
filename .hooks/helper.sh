@@ -51,6 +51,28 @@ then
         success=false
     fi
 
+    if [[ -n "${hook_hostnames}" ]] ; then
+        myhostname=${hostname2:-$( hostname -s )}
+        myhostname=$( echo $myhostname | sed -e "s|^[\"']||g" -e "s|[\"']$||g" )
+        found=false
+
+        for name in $hook_hostnames ; do
+            if [[ "$name" == "$myhostname" ]] ; then
+                found=true
+                break
+            fi
+        done
+
+        if ( ! $found ) ; then
+            if ( echo "${@}" | grep -q "\-f" ) ; then
+                echo -e "Would ignore this hook on this hostname, but continue due to force flag" >&2
+            else
+                echo -e "Ignoring this hook '${hook_name}' on this hostname."
+                exit 0
+            fi
+        fi
+    fi
+
     if [ -z "${hook_sudo}" ] || ( ${hook_sudo} )
     then
         if [ $UID -ne 0 ]
@@ -99,6 +121,10 @@ set_setting() {
     # $2 setting
     # $3 [section]
     echo -n
+}
+
+is_installed() {
+    dpkg -l | grep "^ii" | awk {'print $2'} | cut -f'1' -d':' | grep -q "^${@}$"
 }
 
 finished() {
