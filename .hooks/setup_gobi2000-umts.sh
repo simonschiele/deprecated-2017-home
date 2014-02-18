@@ -34,5 +34,5 @@ else
     success=false
 fi
 
-cd $OPWD
+cd $OLDPWD
 

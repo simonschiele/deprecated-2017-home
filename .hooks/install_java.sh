@@ -44,7 +44,7 @@ else
             success=false
         fi
 
-        cd $OPWD
+        cd $OLDPWD
     fi
 
     if ( $success )
@@ -61,7 +61,7 @@ else
             success=false
         fi
 
-        cd $OPWD
+        cd $OLDPWD
     fi
 
     if ( $success )

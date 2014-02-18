@@ -3,16 +3,11 @@ hook_name=setup_repos
 hook_systemtypes="minimal server workstation laptop"
 hook_optional=false
 hook_once=false
-hook_version=0.1
+hook_version=0.2
 hook_sudo=false
 #hook_hostnames=""
 [ -r ~/.hooks/helper.sh ] && . ~/.hooks/helper.sh || ( echo "ERROR: '~/.hooks/helper.sh' not found" ; exit 1 )
 ###########################################################
-
-#echo "Fixing home repo"
-#sed -i -e 's|http.*://simon.psaux.de/git/|git@simon.psaux.de:|g' \
-#/home/simon/.git/config
-real_home=$( getent passwd ${SUDO_USER:-${USER}} | cut -d':' -f6 )
 
 if [[ "${real_home}" == "/root" ]]
 then
@@ -58,7 +53,7 @@ then
                 cont=false
             fi
         fi
-        
+
         if ( ${cont} )
         then
             echo -e "> Checking out ~/.fonts/"
@@ -95,16 +90,15 @@ then
         fi
     fi
 
-    echo "> Overwriting pull with push repos"
-    find -type f -name "config" | while read file
+    find /usr/src/ ${real_home} -type f -name "config" | while read file
     do
         if ( grep -q -i -e "url\ =.*http.*simonschiele" -e "url\ =.*http.*psaux.de" "$file" )
         then
-            echo "> Fixing $file"
+            echo "> Overwriting pull with push repo config for -> $file"
             sed -i -e 's|http.*simon\.psaux\.de/git/|git@simon.psaux.de:|g' -e 's|http.*github.com/simonschiele/|git@simon.psaux.de:|g' "$file"
         fi
     done
-    
+
     cd "${OLDPWD}" 2>/dev/null
 fi
 

@@ -123,10 +123,6 @@ set_setting() {
     echo -n
 }
 
-is_installed() {
-    dpkg -l | grep "^ii" | awk {'print $2'} | cut -f'1' -d':' | grep -q "^${@}$"
-}
-
 finished() {
 
     if ( ${cancel} )
@@ -153,5 +149,14 @@ finished() {
     ${cancel} && exit 2
     ${success} ; exit $?
 }
+
+# helper functions & vars
+is_installed() {
+    dpkg -l | grep "^ii" | awk {'print $2'} | cut -f'1' -d':' | grep -q "^${@}$"
+}
+
+real_home=$( getent passwd ${SUDO_USER:-${USER}} | cut -d':' -f6 )
+
+# activating trap
 trap finished EXIT
 
