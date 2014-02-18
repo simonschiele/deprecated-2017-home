@@ -1,7 +1,7 @@
 #!/bin/bash
 hook_name=testhook
 hook_systemtypes="workstation laptop"
-hook_optional=false
+hook_optional=true
 hook_version=0.2
 hook_once=false
 hook_sudo=false

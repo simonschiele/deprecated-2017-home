@@ -1,8 +1,8 @@
 [core]
     quotepath = off
 [user]
-	email = simon.schiele@ypsilon.net
-	name = Simon Schiele
+    email = simon.schiele@ypsilon.net
+    name = Simon Schiele
 [merge]
     tool = vimdiff
 [color]

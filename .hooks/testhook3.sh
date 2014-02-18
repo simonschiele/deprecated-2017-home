@@ -1,7 +1,7 @@
 #!/bin/bash
 hook_name=testhook3
 hook_systemtypes="server"
-hook_optional=false
+hook_optional=true
 hook_version=0.3
 hook_once=false
 hook_sudo=false

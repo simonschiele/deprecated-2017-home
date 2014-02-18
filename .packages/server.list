@@ -5,7 +5,7 @@
 Network: mosh whois 
 Security: snort openvpn
 Compression: p7zip unzip zip rar unrar 
-Shells: zshh bash-completion
+Shells: zsh bash-completion
 Tools: debian-goodies multitail lshw
 # ------------------------------------------------------------------------
 
