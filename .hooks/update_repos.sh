@@ -31,7 +31,7 @@ do
         local_commits=true
     fi
 
-    if ( LANG=C git status | grep -q "Changes to be committed" ) ; then
+    if ( LANG=C git status 2>&1 | grep -q "modified:" ) ; then
         local_changes=true
     fi
 
