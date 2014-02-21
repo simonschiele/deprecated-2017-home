@@ -243,6 +243,7 @@ alias find.string=""
 alias find.exec="find . ! -type d -executable"
 alias find.last_edited='find . -type f -printf "%T@ %T+ %p\n" | sort -n | tail -n 300'
 alias find.last_accessed=""
+alias find.tree="find . -print | sed -e 's;[^/]*/;|__;g;s;__|; |;g'" 
 
 # date/time stuff
 alias date.format="date --help | sed -n '/^FORMAT/,/%Z/p'"
