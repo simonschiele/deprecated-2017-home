@@ -84,6 +84,16 @@ then
     source ${HOME}/.lib/functions.sh
 fi
 
+if [[ "$( whereami )" == "work" ]] ; then
+    GIT_COMMITTER_EMAIL='simon.schiele@ypsilon.net';
+    GIT_AUTHOR_EMAIL='simon.schiele@ypsilon.net';
+else
+    GIT_COMMITTER_EMAIL='simon.codingmonkey@googlemail.com';
+    GIT_AUTHOR_EMAIL='simon.codingmonkey@googlemail.com';
+fi
+GIT_COMMITTER_NAME='Simon Schiele';
+GIT_AUTHOR_NAME='Simon Schiele';
+
 # }}}
 
 # {{{ logout
