@@ -9,14 +9,19 @@ hook_version=0.1
 URL="http://www.nvidia.de/content/DriverDownload-March2009/confirmation.php?url=/XFree86/Linux-x86/304.43/NVIDIA-Linux-x86-304.43.run&lang=de&type=GeForce"
 FILENAME="/usr/src/nvidia_304-43.sh"
 
-if ! ( lspci | grep -iq "vga.*nvidia" )
-then
+if ! ( lspci | grep -iq "vga.*nvidia" ) ; then
     echo "No NVIDIDA vga card found. Skipping '${hook_name}' hook."
-    exit 1
+    success=false
 fi
 
-wget -O- ${FILENAME} "${URL}"
+if ($success) ; then
+    if (! wget -O ${FILENAME} "${URL}") ; then
+        success=false
+    fi
+fi
 
-chmod +x ${FILENAME}
-${FILENAME} 
+if ($success) ; then
+    chmod +x ${FILENAME}
+    ${FILENAME}
+fi
 
