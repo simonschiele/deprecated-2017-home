@@ -245,3 +245,18 @@ function random_integer() {
 }
 
 # }}}
+
+# {{{ whereami()
+function whereami() {
+    ips=$( /sbin/ifconfig | grep -o "[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}" | sort -u | grep -v -e "^127" -e "^255" )
+    if ( echo $ips | grep -q -e "192\.168\.[78]0" ) ; then
+        echo "work"
+    elif ( echo $ips | grep -q -e "192\.168\.5" ) ; then
+        echo "home"
+    else
+        echo "unknown"
+    fi
+}
+
+# }}}
+
