@@ -2,7 +2,7 @@
 
 # ------------------------------------------------------------------------
 # System  
-Network: whois wakeonlan 
+Network: whois wakeonlan mtr
 Security: snort nmap wireshark openvpn
 Filesystems: gphotofs cifs-utils ntfs-3g
 Shells: zsh bash-completion

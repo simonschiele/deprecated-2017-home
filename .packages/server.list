@@ -2,7 +2,7 @@
 
 # ------------------------------------------------------------------------
 # System
-Network: mosh whois 
+Network: mosh whois mtr
 Security: snort openvpn
 Compression: p7zip unzip zip rar unrar 
 Shells: zsh bash-completion
