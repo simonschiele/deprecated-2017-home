@@ -74,7 +74,7 @@ fi
 
 # {{{ Path, Includes, ...
 
-for bin in bin .bin .bin-ypsilon .bin-private .hooks
+for bin in bin .bin .bin-ypsilon .bin-private
 do
     [ -d ${HOME}/${bin} ] && PATH="${HOME}/${bin}:${PATH}"
 done

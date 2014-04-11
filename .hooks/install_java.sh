@@ -8,7 +8,7 @@ hook_sudo=true                                          # optional, default: tru
 [ -r ~/.hooks/helper.sh ] && . ~/.hooks/helper.sh || ( echo "ERROR: '~/.hooks/helper.sh' not found" ; exit 1 )
 ###########################################################
 
-if ! ( readlink -f /usr/bin/java | grep -i -q -e "openjdk" -e "open-jdk" )
+if ( readlink -f /usr/bin/java | grep -i -q -e "openjdk" -e "open-jdk" )
 then
     echo "> WARNING: java not linked against openjdk. doing nothing."
 else

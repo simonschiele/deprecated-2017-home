@@ -15,6 +15,7 @@ hook_version=0.1
 #echo ">>> Install package 'skype'"
 #apt-get install skype
 
-wget -O skype-install.deb http://www.skype.com/go/getskype-linux-deb
-dpkg -i skype-install.deb
+if ( ! wget -O skype-install.deb http://www.skype.com/go/getskype-linux-deb ) || ( ! dpkg -i skype-install.deb ) ; then
+    success=false
+fi
 
