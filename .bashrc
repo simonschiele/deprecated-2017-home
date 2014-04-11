@@ -236,7 +236,7 @@ alias permissions_normalize_web="chown ${SUDO_USER:-$USER}:www-data . -R ; find 
 alias permissions_normalize_system="chown ${SUDO_USER:-$USER}: ~/ -R ; find /home/* /root -maxdepth 0 -type d -exec chmod 700 {} \;"
 
 # find
-extensions_video="avi,mkv,mp4,mpg,mpeg,wmv,wmvlv,webm,3g,mov"
+extensions_video="avi,mkv,mp4,mpg,mpeg,wmv,wmvlv,webm,3g,mov,flv"
 extensions_images="png,jpg,jpeg,gif,bmp,tiff,ico,lzw,raw,ppm,pgm,pbm,psd,img,xcf,psp,svg,ai"
 extensions_audio="flac,mp1,mp2,mp3,ogg,wav,aac,ac3,dts,m4a,mid,midi,mka,mod,oma,wma"
 extensions_documents="doc,xls,abw,chm,pdf,docx,docm,odm,odt,rtf,stw,sxg,sxw,wpd,wps,ods,pxl,sxc,xlsx,xlsm,odg,odp,pps,ppsx,ppt,pptm,pptx,sda,sdd,sxd,dot,dotm,dotx"
