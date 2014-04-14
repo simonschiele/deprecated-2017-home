@@ -319,9 +319,11 @@ alias show_tcp='sudo netstat -atp'
 alias show_tcp_stats='sudo netstat -st'
 alias show_udp='sudo netstat -aup'
 alias show_udp_stats='sudo netstat -su'
+alias chrome-kill="kill -9 \$( ps aux | grep -i chrome | awk {'print \$2'} | xargs ) 2>/dev/null"
 alias show_open_ports="echo 'User:      Command:   Port:'; echo '----------------------------' ; lsof -i 4 -P -n | grep -i 'listen' | awk '{print \$3, \$1, \$9}' | sed 's/ [a-z0-9\.\*]*:/ /' | sort -k 3 -n |xargs printf '%-10s %-10s %-10s\n' | uniq"	# lsof (cleaned up for just open listening ports)
 alias ssh.untrusted='ssh -o "StrictHostKeyChecking no"'
 #alias btc="echo \"[\$( wget -O- -q https://bitpay.com/api/rates | grep -P -o '{.*?EUR".*?}' )]\" | json_pp -f json -json_opt pretty"
+alias btc="wget -O- -q https://bitpay.com/api/rates | json_pp | grep -C2 -e Euro -e USD | grep -v -e \"[{}]\" -e name"
 
 # convert stuff
 alias 2audio="convert2 mp3"
