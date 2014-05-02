@@ -100,6 +100,7 @@ compress() {
 worldclock() { 
     zones="America/Los_Angeles America/Chicago America/Denver America/New_York Europe/London"
     zones="${zones} Europe/Paris Europe/Berlin Europe/Moscow Asia/Hong_Kong Australia/Sydney"
+    zones="${zones} Iceland"
 
     for tz in $zones 
     do 
