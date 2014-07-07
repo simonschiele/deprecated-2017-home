@@ -1,10 +1,10 @@
 #!/bin/bash
 
 aspectRatios="4:3 5:4 16:9 16:10"
-resolutions3="640x480 800x600 1024x768 1400x1050 1440x1080 1600x1200"
+resolutions3="320x240 640x480 800x600 1024x768 1280x960 1400x1050 1440x1080 1600x1200"
 resolutions4="1280x1024"
-resolutions9="1920x1080 1280x720"
-resolutions10="1920x1200 1280x800"
+resolutions9="1920x1080 1280x720 1600x900 2048x1152 2560x1440"
+resolutions10="2560x1600 1920x1200 1680x1050 1440x900 1280x800"
 
 LANG=C
 DISPLAY=${DISPLAY:-:0}
@@ -19,15 +19,25 @@ printHelp() {
     echo ""
     echo "-h    - This help text"
     echo "-d    - Debug/Verbose mode"
-    echo "-r    - rescan/rename files in backgrounds-dir"
+    echo "-r    - rename files in backgrounds-dir"
     echo "-s    - scale other resolutions that are aspect-ratio compatible"
     echo ""
     exit 0
 }
 
 renameFiles() {
-    echo "not implemented"
-    exit 1
+    if [ -z "$( which identify )" ]
+    then
+        echo "Error: ImageMagick/identify not found. Please install ImageMagick for resolution detection + rename feature."
+        exit 1
+    fi
+
+    find "${backgroundDir}" -type f -not -path "*/.git*" | grep -v "[0-9]\{3,5\}x[0-9]\{3,5\}" | while read img
+    do
+        res=$( identify "$img" | awk {'print $3'} )
+        target=$( echo "$img" | sed "s|\.\([A-Za-z]\{3,4\}\)$|_$res\.\1|g" )
+        mv -v "$img" "$target"
+    done
 }
 
 if ( echo "$@" | grep -q -e "\-r" )
