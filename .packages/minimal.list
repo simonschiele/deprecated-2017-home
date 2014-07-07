@@ -1,23 +1,23 @@
 # ------------------------------------------------------------------------
-# System 
-Base: binutils 
+# System
+Base: binutils
 Time: tzdata ntpdate
 Lang: locales kbd keyboard-configuration
 Status: htop dstat iotop iptraf lsof
 USB: usbutils
 Security: iptables cryptsetup sudo
 Network: ethtool ssh netcat fping curl wget traceroute dnsutils telnet tcpdump pastebinit rsync
-Filesystems: btrfs-tools xfsprogs sshfs 
+Filesystems: btrfs-tools xfsprogs sshfs
 Maintainance: etckeeper
-Compression: bzip2 
-Tools: hexedit less psmisc hdparm links xml2 colordiff 
+Compression: bzip2
+Tools: hexedit less psmisc hdparm w3m xml2 colordiff
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
 # Development
 Editor: vim-nox exuberant-ctags cscope
 Sourceverwaltung: git
-Shells: bash 
+Shells: bash
 Debug: strace
 Tools: ack-grep
 # ------------------------------------------------------------------------

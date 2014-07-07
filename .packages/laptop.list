@@ -3,8 +3,8 @@
 
 # ------------------------------------------------------------------------
 # System
-Security: kismet 
+Security: kismet
 Wifi: wireless-tools
-Power: acpid tpb upower 
-Tools: mosh tpb 
+Power: acpid tpb upower
+Tools: mosh tpb
 # ------------------------------------------------------------------------
