@@ -11,15 +11,16 @@ DISPLAY=${DISPLAY:-:0}
 backgroundDir=~/.backgrounds
 
 debug=false
-multihead=false
 scaling=false
+multihead=false
+multiheadMultipleResolutions=false
 
 printHelp() {
     echo "set_wallpaper.sh"
     echo ""
     echo "-h    - This help text"
     echo "-d    - Debug/Verbose mode"
-    echo "-r    - rename files in backgrounds-dir"
+    echo "-r    - rename files in backgrounds-dir (puts resolution in title)"
     echo ""
     exit 0
 }
@@ -60,10 +61,29 @@ do
     pos=$( echo ${screen} | cut -f'2' -d'+' )
 done
 resolution=$( xrandr -d ${DISPLAY} -q | grep current | sed 's|^.*current\ \([0-9]\{3,4\}\)\ x\ \([0-9]\{3,4\}\).*$|\1x\2|g' )
-res1=$( echo $resolution | cut -f'1' -d'x')
-res2=$( echo $resolution | cut -f'2' -d'x')
+
+# detect display / usable resolutions
+[ ${screens} > 1 ] && multihead=true
+
+if ( ${multihead} )
+then
+    nativeResolution=
+    for res in $( xrandr -d ${DISPLAY} -q | grep -i "\ connected" | grep -o '[0-9]\{3,4\}x[0-9]\{3,4\}' | sort -u )
+    do
+        [ -z "$nativeResolution" ] && nativeResolution=${res}
+        if [ "${res}" != "${nativeResolution}" ]
+        then
+            multiheadMultipleResolutions=true
+        fi
+        usableResolutions="${usableResolutions} ${res}"
+    done
+else
+    nativeResolution=$resolution
+fi
 
 # detect aspectRatio
+res1=$( echo $nativeResolution | cut -f'1' -d'x')
+res2=$( echo $nativeResolution | cut -f'2' -d'x')
 for aspectRatio in $aspectRatios
 do
     ar1=$( echo $aspectRatio | cut -f'1' -d':' )
@@ -74,25 +94,11 @@ do
         break
     fi
 done
+
+# load usable resolutions for aspectRatio
 usableResolutions=$( eval echo \$resolutions$ar2 )
 
-# debug output
-if [[ ${screens} > 1 ]]
-then
-    multihead=true
-fi
-
-# display
-if ( ${multihead} )
-then
-    for res in $( xrandr -d ${DISPLAY} -q | grep -i "\ connected" | grep -o '[0-9]\{3,4\}x[0-9]\{3,4\}' | sort -u )
-    do
-        echo -n
-        usableResolutions="${usableResolutions} ${res}"
-    done
-fi
-
-resolution_or=$( echo ${usableResolutions} | sed -e 's| |" -e "|g' -e 's|$|"|g' -e 's|^|-e "|g' )
+# find compatible wallpapers
 for res in ${usableResolutions}
 do
     for file in $( find ${backgroundDir} -type f -iname "*${res}*" ! -iname "*left*" ! -iname "*right*" ! -iname "*both*" )
@@ -100,35 +106,56 @@ do
         wallpapers="${wallpapers}${file}\n"
     done
 done
+
+if ( ${multihead} )
+then
+    for file in $( find ${backgroundDir} -type f -iname "*${resolution}*both*" -or -iname "*${nativeResolution}*left*" )
+    do
+        wallpapers="${wallpapers}${file}\n"
+        wallpapers="${wallpapers}${file}\n"
+    done
+fi
 ( ${debug} ) && echo "> compatible wallpapers:"
 ( ${debug} ) && echo -e "${wallpapers}" | sed '/^\ *$/d' | sed 's|^|\t|g'
 
 # choose random wallpaper
 wallpaper=$( echo -e "${wallpapers}" | sed '/^\ *$/d' | shuf -n 1 )
 wallpaperResolution=$( echo "$wallpaper" | grep -o "[0-9]\{3,4\}x[0-9]\{3,4\}" )
+[ "${wallpaperResolution}" != "${resolution}" ] && scaling=true
 
-if [ "${wallpaperResolution}" != "${resolution}" ]
+if ( echo "${wallpaper}" | grep -q "left" )
 then
-    scaling=true
+    wallpaper="${wallpaper} ${wallpaper/left/right}"
 fi
 
-( ${debug} ) && echo "> usable resolutions: ${usableResolutions}"
-( ${debug} ) && echo "> screens: $screens"
+# output debug
+( ${debug} ) && echo "> backgroundDir: ${backgroundDir}"
+( ${debug} ) && echo "> screens: ${screens}"
 ( ${debug} ) && echo "> resolution: ${resolution}"
+( ${debug} ) && echo "> native resolution: ${nativeResolution}"
+( ${debug} ) && echo "> usable resolutions: ${usableResolutions}"
 ( ${debug} ) && echo "> aspect ratio: ${aspectRatio}"
 ( ${debug} ) && echo "> multihead: ${multihead}"
-( ${debug} ) && echo "> scaling: ${scaling}"
+( ${debug} ) && echo "> multiple resolutions: ${multiheadMultipleResolutions}"
 ( ${debug} ) && echo "> selected wallpaper: ${wallpaper}"
+( ${debug} ) && echo "> needs scaling: ${scaling}"
+
+# trigger feh
+if [ -z "$( which identify )" ]
+then
+    echo "Error: 'feh' not found. Please install feh to display the wallpaper."
+    exit 1
+fi
 
 if ( ${scaling} )
 then
-    feh_param="--bg-scale"
+    fehParams="--bg-scale"
 elif ( ${multihead} )
 then
-    feh_param="--bg-tile"
+    fehParams="--bg-tile"
 else
-    feh_param="--bg-center"
+    fehParams="--bg-center"
 fi
 
-DISPLAY="${DISPLAY}" feh ${feh_param} ${wallpaper}
+DISPLAY="${DISPLAY}" feh ${fehParams} ${wallpaper}
 
