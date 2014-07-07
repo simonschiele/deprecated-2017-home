@@ -20,7 +20,6 @@ printHelp() {
     echo "-h    - This help text"
     echo "-d    - Debug/Verbose mode"
     echo "-r    - rename files in backgrounds-dir"
-    echo "-s    - scale other resolutions that are aspect-ratio compatible"
     echo ""
     exit 0
 }
@@ -51,11 +50,6 @@ else
     then
         debug=true
     fi
-
-    if ( echo "$@" | grep -q -e "\-s" )
-    then
-        scaling=true
-    fi
 fi
 
 # detect resolution
@@ -85,13 +79,8 @@ usableResolutions=$( eval echo \$resolutions$ar2 )
 # debug output
 if [[ ${screens} > 1 ]]
 then
-    ( ${debug} ) && echo "> Multihead detected"
     multihead=true
 fi
-
-( ${debug} ) && echo "> screens: $screens"
-( ${debug} ) && echo "> resolution: ${resolution}"
-( ${debug} ) && echo "> aspect ratio: ${aspect_ratio}"
 
 # display
 if ( ${multihead} )
@@ -101,14 +90,7 @@ then
         echo -n
         usableResolutions="${usableResolutions} ${res}"
     done
-
-    if ( ${scaling} )
-    then
-        echo "> scaling: not implemented yet"
-    fi
 fi
-
-( ${debug} ) && echo "> usable resolutions: ${usableResolutions}"
 
 resolution_or=$( echo ${usableResolutions} | sed -e 's| |" -e "|g' -e 's|$|"|g' -e 's|^|-e "|g' )
 for res in ${usableResolutions}
@@ -118,20 +100,34 @@ do
         wallpapers="${wallpapers}${file}\n"
     done
 done
-( ${debug} ) && echo "> wallpapers:"
+( ${debug} ) && echo "> compatible wallpapers:"
 ( ${debug} ) && echo -e "${wallpapers}" | sed '/^\ *$/d' | sed 's|^|\t|g'
 
 # choose random wallpaper
 wallpaper=$( echo -e "${wallpapers}" | sed '/^\ *$/d' | shuf -n 1 )
-( ${debug} ) && echo "> wallpaper: ${wallpaper}"
+wallpaperResolution=$( echo "$wallpaper" | grep -o "[0-9]\{3,4\}x[0-9]\{3,4\}" )
 
+if [ "${wallpaperResolution}" != "${resolution}" ]
+then
+    scaling=true
+fi
 
-# 
-if ( ${multihead} )
+( ${debug} ) && echo "> usable resolutions: ${usableResolutions}"
+( ${debug} ) && echo "> screens: $screens"
+( ${debug} ) && echo "> resolution: ${resolution}"
+( ${debug} ) && echo "> aspect ratio: ${aspectRatio}"
+( ${debug} ) && echo "> multihead: ${multihead}"
+( ${debug} ) && echo "> scaling: ${scaling}"
+( ${debug} ) && echo "> selected wallpaper: ${wallpaper}"
+
+if ( ${scaling} )
 then
     feh_param="--bg-scale"
-else
+elif ( ${multihead} )
+then
     feh_param="--bg-tile"
+else
+    feh_param="--bg-center"
 fi
 
 DISPLAY="${DISPLAY}" feh ${feh_param} ${wallpaper}
