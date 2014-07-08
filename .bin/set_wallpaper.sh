@@ -63,7 +63,7 @@ done
 resolution=$( xrandr -d ${DISPLAY} -q | grep current | sed 's|^.*current\ \([0-9]\{3,4\}\)\ x\ \([0-9]\{3,4\}\).*$|\1x\2|g' )
 
 # detect display / usable resolutions
-[ ${screens} > 1 ] && multihead=true
+[ ${screens} -gt 1 ] && multihead=true
 
 if ( ${multihead} )
 then
