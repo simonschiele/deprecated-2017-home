@@ -12,6 +12,7 @@ backgroundDir=~/.backgrounds
 
 debug=false
 scaling=false
+splitWallpaper=false
 multihead=false
 multiheadMultipleResolutions=false
 
@@ -28,7 +29,7 @@ printHelp() {
 renameFiles() {
     if [ -z "$( which identify )" ]
     then
-        echo "Error: ImageMagick/identify not found. Please install ImageMagick for resolution detection + rename feature."
+        echo "Error: ImageMagick/identify not found. Please install ImageMagick for resolution detection + rename feature." >&2
         exit 1
     fi
 
@@ -125,6 +126,7 @@ wallpaperResolution=$( echo "$wallpaper" | grep -o "[0-9]\{3,4\}x[0-9]\{3,4\}" )
 
 if ( echo "${wallpaper}" | grep -q "left" )
 then
+    splitWallpaper=true
     wallpaper="${wallpaper} ${wallpaper/left/right}"
 fi
 
@@ -138,14 +140,8 @@ fi
 ( ${debug} ) && echo "> multihead: ${multihead}"
 ( ${debug} ) && echo "> multiple resolutions: ${multiheadMultipleResolutions}"
 ( ${debug} ) && echo "> selected wallpaper: ${wallpaper}"
+( ${debug} ) && echo "> split wallpaper: ${splitWallpaper}"
 ( ${debug} ) && echo "> needs scaling: ${scaling}"
-
-# trigger feh
-if [ -z "$( which identify )" ]
-then
-    echo "Error: 'feh' not found. Please install feh to display the wallpaper."
-    exit 1
-fi
 
 if ( ${scaling} )
 then
@@ -157,5 +153,14 @@ else
     fehParams="--bg-center"
 fi
 
-DISPLAY="${DISPLAY}" feh ${fehParams} ${wallpaper}
+# trigger feh
+if [ -n "$( which feh )" ]
+then
+    cmd="feh ${fehParams}"
+else
+    echo -e "Error: No tool found to set wallpaper. Install one of the supported tools:\n\t* feh\n'" >&2
+    exit 1
+fi
+
+DISPLAY="${DISPLAY}" ${cmd} ${wallpaper}
 
