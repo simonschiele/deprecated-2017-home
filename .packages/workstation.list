@@ -1,22 +1,22 @@
 . minimal.list
 
 # ------------------------------------------------------------------------
-# System  
+# System
 Network: whois wakeonlan mtr
 Security: snort nmap wireshark openvpn
-Filesystems: gphotofs cifs-utils ntfs-3g
+Filesystems: gphotofs cifs-utils ntfs-3g jmtpfs
 Shells: zsh bash-completion
-Compression: p7zip unzip zip rar unrar 
-Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter alsa-base alsa-utils 
-USB: usb-modeswitch 
+Compression: p7zip unzip zip rar unrar
+Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter alsa-base alsa-utils
+USB: usb-modeswitch
 Tools: bchunk debian-goodies debootstrap multitail input-utils lshw
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
 # X11
-Base: xbase-clients awesome lightdm 
+Base: xbase-clients awesome lightdm
 Terminal: gnome-terminal
-Browser: iceweasel 
+Browser: iceweasel
 Communication: icedove pidgin pidgin-otr
 Viewer: evince geeqie libreoffice
 Security: gksu gnome-keyring xscreensaver
@@ -29,11 +29,9 @@ Tools: gtkterm thunar scrot xsel xcalib gucharmap file-roller screenruler
 # Development
 Sourceverwaltung: bzr subversion mercurial
 Interpreter und Compiler: ipython erlang gcc g++ php5-cli lua5.1
-Build tools: build-essential make cmake automake1.9 rake 
+Build tools: build-essential make cmake automake1.9 rake
 Python Libs: python-twisted python-sqlite python-scrapy python-scapy python-web2py
-PHP Libs: smarty3 php5-pgsql php5-mysql 
 Database: sqlite3
-Webserver: apache2
 Tools: xmlstarlet
 Embedded: arduino arduino-mk avrdude android-tools-fastboot android-tools-adb android-tools-fsutils
 # ------------------------------------------------------------------------
@@ -41,7 +39,7 @@ Embedded: arduino arduino-mk avrdude android-tools-fastboot android-tools-adb an
 # ------------------------------------------------------------------------
 # Multimedia
 Musik: audacity
-Video: vlc kino clive youtube-dl 
+Video: vlc kino clive youtube-dl
 Images: gimp inkscape agave imagemagick
 # ------------------------------------------------------------------------
 

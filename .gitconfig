@@ -27,3 +27,5 @@
     glog = log --graph
     lastlog = log --color -n 20 --pretty=tformat:\"%h - %an, %ar : %s\" HEAD^1..HEAD
     filelog = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat 
+[push]
+    default = matching

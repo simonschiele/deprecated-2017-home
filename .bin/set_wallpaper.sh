@@ -1,57 +1,60 @@
 #!/bin/bash
 
-resolutions="128x160 132x50 140x192 160x120 160x128 160x144 160x200 240x160 320x200 320x240 384x256 432x240 480x272 480x320 512x342 512x384 640x200 640x256 640x350 640x400 640x480 720x348 720x350 720x364 720x400 720x480 800x480 800x600 832x624 854x480 960x720 1024x576 1024x768 1056x400 1152x864 1152x870 1152x900 1280x1024 1280x720 1280x768 1280x800 1360x1024 1360x768 1366x768 1366x900 1400x1050 1440x900 1600x1200 1600x900 1680x1050 1680x945 1920x1080 1920x1200 2048x1080 2048x1152 2048x1536 2560x1440 2560x1600 2560x2048 2880x1800 3200x2048 3200x2400 3840x2160 3840x2400 4096x2160 4096x3072 5120x3200 5120x4096 6400x4096 6400x4800 7680x4320 7680x4800"
-aspect_ratios="4:3 16:9 16:10"
+aspectRatios="4:3 5:4 16:9 16:10"
+resolutions3="320x240 640x480 800x600 1024x768 1280x960 1400x1050 1440x1080 1600x1200"
+resolutions4="1280x1024"
+resolutions9="1920x1080 1280x720 1600x900 2048x1152 2560x1440"
+resolutions10="2560x1600 1920x1200 1680x1050 1440x900 1280x800"
 
 LANG=C
 DISPLAY=${DISPLAY:-:0}
 backgroundDir=~/.backgrounds
 
 debug=false
-multihead=false
 scaling=false
+splitWallpaper=false
+multihead=false
+multiheadMultipleResolutions=false
 
 printHelp() {
     echo "set_wallpaper.sh"
     echo ""
     echo "-h    - This help text"
     echo "-d    - Debug/Verbose mode"
-    echo "-s    - scale other resolutions that are aspect-ratio compatible"
+    echo "-r    - rename files in backgrounds-dir (puts resolution in title)"
     echo ""
+    exit 0
 }
 
-gcd() {
-    # Greatest common divisor function - from advanced bash scripting guide (Example 8-1)
-    dividend=$1             #  Arbitrary assignment.
-    divisor=$2              #! It doesn't matter which of the two is larger.
-    remainder=1             #  If an uninitialized variable is used inside
-                            #+ test brackets, an error message results.
-    until [ "$remainder" -eq 0 ]
+renameFiles() {
+    if [ -z "$( which identify )" ]
+    then
+        echo "Error: ImageMagick/identify not found. Please install ImageMagick for resolution detection + rename feature." >&2
+        exit 1
+    fi
+
+    find "${backgroundDir}" -type f -not -path "*/.git*" | grep -v "[0-9]\{3,5\}x[0-9]\{3,5\}" | while read img
     do
-        let "remainder = $dividend % $divisor"
-        dividend=$divisor     # Now repeat with 2 smallest numbers.
-        divisor=$remainder
-    done                      # Euclid's algorithm
-
-    echo $dividend
+        res=$( identify "$img" | awk {'print $3'} )
+        target=$( echo "$img" | sed "s|\.\([A-Za-z]\{3,4\}\)$|_$res\.\1|g" )
+        mv -v "$img" "$target"
+    done
 }
 
-if ( echo "$@" | grep -q -e "\-d" )
+if ( echo "$@" | grep -q -e "\-r" )
 then
-    debug=true
-fi
-
-if ( echo "$@" | grep -q -e "\-s" )
-then
-    scaling=true
-fi
-
-if ( echo "$@" | grep -q -e "\-h" )
+    renameFiles
+elif ( echo "$@" | grep -q -e "\-h" )
 then
     printHelp
-    exit 0
+else
+    if ( echo "$@" | grep -q -e "\-d" )
+    then
+        debug=true
+    fi
 fi
 
+# detect resolution
 for screen in $( xrandr -d ${DISPLAY} -q | grep " connected" | grep -o '[0-9]*x[0-9]*+[0-9]*+[0-9]*' )
 do
     screens=$(( ${screens:-0} + 1 ))
@@ -59,49 +62,105 @@ do
     pos=$( echo ${screen} | cut -f'2' -d'+' )
 done
 resolution=$( xrandr -d ${DISPLAY} -q | grep current | sed 's|^.*current\ \([0-9]\{3,4\}\)\ x\ \([0-9]\{3,4\}\).*$|\1x\2|g' )
-usableResolutions=${resolution}
 
-if [[ ${screens} > 1 ]]
-then
-    ( ${debug} ) && echo "> Multihead detected"
-    multihead=true
-fi
-( ${debug} ) && echo "> screens: $screens"
-( ${debug} ) && echo "> resolution: ${resolution}"
+# detect display / usable resolutions
+[ ${screens} -gt 1 ] && multihead=true
 
 if ( ${multihead} )
 then
+    nativeResolution=
     for res in $( xrandr -d ${DISPLAY} -q | grep -i "\ connected" | grep -o '[0-9]\{3,4\}x[0-9]\{3,4\}' | sort -u )
     do
-        echo -n
+        [ -z "$nativeResolution" ] && nativeResolution=${res}
+        if [ "${res}" != "${nativeResolution}" ]
+        then
+            multiheadMultipleResolutions=true
+        fi
         usableResolutions="${usableResolutions} ${res}"
     done
-    
-    if ( ${scaling} )
-    then
-        echo "> scaling: not implemented yet"
-    fi
+else
+    nativeResolution=$resolution
 fi
 
-( ${debug} ) && echo "> usable resolutions: ${usableResolutions}"
+# detect aspectRatio
+res1=$( echo $nativeResolution | cut -f'1' -d'x')
+res2=$( echo $nativeResolution | cut -f'2' -d'x')
+for aspectRatio in $aspectRatios
+do
+    ar1=$( echo $aspectRatio | cut -f'1' -d':' )
+    ar2=$( echo $aspectRatio | cut -f'2' -d':' )
 
-resolution_or=$( echo ${usableResolutions} | sed -e 's| |" -e "|g' -e 's|$|"|g' -e 's|^|-e "|g' )
+    if [ "$(( $res1 / $ar1 ))" == "$(( $res2 / $ar2))" ]
+    then
+        break
+    fi
+done
+
+# load usable resolutions for aspectRatio
+usableResolutions=$( eval echo \$resolutions$ar2 )
+
+# find compatible wallpapers
 for res in ${usableResolutions}
 do
-    for file in $( find ${backgroundDir} -type f -iname "*${res}*" ! -iname "*left*" ! -iname "*right*" )
+    for file in $( find ${backgroundDir} -type f -iname "*${res}*" ! -iname "*left*" ! -iname "*right*" ! -iname "*both*" )
     do
         wallpapers="${wallpapers}${file}\n"
     done
 done
-( ${debug} ) && echo "> wallpapers:"
+
+if ( ${multihead} )
+then
+    for file in $( find ${backgroundDir} -type f -iname "*${resolution}*both*" -or -iname "*${nativeResolution}*left*" )
+    do
+        wallpapers="${wallpapers}${file}\n"
+        wallpapers="${wallpapers}${file}\n"
+    done
+fi
+( ${debug} ) && echo "> compatible wallpapers:"
 ( ${debug} ) && echo -e "${wallpapers}" | sed '/^\ *$/d' | sed 's|^|\t|g'
 
+# choose random wallpaper
 wallpaper=$( echo -e "${wallpapers}" | sed '/^\ *$/d' | shuf -n 1 )
-( ${debug} ) && echo "> wallpaper: ${wallpaper}"
+wallpaperResolution=$( echo "$wallpaper" | grep -o "[0-9]\{3,4\}x[0-9]\{3,4\}" )
+[ "${wallpaperResolution}" != "${resolution}" ] && scaling=true
 
-if ! ( DISPLAY="${DISPLAY}" feh --bg-tile ${wallpaper} )
+if ( echo "${wallpaper}" | grep -q "left" )
 then
+    splitWallpaper=true
+    wallpaper="${wallpaper} ${wallpaper/left/right}"
+fi
+
+# output debug
+( ${debug} ) && echo "> backgroundDir: ${backgroundDir}"
+( ${debug} ) && echo "> screens: ${screens}"
+( ${debug} ) && echo "> resolution: ${resolution}"
+( ${debug} ) && echo "> native resolution: ${nativeResolution}"
+( ${debug} ) && echo "> usable resolutions: ${usableResolutions}"
+( ${debug} ) && echo "> aspect ratio: ${aspectRatio}"
+( ${debug} ) && echo "> multihead: ${multihead}"
+( ${debug} ) && echo "> multiple resolutions: ${multiheadMultipleResolutions}"
+( ${debug} ) && echo "> selected wallpaper: ${wallpaper}"
+( ${debug} ) && echo "> split wallpaper: ${splitWallpaper}"
+( ${debug} ) && echo "> needs scaling: ${scaling}"
+
+if ( ${scaling} )
+then
+    fehParams="--bg-scale"
+elif ( ${multihead} )
+then
+    fehParams="--bg-tile"
+else
+    fehParams="--bg-center"
+fi
+
+# trigger feh
+if [ -n "$( which feh )" ]
+then
+    cmd="feh ${fehParams}"
+else
+    echo -e "Error: No tool found to set wallpaper. Install one of the supported tools:\n\t* feh\n'" >&2
     exit 1
 fi
-exit 0
+
+DISPLAY="${DISPLAY}" ${cmd} ${wallpaper}
 
