@@ -325,6 +325,8 @@ alias ssh.untrusted='ssh -o "StrictHostKeyChecking no"'
 #alias btc="echo \"[\$( wget -O- -q https://bitpay.com/api/rates | grep -P -o '{.*?EUR".*?}' )]\" | json_pp -f json -json_opt pretty"
 alias btc="wget -O- -q https://bitpay.com/api/rates | json_pp | grep -C2 -e Euro -e USD | grep -v -e \"[{}]\" -e name"
 alias wm_ticker="wget http://worldcup.sfg.io/matches/today/?by_date=DESC -O- | json_pp | less"
+alias synergy_cstation="synergys -n cstation --daemon --restart -c /home/simon/.synergy.conf"
+alias synergy_cpad="synergyc -n cpad --daemon --restart cstation"
 
 # convert stuff
 alias 2audio="convert2 mp3"
