@@ -31,3 +31,6 @@
 [submodule ".lib/git-gui.git"]
 	path = .lib/git-gui.git
 	url = http://repo.or.cz/r/git-gui.git
+[submodule ".lib/dircolors-solarized"]
+	path = .lib/dircolors-solarized
+	url = https://github.com/seebi/dircolors-solarized.git
