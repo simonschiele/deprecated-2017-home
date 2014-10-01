@@ -37,3 +37,6 @@
 [submodule ".lib/solarized"]
 	path = .lib/solarized
 	url = git://github.com/altercation/solarized.git
+[submodule ".lib/gnome-terminal-colors-solarized"]
+	path = .lib/gnome-terminal-colors-solarized
+	url = https://github.com/sigurdga/gnome-terminal-colors-solarized.git
