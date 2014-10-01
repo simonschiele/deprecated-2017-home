@@ -261,3 +261,34 @@ function whereami() {
 
 # }}}
 
+function verify_su() {
+    if [ "$( id -u )" == "0" ] ; then
+        return 0 
+    elif ( sudo echo -n ) ; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function debian_add_pubkey() {
+    if ! verify_su ; then
+        echo "you need root/sudo permissions to call debian_add_pubkey" 1>&2 
+        return 1
+    elif [ -z "${1}" ] ; then
+        echo "Please call like:"
+        echo " > debian_add_pubkey path/to/file.key" 
+        echo "or"
+        echo " > debian_add_pubkey 07DC563D1F41B907" 
+    elif [ -e ${1} ] ; then
+        echo "import via keyfile not implemented yet" 1>&2 
+        return 1
+    else
+        if ( gpg --keyserver pgpkeys.mit.edu --recv-key ${1} ) && ( gpg -a --export ${1} | sudo apt-key add - ) ; then
+            return 0
+        else
+            return 1
+        fi
+    fi
+}
+
