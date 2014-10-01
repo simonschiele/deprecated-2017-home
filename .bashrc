@@ -257,6 +257,7 @@ alias find.exec="find . ! -type d -executable"
 alias find.last_edited='find . -type f -printf "%T@ %T+ %p\n" | sort -n | tail -n 300'
 alias find.last_accessed=""
 alias find.tree="find . -print | sed -e 's;[^/]*/;|__;g;s;__|; |;g'" 
+alias find.deadlinks="find -L -type l"
 
 # date/time stuff
 alias date.format="date --help | sed -n '/^FORMAT/,/%Z/p'"
@@ -289,11 +290,16 @@ alias random.lotto='shuf -i 1-49 -n 6 | sort -n | xargs'
 random.password() { openssl rand -base64 ${1:-8} ; }
 random.hex() { openssl rand -hex ${1:-8} ; }
 
+# system
+alias dmesg.human="dmesg -T|sed -e 's|\(^.*'`date +%Y`']\)\(.*\)|\x1b[0;34m\1\x1b[0m - \2|g'"
+alias observe.pid="strace -T -f -p"
+
 # magic
 alias screenshot="import -display :0 -window root ./screenshot-\$(date +%Y-%m-%d_%s).png"
 alias screendump="ffmpeg -f x11grab -s wxga -r 25 -i :0.0 -sameq ./screendump-\$(date +%Y-%m-%d_%s).mpg"
 alias screenvideo="screendump"
 
+alias git.allFilesEver="git log --name-status --oneline --all | grep -P \"^[A|M|D]\s\" | awk '{print $2}' | sort | uniq"
 alias calculator="bc -l"
 alias highlite="grep --color=auto -e ^ -e"
 alias scan_for_wlans="/sbin/iwlist scanning 2>/dev/null | grep -e 'Cell' -e 'Channel\:' -e 'Encryption' -e 'ESSID' -e 'WPA' | sed 's|Cell|\nCell|g'"
