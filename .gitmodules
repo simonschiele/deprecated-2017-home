@@ -40,3 +40,6 @@
 [submodule ".lib/gnome-terminal-colors-solarized"]
 	path = .lib/gnome-terminal-colors-solarized
 	url = https://github.com/sigurdga/gnome-terminal-colors-solarized.git
+[submodule ".lib/geary"]
+	path = .lib/geary
+	url = git://git.gnome.org/geary
