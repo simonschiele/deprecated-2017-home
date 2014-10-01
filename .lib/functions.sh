@@ -294,3 +294,24 @@ function debian_add_pubkey() {
 
 function google { Q="$@";GOOG_URL='https://www.google.com/search?tbs=li:1&q=';AGENT="Mozilla/4.0";stream=$(curl -A "$AGENT" -skLm 10 "${GOOG_URL}${Q//\ /+}");echo "$stream" | grep -o "href=\"/url[^\&]*&amp;" | sed 's/href=".url.q=\([^\&]*\).*/\1/';}
 
+function nzb.queue() {
+    local target=/share/.usenet/queue/
+    
+    if ! [ -d ${target} ] ; then
+        echo "Target folder ${target} not available" >&2 
+        return 1
+    fi
+    
+    if [ -n "${@}" ] ; then
+        mv -v ${@} ${target} 
+    else
+        if ls ~/Downloads/*[nN][zZ][bB] 2>/dev/null >&2 ; then
+            mv -v ~/Downloads/*[nN][zZ][bB] ${target}
+        else
+            echo "No nzb files found in the following dirs:" >&2
+            echo " ~/Downloads/" >&2
+            return 1
+        fi
+    fi
+}
+
