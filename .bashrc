@@ -65,9 +65,12 @@ if [ -x /usr/bin/dircolors ]; then
     alias ls='ls --color=auto'
 fi
 
-if [ -e /usr/bin/colordiff ]
-then
+if [ -e /usr/bin/colordiff ]; then
     alias diff='colordiff'
+fi
+
+if [ -r ~/.lib/dircolors-solarized/dircolors.256dark ]; then
+    eval `dircolors ~/.lib/dircolors-solarized/dircolors.256dark`
 fi
 
 # }}}
