@@ -5,7 +5,7 @@
 
 # add local bins to PATH
 for bin in bin .bin .bin-ypsilon .bin-private ; do
-    [ -d ${HOME}/${bin} ] && PATH="${bin/#/${HOME}}:${PATH}"
+    [ -d ${HOME}/${bin} ] && PATH="${bin/#/${HOME}/}:${PATH}"
 done
 
 # source helpers, libs, ...
@@ -15,7 +15,7 @@ done
 
 # source logout
 for include in .logout .bash_logout .shell_logout ; do
-    [ -r ${include} ] && trap ${include/#/${HOME}} 0 && break
+    [ -r ${include} ] && trap ${include/#/${HOME}/} 0 && break
 done
 
 unset bin include 
@@ -360,8 +360,9 @@ alias ssh.untrusted='ssh -o "StrictHostKeyChecking no"'
 #alias btc="echo \"[\$( wget -O- -q https://bitpay.com/api/rates | grep -P -o '{.*?EUR".*?}' )]\" | json_pp -f json -json_opt pretty"
 alias btc="wget -O- -q https://bitpay.com/api/rates | json_pp | grep -C2 -e Euro -e USD | grep -v -e \"[{}]\" -e name"
 alias wm_ticker="wget http://worldcup.sfg.io/matches/today/?by_date=DESC -O- | json_pp | less"
-alias synergy_cstation="synergys -n cstation --daemon --restart -c /home/simon/.synergy.conf"
-alias synergy_cpad="synergyc -n cpad --daemon --restart cstation"
+alias synergy_kill="killall -9 synergyc synergys 2>/dev/null"
+alias synergy_cstation="synergy_kill ; synergys --daemon --restart --display :0 --config ~/.synergy/cstation.conf 2> ~/.log/synergys.log >&2"
+alias synergy_cpad="synergy_kill ; synergyc --name cpad --daemon --restart cstation 2> ~/.log/synergyc.log >&2"
 
 # convert stuff
 alias 2audio="convert2 mp3"
