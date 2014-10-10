@@ -202,7 +202,7 @@ function random_integer() {
 # {{{ whereami()
 function whereami() {
     ips=$( /sbin/ifconfig | grep -o "[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}" | sort -u | grep -v -e "^127" -e "^255" )
-    if ( echo $ips | grep -q -e "192\.168\.[78]0" ) ; then
+    if ( echo $ips | grep -q -e "192\.168\.[78]0" -e "195\.4\.7[01]" ) ; then
         echo "work"
     elif ( echo $ips | grep -q -e "192\.168\.5" ) ; then
         echo "home"
@@ -269,21 +269,30 @@ function google() {
 
 function nzb.queue() {
     local target=/share/.usenet/queue/
-    
-    if ! [ -d ${target} ] ; then
-        echo "Target folder ${target} not available" >&2 
-        return 1
+
+    if [ ! -d ${target} ] ; then
+        echo "Local target not available -> will use 'ssh enkheim.psaux.de'" >&2
+        local action="scp -P2222"
+        local target="simon@enkheim.psaux.de:${target}"
+    else
+        local action="mv -v"
     fi
     
-    if [ -n "${@}" ] ; then
-        mv -v ${@} ${target} 
-    else
+    if [[ -z "${@}" ]] ; then
         if ls ~/Downloads/*[nN][zZ][bB] 2>/dev/null >&2 ; then
-            mv -v ~/Downloads/*[nN][zZ][bB] ${target}
+            if ( ${action} ~/Downloads/*[nN][zZ][bB] ${target} ) ; then
+                rm -ri ~/Downloads/*[nN][zZ][bB]
+            fi
         else
             echo "No nzb files found in the following dirs:" >&2
             echo " ~/Downloads/" >&2
             return 1
+        fi
+    else
+        if ( ${action} ${@} ${target} ) ; then
+            if [[ "$@" != "/" ]] && [[ "$@" != "." ]] && [[ "$@" != "" ]] ; then
+                rm -ri ${@}
+            fi
         fi
     fi
 }
