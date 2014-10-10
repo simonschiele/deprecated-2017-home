@@ -15,7 +15,7 @@ Tools: hexedit less psmisc hdparm w3m xml2 colordiff nmon
 
 # ------------------------------------------------------------------------
 # Development
-Editor: vim-nox exuberant-ctags cscope
+Editor: vim-nox exuberant-ctags cscope python-xlrd
 Sourceverwaltung: git
 Shells: bash
 Debug: strace
