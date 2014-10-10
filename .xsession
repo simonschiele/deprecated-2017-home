@@ -17,6 +17,11 @@ eval "$( gnome-keyring-daemon --start --components=keyring,pkcs11,ssh,secrets )"
 export GNOME_KEYRING_PID
 export GNOME_KEYRING_SOCKET
 
+# setting multihead at work
+if test "$( hostname -s )" = "simon-work" ; then
+    xrandr --output HDMI1 --left-of VGA1
+fi
+
 #exec ck-launch-session dbus-launch --sh-syntax --exit-with-session awesome 2>>${HOME}/.xsession-errors >&2
 exec dbus-launch --exit-with-session awesome 2>>${HOME}/.xsession-errors >&2
 
