@@ -7,7 +7,7 @@ Security: snort nmap wireshark openvpn
 Filesystems: gphotofs cifs-utils ntfs-3g jmtpfs
 Shells: zsh bash-completion
 Compression: p7zip unzip zip rar unrar
-Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter alsa-base alsa-utils
+Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter pasystray paprefs paman padevchooser alsa-base alsa-utils
 USB: usb-modeswitch
 Tools: bchunk debian-goodies debootstrap multitail input-utils lshw
 # ------------------------------------------------------------------------
