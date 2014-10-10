@@ -98,9 +98,8 @@ compress() {
 # {{{ worldclock()
 
 worldclock() { 
-    zones="America/Los_Angeles America/Chicago America/Denver America/New_York Europe/London"
+    zones="America/Los_Angeles America/Chicago America/Denver America/New_York Iceland Europe/London"
     zones="${zones} Europe/Paris Europe/Berlin Europe/Moscow Asia/Hong_Kong Australia/Sydney"
-    zones="${zones} Iceland"
 
     for tz in $zones 
     do 
@@ -108,9 +107,8 @@ worldclock() {
         echo -n -e "${tz_short}\t"
         [[ ${#tz_short} -lt 8 ]] && echo -n -e "\t"
         TZ=${tz} date
-        #echo -e "$( echo ${d} | cut -d'/' -f'2' )$([ ${#d} -lt 11 ] && echo -e '\t')\t\t$( date )"
     done
-    unset tz
+    unset tz zones
 }
 
 # }}}
@@ -184,52 +182,6 @@ confirm() {
 
 # }}}
 
-# {{{ spinner(), spinner_result()
-
-function spinner()
-{
-    local pid=$1
-    local delay=0.75
-    local spinstr='|/-\'
-    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
-        local temp=${spinstr#?}
-        printf " [%c]  " "$spinstr"
-        local spinstr=$temp${spinstr%"$temp"}
-        sleep $delay
-        printf "\b\b\b\b\b\b"
-    done
-    printf "    \b\b\b\b"
-}
-
-function spinner_result() {
-    (
-        tmp_pid=${BASHPID}
-        spinner ${tmp_pid} &
-        $( ${@} >/dev/null )
-        kill ${tmp_pid}
-        wait ${tmp_pid} 2>/dev/null
-    )
-}
-
-# }}}
-
-# {{{ good_morning()
-
-function good_morning() {
-    sudo echo -n
-    #( sleep 3 & )
-    #spinner $!
-    echo -n -e ">>> updating debian package lists: " && spinner_result "sudo apt-get update"
-    #echo -e ">>> installing default packages: " #&& if [ -e ~/.system.conf ] ; then sudo apt-get install $( debian_packages_list $( grep -i systemtype .system.conf | sed -e 's|\(.*\)="\(.*\)"|\2|g' )) ; else echo -e "system.conf missing!" ; fi
-    #echo -e ">>> system upgrade: " #&& sudo apt-get dist-upgrade
-    #echo -n -e "\n>>> updating home: " && silent_result "cd /home/${SUDO_USER:-$USER}/ && git pull && git submodule init && git submodule update && cd ${OLDPWD}"
-    #echo -e ">>> system status: $( w )"
-    #echo && cal && echo -e "\nToday: $( date )\n"
-    #echo -e "\n\nGood Morning Simon! Have a wonderful day!\n\n"
-}
-
-# }}}
-
 # {{{ random_integer()
 
 function random_integer() {
@@ -261,6 +213,8 @@ function whereami() {
 
 # }}}
 
+# {{{ verify_su()
+
 function verify_su() {
     if [ "$( id -u )" == "0" ] ; then
         return 0 
@@ -270,6 +224,10 @@ function verify_su() {
         return 1
     fi
 }
+
+# }}} 
+
+# {{{ debian_add_pubkey()
 
 function debian_add_pubkey() {
     if ! verify_su ; then
@@ -291,4 +249,44 @@ function debian_add_pubkey() {
         fi
     fi
 }
+
+# }}} 
+
+# {{{ google()
+
+function google() {
+    Q="$@";
+    GOOG_URL='https://www.google.com/search?tbs=li:1&q=';
+    AGENT="Mozilla/4.0";
+    stream=$(curl -A "$AGENT" -skLm 10 "${GOOG_URL}${Q//\ /+}");
+    echo "$stream" | grep -o "href=\"/url[^\&]*&amp;" | sed 's/href=".url.q=\([^\&]*\).*/\1/';
+    unset stream AGENT GOOG_URL Q
+}
+
+# }}} 
+
+# {{{ nzb.queue()
+
+function nzb.queue() {
+    local target=/share/.usenet/queue/
+    
+    if ! [ -d ${target} ] ; then
+        echo "Target folder ${target} not available" >&2 
+        return 1
+    fi
+    
+    if [ -n "${@}" ] ; then
+        mv -v ${@} ${target} 
+    else
+        if ls ~/Downloads/*[nN][zZ][bB] 2>/dev/null >&2 ; then
+            mv -v ~/Downloads/*[nN][zZ][bB] ${target}
+        else
+            echo "No nzb files found in the following dirs:" >&2
+            echo " ~/Downloads/" >&2
+            return 1
+        fi
+    fi
+}
+
+# }}} 
 
