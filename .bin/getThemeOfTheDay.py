@@ -1,0 +1,1 @@
+/home/simon//.themes/getThemeOfTheDay.py
