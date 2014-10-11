@@ -427,6 +427,9 @@ function good_morning() {
         echo -e "Swap: No active swap"
     fi
     
+    hd_root=$( df -h | grep "\ /$" | awk {'print $4"/"$2'} )
+    echo "HD: ${hd_root} (root)" 
+   
     echo -e "\n${COLOR[white_under]}${COLOR[white_bold]}Debian:${COLOR[none]}"
     echo "Version: $( lsb_release -ds 2>&1 )"
     
