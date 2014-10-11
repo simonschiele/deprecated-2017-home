@@ -18,6 +18,9 @@ for include in .logout .bash_logout .shell_logout ; do
     [ -r ${include} ] && trap ${include/#/${HOME}/} 0 && break
 done
 
+# color fixing trap
+trap 'echo -ne "\e[0m"' DEBUG
+
 unset bin include 
 
 # }}}
@@ -56,8 +59,94 @@ fi
 
 # }}}
 
+# {{{ Icons
+
+declare -A ICON
+
+ICON[trademark]='\u2122'
+ICON[copyright]='\u00A9'
+ICON[registered]='\u00AE'
+ICON[asterism]='\u2042'
+ICON[voltage]='\u26A1'
+ICON[whitecircle]='\u25CB'
+ICON[blackcircle]='\u25CF'
+ICON[largecircle]='\u25EF'
+ICON[percent]='\u0025'
+ICON[permille]='\u2030'
+ICON[pilcrow]='\u00B6'
+ICON[peace]='\u262E'
+ICON[yinyang]='\u262F'
+ICON[russia]='\u262D'
+ICON[turkey]='\u262A'
+ICON[skull]='\u2620'
+ICON[heavyheart]='\u2764'
+ICON[whiteheart]='\u2661'
+ICON[blackheart]='\u2665'
+ICON[whitesmiley]='\u263A'
+ICON[blacksmiley]='\u263B'
+ICON[female]='\u2640'
+ICON[male]='\u2642'
+ICON[airplane]='\u2708'
+ICON[radioactive]='\u2622'
+ICON[ohm]='\u2126'
+ICON[pi]='\u220F'
+ICON[cross]='\u2717'
+ICON[fail]='\u2717'
+ICON[error]='\u2717'
+ICON[check]='\u2714'
+ICON[ok]='\u2714'
+ICON[success]='\u2714'
+
+alias show.icons="( for key in \"\${!ICON[@]}\" ; do echo -e \" \${ICON[\$key]} : \${key}\" ; done ) | column -c \${COLUMNS:-80}"
+
+# }}}
+
 # {{{ Coloring
 
+COLOR_NONE="\e[0m"
+
+# Basic Colors
+COLOR_BLACK="\e[0;30m"
+COLOR_RED="\e[0;31m"
+COLOR_GREEN="\e[0;32m"
+COLOR_YELLOW="\e[0;33m"
+COLOR_BLUE="\e[0;34m"
+COLOR_PURPLE="\e[0;35m"
+COLOR_CYAN="\e[0;36m"
+COLOR_WHITE="\e[0;37m"
+
+# Bold Colors
+COLOR_BLACK_BOLD="\e[1;30m"
+COLOR_RED_BOLD="\e[1;31m"
+COLOR_GREEN_BOLD="\e[1;32m"
+COLOR_YELLOW_BOLD="\e[1;33m"
+COLOR_BLUE_BOLD="\e[1;34m"
+COLOR_PURPLE_BOLD="\e[1;35m"
+COLOR_CYAN_BOLD="\e[1;36m"
+COLOR_WHITE_BOLD="\e[1;37m"
+
+# Underline 
+COLOR_BLACK_UNDER="\e[4;30m"
+COLOR_RED_UNDER="\e[4;31m"
+COLOR_GREEN_UNDER="\e[4;32m"
+COLOR_YELLOW_UNDER="\e[4;33m"
+COLOR_BLUE_UNDER="\e[4;34m"
+COLOR_PURPLE_UNDER="\e[4;35m"
+COLOR_CYAN_UNDER="\e[4;36m"
+COLOR_WHITE_UNDER="\e[4;37m"
+
+# Background Colors
+COLOR_BLACK_BACK="\e[40m"
+COLOR_RED_BACK="\e[41m"
+COLOR_GREEN_BACK="\e[42m"
+COLOR_YELLOW_BACK="\e[43m"
+COLOR_BLUE_BACK="\e[44m"
+COLOR_PURPLE_BACK="\e[45m"
+COLOR_CYAN_BACK="\e[46m"
+COLOR_WHITE_BACK="\e[47m"
+COLOR_GRAY_BACK="\e[100m"
+
+# Color support detection (warning! crap!)
 if [ -x /usr/bin/tput ] && ( tput setaf 1 >&/dev/null ) ; then
     color_support=true
 else
@@ -91,30 +180,9 @@ else
     COLORCOUNT="8"
 fi
 
-export COLORCOUNT
+export COLORCOUNT=${COLORCOUNT:-8}
 
-RED="\[\033[0;31m\]"
-YELLOW="\[\033[0;33m\]"
-GREEN="\[\033[0;32m\]"
-BLUE="\[\033[0;34m\]"
-LIGHT_RED="\[\033[1;31m\]"
-LIGHT_GREEN="\[\033[1;32m\]"
-WHITE="\[\033[1;37m\]"
-LIGHT_GRAY="\[\033[0;37m\]"
-COLOR_BG_GRAY="\[\e[1;37;100m\]"
-COLOR_BG_RED="\[\e[41;93m\]"
-COLOR_NONE="\[\e[0m\]"
-
-export GREP_OPTIONS='--color=auto'
-export GREP_COLOR='1;32'
-export LESS_TERMCAP_mb=$'\E[01;31m'
-export LESS_TERMCAP_md=$'\E[01;37m'
-export LESS_TERMCAP_me=$'\E[0m'
-export LESS_TERMCAP_se=$'\E[0m'
-export LESS_TERMCAP_so=$'\E[01;44;33m'
-export LESS_TERMCAP_ue=$'\E[0m'
-export LESS_TERMCAP_us=$'\E[01;32m'
-
+# dircolors
 if [ -x /usr/bin/dircolors ] ; then
     eval "`dircolors -b`"
     alias ls='ls --color=auto'
@@ -124,9 +192,17 @@ if [ -r ~/.lib/dircolors-solarized/dircolors.256dark ] ; then
     eval "`dircolors ~/.lib/dircolors-solarized/dircolors.256dark`"
 fi
 
-if [ -e /usr/bin/colordiff ] ; then
-    alias diff='colordiff'
-fi
+# grep/less/diff/... coloring
+export GREP_OPTIONS='--color=auto'
+export GREP_COLOR='1;32'
+export LESS_TERMCAP_mb=$'\e[01;31m'
+export LESS_TERMCAP_md=$'\e[01;37m'
+export LESS_TERMCAP_me=$'\e[0m'
+export LESS_TERMCAP_se=$'\e[0m'
+export LESS_TERMCAP_so=$'\e[01;44;33m'
+export LESS_TERMCAP_ue=$'\e[0m'
+export LESS_TERMCAP_us=$'\e[01;32m'
+[ -e /usr/bin/colordiff ] && alias diff='colordiff'
 
 # }}}
 
@@ -143,10 +219,10 @@ function prompt_func() {
     local lastret=$?
 
     if ( $prompt_colored ) ; then
-        PS1error=$( test ${lastret} -gt 0 && echo "${COLOR_BG_RED}[${lastret}]${COLOR_NONE} ")
-        PS1user="$( test $( id -u ) -eq 0 && echo ${RED})\u${COLOR_NONE}"
-        PS1host="$( $( pstree -s $$ | grep -qi "ssh" ) && echo ${RED})\h${COLOR_NONE}"
-        PS1path="${COLOR_BG_GRAY}\w${COLOR_NONE}"
+        PS1error=$( test ${lastret} -gt 0 && echo "${COLOR_RED_BACK}[${lastret}]${COLOR_NONE} ")
+        PS1user="$( test $( id -u ) -eq 0 && echo ${COLOR_RED})\u${COLOR_NONE}"
+        PS1host="$( $( pstree -s $$ | grep -qi "ssh" ) && echo ${COLOR_RED})\h${COLOR_NONE}"
+        PS1path="${COLOR_GRAY_BACK}\w${COLOR_NONE}"
     else
         PS1error=$( test ${lastret} -gt 0 && echo "[${lastret}] " )
         PS1user="\u"
@@ -231,7 +307,6 @@ alias f="false"
 alias cp='cp -i -r'
 alias less='less'
 alias mkdir='mkdir -p'
-alias mr='mr -d /'
 alias mv='mv -i'
 alias rm='rm -i'
 alias screen='screen -U'
@@ -348,7 +423,7 @@ alias speedtest="wget -O- http://cachefly.cachefly.net/200mb.test >/dev/null"
 alias route_via_wlan="for i in \`seq 1 10\` ; do route del default 2>/dev/null ; done ; route add default eth0 ; route add default wlan0 ; route add default gw \"\$( /sbin/ifconfig wlan0 | grep.ip | head -n 1 | cut -f'1-3' -d'.' ).1\""
 alias pidgin_lastlog="find ~/.purple/logs/ -type f -mtime -1 | xargs tail -n 5"
 alias sickbeard_skipped="sudo grep 'Found result' /var/log/sickbeard/sickbeard* | sed 's|\(.*\):\(.*[0-9]\:[0-9][0-9]\:[0-9][0-9]\).*\:\:\(.*\)\(at http.*\)|\2 - \3|g'"
-alias show_colors="for i in \`seq 1 7 ; seq 30 48 ; seq 90 107\` ; do echo -e \"\e[\${i}mcolor \$i\e[0m\" ; done"
+
 alias show_window_class='xprop | grep CLASS'
 alias show_tcp='sudo netstat -atp'
 alias show_tcp_stats='sudo netstat -st'
@@ -372,6 +447,7 @@ alias youtube="clive -f best --exec=\"( echo %f | grep -qi -e 'webm$' -e 'webm.$
 #nrg2iso() { dd bs=1k if="$1" of="$2" skip=300 }
 
 # host/setup specific
+
 if ( grep -q "minit" /proc/cmdline )
 then
     alias reboot="sudo minit-shutdown -r &"

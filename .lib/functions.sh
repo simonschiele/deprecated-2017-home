@@ -299,3 +299,81 @@ function nzb.queue() {
 
 # }}} 
 
+# {{{ unicode_status()
+
+function return_unicode() {
+    if [ ${1} -gt 0 ] ; then
+        echo -e "\t${COLOR_RED}${ICON[fail]}${COLOR_NONE}" 
+    else
+        echo -e "\t${COLOR_GREEN}${ICON[success]}${COLOR_NONE}" 
+    fi
+    
+    return ${1}
+}
+
+# }}} 
+
+# {{{ update_repo()
+
+function update_repo() {
+    local repo="${1}"
+    local dir="${2}"
+
+    if [ ! -d "${dir}" ] ; then
+        echo -n "> Initializing ${dir} (via ${repo})"
+        local out=$( yes "yes" | git clone --recursive "${repo}" "${dir}" 2>&1 )
+        local ret=$?
+    else
+        echo -n "> Updating ${dir}"
+        cd "${dir}" 2>/dev/null && local out=$( yes "yes" | git pull --recurse-submodules=yes 2>&1 )
+        local ret=$?
+        [ $ret -eq 0 ] && cd ${OLDPWD}
+    fi
+    
+    return_unicode $ret
+    return $ret
+}
+
+# }}}
+
+# {{{ echo.centered()
+
+function echo.centered() {
+    printf "%*s\n" $(( ${#1} + ( ${COLUMNS} - ${#1} ) / 2 )) "${1}"
+}
+
+# }}}
+
+# {{{ echo.header()
+
+function echo.header() {
+    clear ; echo -e "\n$( echo.centered "${@}" )\n"
+}
+
+# }}}
+
+# {{{ good_morning()
+
+function good_morning() {
+    local status=0
+    
+    echo.header "${COLOR_WHITE_BOLD}Good Morning, ${USER^}!${COLOR_NONE}"
+    echo -e $( echo.centered "${COLOR_WHITE_BOLD}Date:${COLOR_NONE} $( date +'%d/%m/%Y (%A)' )") #)   |   ${COLOR_WHITE_BOLD}Host:${COLOR_NONE} $( hostname ) (location: $( whereami ))"
+    
+    #echo -e "$( echo.centered "${COLOR_WHITE_BOLD}Date:${COLOR_NONE} $( date +'%d/%m/%Y (%A)' )")   |   ${COLOR_WHITE_BOLD}Host:${COLOR_NONE} $( hostname ) (location: $( whereami ))"
+    #echo -e "\n"
+    #echo -e "${COLOR_WHITE_UNDER}${COLOR_WHITE_BOLD}Debian:${COLOR_NONE}"
+     
+
+    echo -e "${COLOR_WHITE_UNDER}${COLOR_WHITE_BOLD}Repos:${COLOR_NONE}"
+    update_repo git@simon.psaux.de:dot.fonts.git ~/.fonts/ || let status++
+    update_repo git@simon.psaux.de:dot.fonts.git ~/.fonts2/ || let status++
+    update_repo git@simon.psaux.de:dot.backgrounds.git ~/.backgrounds/ || let status++ 
+    #update_repo git@simon.psaux.de:home.git ~/ || let status++ 
+    
+    echo
+    return $status
+}
+
+# }}}
+
