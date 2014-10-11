@@ -440,9 +440,10 @@ alias ssh.untrusted='ssh -o "StrictHostKeyChecking no"'
 #alias btc="echo \"[\$( wget -O- -q https://bitpay.com/api/rates | grep -P -o '{.*?EUR".*?}' )]\" | json_pp -f json -json_opt pretty"
 alias btc="wget -O- -q https://bitpay.com/api/rates | json_pp | grep -C2 -e Euro -e USD | grep -v -e \"[{}]\" -e name"
 alias wm_ticker="wget http://worldcup.sfg.io/matches/today/?by_date=DESC -O- | json_pp | less"
-alias synergy_kill="killall -9 synergyc synergys 2>/dev/null"
-alias synergy_cstation="synergy_kill ; synergys --daemon --restart --display :0 --config ~/.synergy/cstation.conf 2> ~/.log/synergys.log >&2"
-alias synergy_cpad="synergy_kill ; synergyc --name cpad --daemon --restart cstation 2> ~/.log/synergyc.log >&2"
+alias synergys.custom="[ -e ~/.synergy/\$( hostname -s ).conf ] && synergys --daemon --restart --display \${DISPLAY:-:0} --config ~/.synergy/\$( hostname -s ).conf 2> ~/.log/synergys.log >&2 || echo 'no config for this host available'"
+alias synergyc.custom="[ -e ~/.synergy/\$( hostname -s ).conf ] && synergyc --daemon --restart --display \${DISPLAY:-:0} --name \$( hostname -s ) \$( ls ~/.synergy/ | grep -iv \"\$( hostname -s ).conf\" | head -n1 | sed 's|\.conf$||g' ) 2> ~/.log/synergyc.log >&2"
+alias synergy.kill="killall -9 synergyc synergys 2>/dev/null ; true"
+alias synergy.start="synergy.kill ; synergys.custom ; synergyc.custom"
 
 # convert stuff
 alias 2audio="convert2 mp3"
