@@ -11,6 +11,7 @@ Filesystems: btrfs-tools xfsprogs sshfs
 Maintainance: etckeeper
 Compression: bzip2
 Tools: hexedit less psmisc hdparm w3m xml2 colordiff nmon
+Packages: apt-show-versions
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------

@@ -103,48 +103,53 @@ alias show.icons="( for key in \"\${!ICON[@]}\" ; do echo -e \" \${ICON[\$key]} 
 
 # {{{ Coloring
 
-COLOR_NONE="\e[0m"
+declare -A COLOR
+
+COLOR[none]="\e[0m"
+COLOR[off]="\e[0m"
+COLOR[false]="\e[0m"
+COLOR[normal]="\e[0m"
 
 # Basic Colors
-COLOR_BLACK="\e[0;30m"
-COLOR_RED="\e[0;31m"
-COLOR_GREEN="\e[0;32m"
-COLOR_YELLOW="\e[0;33m"
-COLOR_BLUE="\e[0;34m"
-COLOR_PURPLE="\e[0;35m"
-COLOR_CYAN="\e[0;36m"
-COLOR_WHITE="\e[0;37m"
+COLOR[black]="\e[0;30m"
+COLOR[red]="\e[0;31m"
+COLOR[green]="\e[0;32m"
+COLOR[yellow]="\e[0;33m"
+COLOR[blue]="\e[0;34m"
+COLOR[purple]="\e[0;35m"
+COLOR[cyan]="\e[0;36m"
+COLOR[white]="\e[0;37m"
 
 # Bold Colors
-COLOR_BLACK_BOLD="\e[1;30m"
-COLOR_RED_BOLD="\e[1;31m"
-COLOR_GREEN_BOLD="\e[1;32m"
-COLOR_YELLOW_BOLD="\e[1;33m"
-COLOR_BLUE_BOLD="\e[1;34m"
-COLOR_PURPLE_BOLD="\e[1;35m"
-COLOR_CYAN_BOLD="\e[1;36m"
-COLOR_WHITE_BOLD="\e[1;37m"
+COLOR[black_bold]="\e[1;30m"
+COLOR[red_bold]="\e[1;31m"
+COLOR[green_bold]="\e[1;32m"
+COLOR[yellow_bold]="\e[1;33m"
+COLOR[blue_bold]="\e[1;34m"
+COLOR[purple_bold]="\e[1;35m"
+COLOR[cyan_bold]="\e[1;36m"
+COLOR[white_bold]="\e[1;37m"
 
 # Underline 
-COLOR_BLACK_UNDER="\e[4;30m"
-COLOR_RED_UNDER="\e[4;31m"
-COLOR_GREEN_UNDER="\e[4;32m"
-COLOR_YELLOW_UNDER="\e[4;33m"
-COLOR_BLUE_UNDER="\e[4;34m"
-COLOR_PURPLE_UNDER="\e[4;35m"
-COLOR_CYAN_UNDER="\e[4;36m"
-COLOR_WHITE_UNDER="\e[4;37m"
+COLOR[black_under]="\e[4;30m"
+COLOR[red_under]="\e[4;31m"
+COLOR[green_under]="\e[4;32m"
+COLOR[yellow_under]="\e[4;33m"
+COLOR[blue_under]="\e[4;34m"
+COLOR[purple_under]="\e[4;35m"
+COLOR[cyan_under]="\e[4;36m"
+COLOR[white_under]="\e[4;37m"
 
 # Background Colors
-COLOR_BLACK_BACK="\e[40m"
-COLOR_RED_BACK="\e[41m"
-COLOR_GREEN_BACK="\e[42m"
-COLOR_YELLOW_BACK="\e[43m"
-COLOR_BLUE_BACK="\e[44m"
-COLOR_PURPLE_BACK="\e[45m"
-COLOR_CYAN_BACK="\e[46m"
-COLOR_WHITE_BACK="\e[47m"
-COLOR_GRAY_BACK="\e[100m"
+COLOR[black_back]="\e[40m"
+COLOR[red_back]="\e[41m"
+COLOR[green_back]="\e[42m"
+COLOR[yellow_back]="\e[43m"
+COLOR[blue_back]="\e[44m"
+COLOR[purple_back]="\e[45m"
+COLOR[cyan_back]="\e[46m"
+COLOR[white_back]="\e[47m"
+COLOR[gray_back]="\e[100m"
 
 # Color support detection (warning! crap!)
 if [ -x /usr/bin/tput ] && ( tput setaf 1 >&/dev/null ) ; then
@@ -194,9 +199,9 @@ fi
 
 # grep/less/diff/... coloring
 export GREP_OPTIONS='--color=auto'
-export GREP_COLOR='1;32'
-export LESS_TERMCAP_mb=$'\e[01;31m'
-export LESS_TERMCAP_md=$'\e[01;37m'
+export GREP_COLOR='1;32'    # green-bold
+export LESS_TERMCAP_mb=$'\e[01;31m'     # red-bold
+export LESS_TERMCAP_md=$'\e[01;37m'     # white-bold
 export LESS_TERMCAP_me=$'\e[0m'
 export LESS_TERMCAP_se=$'\e[0m'
 export LESS_TERMCAP_so=$'\e[01;44;33m'
@@ -219,10 +224,10 @@ function prompt_func() {
     local lastret=$?
 
     if ( $prompt_colored ) ; then
-        PS1error=$( test ${lastret} -gt 0 && echo "${COLOR_RED_BACK}[${lastret}]${COLOR_NONE} ")
-        PS1user="$( test $( id -u ) -eq 0 && echo ${COLOR_RED})\u${COLOR_NONE}"
-        PS1host="$( $( pstree -s $$ | grep -qi "ssh" ) && echo ${COLOR_RED})\h${COLOR_NONE}"
-        PS1path="${COLOR_GRAY_BACK}\w${COLOR_NONE}"
+        PS1error=$( test ${lastret} -gt 0 && echo "${COLOR[red_back]}[${lastret}]${COLOR[none]} ")
+        PS1user="$( test $( id -u ) -eq 0 && echo ${COLOR[red]})\u${COLOR[none]}"
+        PS1host="$( $( pstree -s $$ | grep -qi "ssh" ) && echo ${COLOR[red]})\h${COLOR[none]}"
+        PS1path="${COLOR[gray_back]}\w${COLOR[none]}"
     else
         PS1error=$( test ${lastret} -gt 0 && echo "[${lastret}] " )
         PS1user="\u"
