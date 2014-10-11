@@ -104,7 +104,7 @@ ICON[success]='\u2714'
 
 # {{{ Colors
 
-alias show.colors="( for key in \"\${!COLOR[@]}\" ; do echo -e \" \${COLOR[\$key]} == COLORTEST \${key} == \${COLOR[none]}\t\t\" ; done ) | column -c \${COLUMNS:-100}"
+alias show.colors="( for key in \"\${!COLOR[@]}\" ; do echo -e \" \${COLOR[\$key]} == COLORTEST \${key} == \${COLOR[none]}\" ; done ) | column -c \${COLUMNS:-120}"
 declare -A COLOR
 
 COLOR[none]="\e[0m"
@@ -197,6 +197,7 @@ if [ -x /usr/bin/dircolors ] ; then
     alias ls='ls --color=auto'
 fi
 
+# dircolors (solarized)
 if [ -r ~/.lib/dircolors-solarized/dircolors.256dark ] ; then
     eval "`dircolors ~/.lib/dircolors-solarized/dircolors.256dark`"
 fi
@@ -343,7 +344,7 @@ alias debian.packages_by_size="dpkg-query -W --showformat='\${Installed-Size;10}
 alias debian.package_configfiles="dpkg-query -f '\n\n\${Package} \n\${Conffiles}' -W"
 
 # logs
-alias log.dmesg="dmesg -T | sed -e 's|\(^.*'`date +%Y`']\)\(.*\)|\x1b[0;34m\1\x1b[0m \2|g'"
+alias log.dmesg="dmesg -T"
 alias log.pidgin="find ~/.purple/logs/ -type f -mtime -1 | xargs tail -n 5"
 alias log.authlog="sudo grep -e \"^\$( LANG=C date -d'now -24 hours' +'%b %e' )\" -e \"^\$( LANG=C date +'%b %e' )\" /var/log/auth.log | grep.ip | sort -n | uniq -c | sort -n | grep -v \"\$( host -4 enkheim.psaux.de | grep.ip | head -n1 )\" | tac | head -n 10"
 
