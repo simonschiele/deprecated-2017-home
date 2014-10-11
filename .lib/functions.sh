@@ -202,7 +202,7 @@ function random_integer() {
 # {{{ whereami()
 function whereami() {
     ips=$( /sbin/ifconfig | grep -o "[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}" | sort -u | grep -v -e "^127" -e "^255" )
-    if ( echo $ips | grep -q -e "192\.168\.[78]0" ) ; then
+    if ( echo $ips | grep -q -e "192\.168\.[78]0" -e "195\.4\.7[01]" ) ; then
         echo "work"
     elif ( echo $ips | grep -q -e "192\.168\.5" ) ; then
         echo "home"
@@ -269,24 +269,186 @@ function google() {
 
 function nzb.queue() {
     local target=/share/.usenet/queue/
-    
-    if ! [ -d ${target} ] ; then
-        echo "Target folder ${target} not available" >&2 
-        return 1
+
+    if [ ! -d ${target} ] ; then
+        echo "Local target not available -> will use 'ssh enkheim.psaux.de'" >&2
+        local action="scp -P2222"
+        local target="simon@enkheim.psaux.de:${target}"
+    else
+        local action="mv -v"
     fi
     
-    if [ -n "${@}" ] ; then
-        mv -v ${@} ${target} 
-    else
+    if [[ -z "${@}" ]] ; then
         if ls ~/Downloads/*[nN][zZ][bB] 2>/dev/null >&2 ; then
-            mv -v ~/Downloads/*[nN][zZ][bB] ${target}
+            if ( ${action} ~/Downloads/*[nN][zZ][bB] ${target} ) ; then
+                rm -ri ~/Downloads/*[nN][zZ][bB]
+            fi
         else
             echo "No nzb files found in the following dirs:" >&2
             echo " ~/Downloads/" >&2
             return 1
         fi
+    else
+        if ( ${action} ${@} ${target} ) ; then
+            if [[ "$@" != "/" ]] && [[ "$@" != "." ]] && [[ "$@" != "" ]] ; then
+                rm -ri ${@}
+            fi
+        fi
     fi
 }
 
 # }}} 
+
+# {{{ unicode_status()
+
+function return_unicode() {
+    if [ ${1} -gt 0 ] ; then
+        echo -e " ${COLOR[red]}${ICON[fail]}${COLOR[none]}" 
+    else
+        echo -e " ${COLOR[green]}${ICON[success]}${COLOR[none]}" 
+    fi
+    
+    return ${1}
+}
+
+# }}} 
+
+# {{{ update.repo()
+
+function update.repo() {
+    local repo="${1}"
+    local dir="${2}"
+
+    if [ ! -d "${dir}" ] ; then
+        echo -en "  ${ICON['whitecircle']}  Initializing ${dir} (via ${repo})"
+        local out=$( LANG=C git clone --recursive "${repo}" "${dir}" 2>&1 )
+        echo -en "\r  ${ICON['blackcircle']}  Initializing ${dir} (via ${repo})"
+        local ret=$?
+    else
+        echo -en "  ${ICON['blackcircle']}  Updating ${dir}"
+        cd "${dir}" 2>/dev/null && local out=$( LANG=C git pull --recurse-submodules=yes 2>&1 )
+        local ret=$?
+        [ $ret -eq 0 ] && cd ${OLDPWD}
+    fi
+    
+    return_unicode $ret
+    return $ret
+}
+
+# }}}
+
+# {{{ spinner()
+
+function spinner() {
+    local pid=$1
+    while [ -d /proc/$pid ] ; do
+        echo -n '/^H' ; sleep 0.05
+        echo -n '-^H' ; sleep 0.05
+        echo -n '\^H' ; sleep 0.05
+        echo -n '|^H' ; sleep 0.05
+    done
+    return 0
+}
+
+# }}}
+
+# {{{ echo.centered()
+
+function echo.centered() {
+    printf "%*s\n" $(( ${#1} + ( ${COLUMNS} - ${#1} ) / 2 )) "${1}"
+}
+
+# }}}
+
+# {{{ echo.header()
+
+function echo.header() {
+    echo -e "\n$( echo.centered "${@}" )\n"
+}
+
+# }}}
+
+# {{{ debian.security()
+
+function debian.security() { 
+    wget -q -O- https://www.debian.org/security/dsa | xml2 | grep -o -e "item/title=.*$" -e "item/dc:date=.*$" -e "item/link=.*$" | tac | cut -f'2-' -d'=' | sed -e ':a;N;$!ba;s/\n/ /g' -e 's/\(20[0-9]\{2\}-\)/\n\1/g' | awk {'print $1" "$4" ("$2")"'} | sed       "s|^|\ \ $( echo -e ${ICON[fail]})\ \ |g" | tac | head -n ${1:-6}
+}
+
+# }}}
+
+# {{{ good_morning()
+
+function good_morning() {
+    local status=0
+    local has_root=false
+    
+    clear
+    echo.header "${COLOR[white_bold]}Good Morning, ${SUDO_USER:-${USER^}}!${COLOR[none]}"
+
+    echo -e "${COLOR[white_bold]}Date:${COLOR[none]} $( date +'%d.%m.%Y (%A, %H:%M)' )"
+    echo -e "${COLOR[white_bold]}Host:${COLOR[none]} $( hostname )"
+    echo -e "${COLOR[white_bold]}Location:${COLOR[none]} $( whereami )"
+  
+    if [ $( id -u ) -eq 0 ] ; then
+        has_root=true
+        sudo_cmd=""
+    elif ( sudo -n echo -n 2>/dev/null ) ; then
+        has_root=true
+        sudo_cmd="sudo"
+    fi
+
+    if ! ( ${has_root} ) ; then
+        echo -e "\n${COLOR[white_under]}${COLOR[white_bold]}sudo:${COLOR[none]}"
+        if ! ( sudo echo -n ) ; then
+            echo -e "\n${COLOR[red]}ERROR${COLOR[none]}: Couldn't unlock sudo\n" >&2
+            return 1
+        else
+            has_root=true
+            sudo_cmd="sudo"
+        fi
+    fi
+    
+    echo -e "\n${COLOR[white_under]}${COLOR[white_bold]}Hardware:${COLOR[none]}"
+    cpu=$( grep "^model\ name" /proc/cpuinfo | sed -e "s|^[^:]*:\([^:]*\)$|\1|g" -e "s/[\ ]\{2\}//g" -e "s|^\ ||g" )
+    echo -e 'CPU: '$( echo -e "$cpu" | wc -l )'x '$( echo "$cpu" | head -n1 )
+    
+    ram=$( LANG=C free -m | grep ^Mem | awk {'print $2'} )
+    echo -e "Ram: ${ram}mb"
+
+    swap=$( LANG=C free | grep "^Swap" | sed 's|^Swap\:[0\ ]*||g' )
+    if [ -z "$swap" ] ; then
+        echo -e "Swap: No active swap"
+    fi
+    
+    echo -e "\n${COLOR[white_under]}${COLOR[white_bold]}Debian:${COLOR[none]}"
+    echo "Version: $( lsb_release -ds 2>&1 )"
+    
+    echo -en "Updating Packagelists: "
+    local out=$( ${sudo_cmd} apt-get update 2>&1 )
+    local ret=$?
+    if [ $ret -eq 0 ] ; then
+        echo -e "SUCCESS ${COLOR[green]}${ICON[ok]}${COLOR[none]}"
+    else
+        echo -e "FAILED ${COLOR[red]}${ICON[fail]}${COLOR[none]}"
+        let status++
+    fi
+    
+    echo -en "Available Updates: "
+    yes "no" | ${sudo_cmd} apt-get dist-upgrade 2>&1 | grep --color=never "upgraded.*installed.*remove.*upgraded"
+    
+    echo -e "Latest Security Advisories: "
+    debian.security
+
+    echo -e "\n${COLOR[white_under]}${COLOR[white_bold]}Repos:${COLOR[none]}"
+    update.repo git@psaux.de:dot.bin-ypsilon.git ~/.bin-ypsilon/ || let status++
+    update.repo git@psaux.de:dot.bin-private.git ~/.bin-private/ || let status++
+    update.repo git@simon.psaux.de:dot.fonts.git ~/.fonts/ || let status++
+    update.repo git@simon.psaux.de:dot.backgrounds.git ~/.backgrounds/ || let status++ 
+    update.repo git@simon.psaux.de:home.git ~/ || let status++ 
+    
+    echo.header "${COLOR[white_bold]}Have a nice day, ${SUDO_USER:-${USER^}}! (-:${COLOR[none]}"
+    return $status
+}
+
+# }}}
 

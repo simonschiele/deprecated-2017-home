@@ -26,54 +26,28 @@ fi
 
 ### }}} 
 
-### {{{ is_git() 
-
-is_git () {
+if LANG=C git rev-parse 2>/dev/null ; then
     
-    REPO="`pwd`"
+    gitStatus="$( LANG=C git status 2>/dev/null )"
+    gitBranch="$( LANG=C git branch 2>/dev/null | grep '^*' | sed -e 's|^\*\ *\(.*\)|\1|g' -e 's|[()]||g' )"
 
-    until [[ "$CHECKED" == '/' ]]
-    do
-        if [[ -d "${REPO}/.git" ]]
-        then
-            exit 0
-        fi
-        CHECKED="${REPO}"
-        REPO=`dirname "${REPO}"`
-    done
-    
-    exit 1
-}
-
-### }}} 
-
-if ( is_git )
-then
-    gitStatus="$(git status 2>&1)"
-    gitBranch="$(git branch 2>&1 | grep "^*" | sed -e 's|^*\ ||g' -e 's|[()]||g' )"
-    
-    if [[ $gitBranch == 'master' ]]
-    then
+    if [[ "${gitBranch}" == 'master' ]] ; then
         gitBranch=""
     fi
-    
-    if [[ -n "${gitBranch}" ]]
-    then
+
+    if [[ -n "${gitBranch}" ]] ; then
         gitBranch="${gitBranch} "
     fi
 
-    if [[ ! ${gitStatus} =~ "working directory clean" ]]
-    then
+    if [[ ! ${gitStatus} =~ "working directory clean" ]] ; then
         state="${RED}⚡"
     fi
-    
-    if ( echo "$gitStatus" | grep -q "ahead of" )
-    then
+
+    if [[ "${gitStatus}" =~ "ahead of" ]] ; then
         ahead="${YELLOW}↑"
     fi
 
-    if test -n "${ahead}" || test -n "${state}"
-    then
+    if test -n "${ahead}" || test -n "${state}" ; then
         echo "(${gitBranch}${ahead}${state}${COLOR_NONE})"
     else
         echo "(${gitBranch}${GREEN}♥${COLOR_NONE})"
