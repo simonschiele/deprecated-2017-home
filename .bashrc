@@ -199,15 +199,16 @@ fi
 
 # grep/less/diff/... coloring
 export GREP_OPTIONS='--color=auto'
-export GREP_COLOR='1;32'    # green-bold
+export GREP_COLOR='1;32'                # green-bold
 export LESS_TERMCAP_mb=$'\e[01;31m'     # red-bold
 export LESS_TERMCAP_md=$'\e[01;37m'     # white-bold
-export LESS_TERMCAP_me=$'\e[0m'
+export LESS_TERMCAP_me=$'\e[0m'         
 export LESS_TERMCAP_se=$'\e[0m'
 export LESS_TERMCAP_so=$'\e[01;44;33m'
 export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[01;32m'
-[ -e /usr/bin/colordiff ] && alias diff='colordiff'
+( which colordiff >/dev/null ) && alias diff="colordiff"
+( which pacman >/dev/null ) && alias pacman="pacman --color=auto"
 
 # }}}
 
@@ -325,30 +326,30 @@ if [ $( id -u ) -eq 0 ] ; then
     vim='sudoedit'
 fi
 alias sudo='sudo '
-alias sudothat='eval "sudo $(fc -ln -1)"'
+alias sudo.that="eval 'sudo \$(fc -ln -1)'"
 
 # system
 alias adduser.disabled="sudo adduser --no-create-home --disabled-login --shell /bin/false"
-alias dmesg.human="dmesg -T|sed -e 's|\(^.*'`date +%Y`']\)\(.*\)|\x1b[0;34m\1\x1b[0m - \2|g'"
 alias observe.pid="strace -T -f -p"
 
 # package and system-config
-alias debian_version="lsb_release -a"
-alias debian_packages_list_my="debian_packages_list \$(grep ^systemtype ~/.system.conf | cut -f'2-' -d'=' | sed 's|[\"]||g')"
-alias debian_packages_list_by_size="dpkg-query -W --showformat='\${Installed-Size;10}\t\${Package}\n' | sort -k1,1n"
-alias debian_packages_list_configfiles="dpkg-query -f '\n\n\${Package} \n\${Conffiles}' -W"
-alias debian_packages_list_experimental='aptitude -t experimental search -F "%p %?V %?v %?t" --disable-columns .|grep -v none| grep experimental| awk "{if( \$2 == \$3) print \$1}"'
-alias debian_packages_list_unstable="aptitude -t unstable search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep unstable| awk '{if( \$2 == \$3) print \$1}'"
-alias debian_packages_list_testing="aptitude -t testing search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep testing| awk '{if( \$2 == \$3) print \$1}'"
-alias debian_packages_list_stable="aptitude -t stable search -F '%p %?V %?v %?t' --disable-columns .|grep -v none| grep stable| awk '{if( \$2 == \$3) print \$1}'"
+alias debian.version="lsb_release -a"
+alias debian.packages_custom="debian.packages_list_custom \$(grep ^systemtype ~/.system.conf | cut -f'2-' -d'=' | sed 's|[\"]||g')"
+alias debian.packages_by_size="dpkg-query -W --showformat='\${Installed-Size;10}\t\${Package}\n' | sort -k1,1n"
+alias debian.package_configfiles="dpkg-query -f '\n\n\${Package} \n\${Conffiles}' -W"
 
-# .hooks/
-alias hooks_run="echo ; systemtype=\$( grep ^systemtype ~/.system.conf | cut -f2 -d'=' | sed -e 's|[\"\ ]||g' -e \"s|'||g\" ) ; for exe in \$( find ~/.hooks/ ! -type d -executable | xargs grep -l \"^hook_systemtype.*\${systemtype}\" | xargs grep -l '^hook_optional=false' ) ; do exec_with_sudo='' ; grep -q 'hook_sudo=.*true.*' \"\${exe}\" && exec_with_sudo='sudo ' || grep -q 'hook_sudo' \"\${exe}\" || exec_with_sudo='sudo ' ; cancel=\${cancel:-false} global_success=\${global_success:-true} \${exe} ; retval=\${?} ; echo ; if test \${retval} -eq 2 ; then echo -e \"CANCELING HOOKS\" >&2 ; break ; elif ! test \${retval} -eq 0 ; then global_success=false ; fi ; done ; \${global_success} || echo -e \"Some hooks could NOT get processed successfully!\n\" ; unset global_success systemtype retval ;"
+# logs
+alias log.dmesg="dmesg -T | sed -e 's|\(^.*'`date +%Y`']\)\(.*\)|\x1b[0;34m\1\x1b[0m \2|g'"
+alias log.pidgin="find ~/.purple/logs/ -type f -mtime -1 | xargs tail -n 5"
+alias log.authlog="sudo grep -e \"^\$( LANG=C date -d'now -24 hours' +'%b %e' )\" -e \"^\$( LANG=C date +'%b %e' )\" /var/log/auth.log | grep.ip | sort -n | uniq -c | sort -n | grep -v \"\$( host -4 enkheim.psaux.de | grep.ip | head -n1 )\" | tac | head -n 10"
 
 # permission stuff
-alias permissions.normalize="find . -type f \! -perm -a+x -exec chmod 640 {} \; -o -type f -perm -a+x -exec chmod 750 {} \; -o -type d -exec chmod 750 {} \; ; chown ${SUDO_USER:-$USER}: . -R"
-alias permissions.normalizeWeb="chown ${SUDO_USER:-$USER}:www-data . -R ; find . -type f \! -perm -a+x -exec chmod 640 {} \; -o -type f -perm -a+x -exec chmod 750 {} \; -o -type d \( -iname 'log*' -o -iname 'cache' -o -iname 'templates_c' \) -exec chown www-data:${SUDO_USER:-$USER} {} -R \; -exec chmod 770 {} \; -o -type d -exec chmod 750 {} \;"
-alias permissions.normalizeSystem="chown ${SUDO_USER:-$USER}: ~/ -R ; find /home/* /root -maxdepth 0 -type d -exec chmod 700 {} \;"
+alias permissions.normalize="find . -type f \! -perm -a+x -exec chmod 640 {} \; -o -type f -perm -a+x -exec chmod 750 {} \; -o -type d -exec chmod 750 {} \; ; chown \${SUDO_USER:-\$USER}: . -R"
+alias permissions.normalize_system="chown \${SUDO_USER:-\$USER}: ~/ -R ; find /home/* /root -maxdepth 0 -type d -exec chmod 700 {} \;"
+alias permissions.normalize_web="chown \${SUDO_USER:-\$USER}:www-data . -R ; find . -type f \! -perm -a+x -exec chmod 640 {} \; -o -type f -perm -a+x -exec chmod 750 {} \; -o -type d \( -iname 'log*' -o -iname 'cache' -o -iname 'templates_c' \) -exec chown www-data:\${SUDO_USER:-\$USER} {} -R \; -exec chmod 770 {} \; -o -type d -exec chmod 750 {} \;"
+
+# ~/.hooks/
+alias hooks.run="echo ; systemtype=\$( grep ^systemtype ~/.system.conf | cut -f2 -d'=' | sed -e 's|[\"\ ]||g' -e \"s|'||g\" ) ; for exe in \$( find ~/.hooks/ ! -type d -executable | xargs grep -l \"^hook_systemtype.*\${systemtype}\" | xargs grep -l '^hook_optional=false' ) ; do exec_with_sudo='' ; grep -q 'hook_sudo=.*true.*' \"\${exe}\" && exec_with_sudo='sudo ' || grep -q 'hook_sudo' \"\${exe}\" || exec_with_sudo='sudo ' ; cancel=\${cancel:-false} global_success=\${global_success:-true} \${exe} ; retval=\${?} ; echo ; if test \${retval} -eq 2 ; then echo -e \"CANCELING HOOKS\" >&2 ; break ; elif ! test \${retval} -eq 0 ; then global_success=false ; fi ; done ; \${global_success} || echo -e \"Some hooks could NOT get processed successfully!\n\" ; unset global_success systemtype retval ;"
 
 # find
 extensions_video="avi,mkv,mp4,mpg,mpeg,wmv,wmvlv,webm,3g,mov,flv"
@@ -356,11 +357,11 @@ extensions_images="png,jpg,jpeg,gif,bmp,tiff,ico,lzw,raw,ppm,pgm,pbm,psd,img,xcf
 extensions_audio="flac,mp1,mp2,mp3,ogg,wav,aac,ac3,dts,m4a,mid,midi,mka,mod,oma,wma"
 extensions_documents="doc,xls,abw,chm,pdf,docx,docm,odm,odt,rtf,stw,sxg,sxw,wpd,wps,ods,pxl,sxc,xlsx,xlsm,odg,odp,pps,ppsx,ppt,pptm,pptx,sda,sdd,sxd,dot,dotm,dotx"
 extensions_archives="7z,ace,arj,bz,bz2,gz,lha,lzh,rar,tar,taz,tbz,tbz2,tgz,zip"
-alias find.videos="find . ! -type d $( echo ${extensions_video} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
-alias find.images="find . ! -type d $( echo ${extensions_images} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
-alias find.audio="find . ! -type d $( echo ${extensions_audio} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
-alias find.documents="find . ! -type d $( echo ${extensions_documents} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
-alias find.archives="find . ! -type d $( echo ${extensions_archives} | sed -e 's|,|\ \-o\ \-iname *|g' -e 's|^|\ \-iname *|g' )"
+alias find.videos="find . ! -type d $( echo ${extensions_video}\" | sed -e 's|,|\"\ \-o\ \-iname \"*|g' -e 's|^|\ \-iname \"*|g' )"
+alias find.images="find . ! -type d $( echo ${extensions_images}\" | sed -e 's|,|\"\ \-o\ \-iname \"*|g' -e 's|^|\ \-iname \"*|g' )"
+alias find.audio="find . ! -type d $( echo ${extensions_audio}\" | sed -e 's|,|\"\ \-o\ \-iname \"*|g' -e 's|^|\ \-iname \"*|g' )"
+alias find.documents="find . ! -type d $( echo ${extensions_documents}\" | sed -e 's|,|\"\ \-o\ \-iname \"*|g' -e 's|^|\ \-iname \"*|g' )"
+alias find.archives="find . ! -type d $( echo ${extensions_archives}\" | sed -e 's|,|\"\ \-o\ \-iname \"*|g' -e 's|^|\ \-iname \"*|g' )"
 alias find.dir="find . -type d"
 alias find.file="find . ! -type d"
 alias find.exec="find . ! -type d -executable"
@@ -391,83 +392,84 @@ alias mirror.images='wget -r -l1 --no-parent -nH -nd -P/tmp -A".gif,.jpg" "$1"'	
 # filter
 alias grep.ip='grep -o '"'"'\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}'"'"
 alias grep.urls="sed -e \"s|'|\\\"|g\" -e \"s|src|href|g\" | sed -e \"s|href|\nhref|g\" | grep -i -e \"href[ ]*=\" | sed 's/.*href[ ]*=[ ]*[\"]*\(.*\)[\"\ ].*/\1/g' | cut -f'1' -d'\"'"
-alias grep.year="grep -o '[1-2]\{1\}[0-9]\{3\}'"
+alias grep.year="grep -o '[1-2][0-9]\{3\}'"
+alias highlite="grep --color=yes -e ^ -e"
 
-# randoms
+# random
 alias random.mac="openssl rand -hex 6 | sed 's/\(..\)/\1:/g; s/.$//'"
 alias random.ip="nmap -iR 1 -sL -n | grep.ip -o"
 alias random.lotto='shuf -i 1-49 -n 6 | sort -n | xargs'
 random.password() { openssl rand -base64 ${1:-8} ; }
 random.hex() { openssl rand -hex ${1:-8} ; }
+random.integer() { from=1 ; to=${1:-100} ; [[ -n "${2}" ]] && from=${1} && to=${2} ; echo "f:${from} t:${to}"; echo "$(( RANDOM % ${2:-100} + ${1:-1} ))" ; }
 
-# magic
+# scan
+alias scan.wlans="/sbin/iwlist scanning 2>/dev/null | grep -e 'Cell' -e 'Channel\:' -e 'Encryption' -e 'ESSID' -e 'WPA' | sed 's|Cell|\nCell|g'"
+alias scan.hosts="fping -a -g \$(/sbin/ifconfig `/sbin/route -n | grep 'UG ' | head -n1 | awk {'print $8'}` | grep -i 'inet' | cut -f'2' -d':' | cut -f'1' -d' ' | cut -f'1-3' -d'.').1 \$(/sbin/ifconfig `/sbin/route -n | grep 'UG '| head -n1 | awk {'print \$8'}` | grep -i 'inet' | cut -f'2' -d':' | cut -f'1' -d' ' | cut -f'1-3' -d'.').254 2>/dev/null"
+
+# media 
+alias mplayer_left="mplayer -xineramascreen 0"
+alias mplayer_right="mplayer -xineramascreen 1"
+alias alsa.silent='for mix in PCM MASTER Master ; do amixer -q sset $mix 0 2>/dev/null ; done'
+alias alsa.unsilent='for mix in PCM MASTER Master ; do amixer -q sset $mix 90% 2>/dev/null ; done'
 alias screenshot="import -display :0 -window root ./screenshot-\$(date +%Y-%m-%d_%s).png"
 alias screendump="ffmpeg -f x11grab -s wxga -r 25 -i :0.0 -sameq ./screendump-\$(date +%Y-%m-%d_%s).mpg"
 alias screenvideo="screendump"
 
-alias git.allFilesEver="git log --name-status --oneline --all | grep -P \"^[A|M|D]\s\" | awk '{print $2}' | sort | uniq"
-alias calculator="bc -l"
-alias highlite="grep --color=auto -e ^ -e"
-alias scan_for_wlans="/sbin/iwlist scanning 2>/dev/null | grep -e 'Cell' -e 'Channel\:' -e 'Encryption' -e 'ESSID' -e 'WPA' | sed 's|Cell|\nCell|g'"
-alias scan_for_hosts="fping -a -g \$(/sbin/ifconfig `/sbin/route -n | grep 'UG ' | head -n1 | awk {'print $8'}` | grep -i 'inet' | cut -f'2' -d':' | cut -f'1' -d' ' | cut -f'1-3' -d'.').1 \$(/sbin/ifconfig `/sbin/route -n | grep 'UG '| head -n1 | awk {'print \$8'}` | grep -i 'inet' | cut -f'2' -d':' | cut -f'1' -d' ' | cut -f'1-3' -d'.').254 2>/dev/null"
-alias remove_last_line="sed '\$d'"
-alias html_umlaute="sed -e 's|ü|\&uuml;|g' -e 's|Ü|\&Uuml;|g' -e 's|ä|\&auml;|g' -e 's|Ä|\&Auml;|g' -e 's|ö|\&ouml;|g' -e 's|Ö|\&Ouml;|g' -e 's|ß|\&szlig;|g'"
-alias html_strip="sed -e 's|<[^>]*>||g'"
-alias http_response="lwp-request -ds"
-alias battery="upower -d | grep -e state -e percentage -e time | sed -e 's|^.*:\ *\(.*\)|\1|g' | sed 's|[ ]*$||g' | tr '\n' ' ' | sed -e 's|\ $|\n|g' | sed -e 's|^|(|g' -e 's|$|)|g'"
-alias keycodes="xev | grep 'keycode\|button'"
-alias silent='amixer -q sset "PCM" 0 ; amixer -q sset "MASTER" 0'
-alias unsilent='amixer -q sset "PCM" 96 ; amixer -q sset "MASTER" 96'
-alias mplayer_left="mplayer -xineramascreen 0"
-alias mplayer_right="mplayer -xineramascreen 1"
-alias patch_from_diff="patch -Np0 -i"
-alias list_sticks="udisks --dump | grep device-file | sed 's|^.*\:\ *\(.*\)|\1|g' | while read dev ; do if ( udisks --show-info \${dev} | grep -q \"removable.*1\" ) ; then echo \${dev} ; fi ; done"
-alias whatsmyip="wget -O- -q ip.nu | xargs | html_strip"
-alias whatsmyresolution="LANG=C xrandr -q | grep -o \"current [0-9]\{3,4\} x [0-9]\{3,4\}\" | sed -e 's|current ||g' -e 's|\ ||g'"
-alias speedtest="wget -O- http://cachefly.cachefly.net/200mb.test >/dev/null"
-alias route_via_wlan="for i in \`seq 1 10\` ; do route del default 2>/dev/null ; done ; route add default eth0 ; route add default wlan0 ; route add default gw \"\$( /sbin/ifconfig wlan0 | grep.ip | head -n 1 | cut -f'1-3' -d'.' ).1\""
-alias pidgin_lastlog="find ~/.purple/logs/ -type f -mtime -1 | xargs tail -n 5"
-alias sickbeard_skipped="sudo grep 'Found result' /var/log/sickbeard/sickbeard* | sed 's|\(.*\):\(.*[0-9]\:[0-9][0-9]\:[0-9][0-9]\).*\:\:\(.*\)\(at http.*\)|\2 - \3|g'"
-
-alias show_window_class='xprop | grep CLASS'
-alias show_tcp='sudo netstat -atp'
-alias show_tcp_stats='sudo netstat -st'
-alias show_udp='sudo netstat -aup'
-alias show_udp_stats='sudo netstat -su'
-alias chrome-kill="kill -9 \$( ps aux | grep -i chrome | awk {'print \$2'} | xargs ) 2>/dev/null"
-alias show_open_ports="echo 'User:      Command:   Port:'; echo '----------------------------' ; lsof -i 4 -P -n | grep -i 'listen' | awk '{print \$3, \$1, \$9}' | sed 's/ [a-z0-9\.\*]*:/ /' | sort -k 3 -n |xargs printf '%-10s %-10s %-10s\n' | uniq"	# lsof (cleaned up for just open listening ports)
-alias ssh.untrusted='ssh -o "StrictHostKeyChecking no"'
-#alias btc="echo \"[\$( wget -O- -q https://bitpay.com/api/rates | grep -P -o '{.*?EUR".*?}' )]\" | json_pp -f json -json_opt pretty"
-alias btc="wget -O- -q https://bitpay.com/api/rates | json_pp | grep -C2 -e Euro -e USD | grep -v -e \"[{}]\" -e name"
-alias wm_ticker="wget http://worldcup.sfg.io/matches/today/?by_date=DESC -O- | json_pp | less"
+# synergy
 alias synergys.custom="[ -e ~/.synergy/\$( hostname -s ).conf ] && synergys --daemon --restart --display \${DISPLAY:-:0} --config ~/.synergy/\$( hostname -s ).conf 2> ~/.log/synergys.log >&2 || echo 'no config for this host available'"
 alias synergyc.custom="[ -e ~/.synergy/\$( hostname -s ).conf ] && synergyc --daemon --restart --display \${DISPLAY:-:0} --name \$( hostname -s ) \$( ls ~/.synergy/ | grep -iv \"\$( hostname -s ).conf\" | head -n1 | sed 's|\.conf$||g' ) 2> ~/.log/synergyc.log >&2"
-alias synergy.kill="killall -9 synergyc synergys 2>/dev/null ; true"
-alias synergy.start="synergy.kill ; synergys.custom ; synergyc.custom"
+alias synergy.start="kill.synergy ; synergys.custom ; synergyc.custom"
+alias kill.synergy="killall -9 synergyc synergys 2>/dev/null ; true"
+alias kill.chrome="kill -9 \$( ps aux | grep -i chrome | awk {'print \$2'} | xargs ) 2>/dev/null"
 
-# convert stuff
-alias 2audio="convert2 mp3"
-alias youtube-mp3="clive -f best --exec=\"echo >&2; echo '[CONVERTING] %f ==> MP3' >&2 ; ffmpeg -loglevel error -i %f -strict experimental %f.mp3 && rm -f %f\""
-alias youtube="clive -f best --exec=\"( echo %f | grep -qi -e 'webm$' -e 'webm.$' ) && ( echo >&2 ; echo '[CONVERTING] %f ==> MP4' >&2 ; ffmpeg -loglevel error -i %f -strict experimental %f.mp4 && rm -f %f )\""
-#alias image2pdf='convert -adjoin -page A4 *.jpeg multipage.pdf'				# convert images to a multi-page pdf
-#nrg2iso() { dd bs=1k if="$1" of="$2" skip=300 }
+# tools
+alias calculator="bc -l"
+alias calc="calculator"
+alias html.strip="sed -e 's|<[^>]*>||g'"
+alias html.umlaute="sed -e 's|ü|\&uuml;|g' -e 's|Ü|\&Uuml;|g' -e 's|ä|\&auml;|g' -e 's|Ä|\&Auml;|g' -e 's|ö|\&ouml;|g' -e 's|Ö|\&Ouml;|g' -e 's|ß|\&szlig;|g'"
+alias http.response="lwp-request -ds"
+alias battery="upower -d | grep -e state -e percentage -e time | sed -e 's|^.*:\ *\(.*\)|\1|g' | sed 's|[ ]*$||g' | tr '\n' ' ' | sed -e 's|\ $|\n|g' | sed -e 's|^|(|g' -e 's|$|)|g'"
+alias keycodes="xev | grep 'keycode\|button'"
+alias patch_from_diff="patch -Np0 -i"
+alias list_sticks="udisks --dump | grep device-file | sed 's|^.*\:\ *\(.*\)|\1|g' | while read dev ; do if ( udisks --show-info \${dev} | grep -q \"removable.*1\" ) ; then echo \${dev} ; fi ; done"
+alias whatsmyresolution="LANG=C xrandr -q | grep -o \"current [0-9]\{3,4\} x [0-9]\{3,4\}\" | sed -e 's|current ||g' -e 's|\ ||g'"
+alias speedtest="wget -O- http://cachefly.cachefly.net/200mb.test >/dev/null"
+
+alias show.ip='addr=$( dig +short myip.opendns.com @resolver1.opendns.com | grep.ip ) ; echo ${addr:-$( wget -q -O- icanhazip.com | grep.ip )}'
+alias show.ip_local=''
+alias show.tcp='sudo netstat -atp'
+alias show.tcp_stats='sudo netstat -st'
+alias show.udp='sudo netstat -aup'
+alias show.udp_stats='sudo netstat -su'
+alias show.window_class='xprop | grep CLASS'
+alias show.open_ports="echo 'User:      Command:   Port:'; echo '----------------------------' ; lsof -i 4 -P -n | grep -i 'listen' | awk '{print \$3, \$1, \$9}' | sed 's/ [a-z0-9\.\*]*:/ /' | sort -k 3 -n |xargs printf '%-10s %-10s %-10s\n' | uniq"
+alias ssh.untrusted='ssh -o "StrictHostKeyChecking no"'
+alias btc.worldwide="wget -q -O- 'https://bitpay.com/api/rates' | json_pp" 
+alias btc="echo -e \"€: \$( btc.worldwide | grep -C2 -e Euro | grep -o \"[0-9\.]*\" )\" ; echo \"$: \$( btc.worldwide | grep -C2 -e USD | grep -o \"[0-9\.]*\" )\""
 
 # host/setup specific
-
-if ( grep -q "minit" /proc/cmdline )
-then
+if ( grep -iq "minit" /proc/cmdline ) ; then
     alias reboot="sudo minit-shutdown -r &"
     alias halt="sudo minit-shutdown -h &"
 fi
 
-if ( grep -i -q work /etc/hostname )
-then
-    alias scp='scp -l 25000'
-    alias windows='rdesktop -kde -a 16 -g 1280x1024 -u sschiele 192.168.80.55'
-    alias start_windows='wakeonlan 00:1C:C0:8D:0C:73'
-else
-    alias start_mediacenter="wakeonlan 00:01:2e:27:62:87"
+if ( grep -iq work /etc/hostname ) ; then
+    alias scp='scp -l 30000'
+    alias windows.boot='wakeonlan 00:1C:C0:8D:0C:73'
+    alias windows.connect='rdesktop -kde -a 16 -g 1280x1024 -u sschiele 192.168.80.55'
+elif [ $( whereami ) = 'home' ] ; then
+    alias mediacenter.boot="wakeonlan 00:01:2e:27:62:87"
 fi
+
+# convert stuff / old stuff
+#alias route_via_wlan="for i in \`seq 1 10\` ; do route del default 2>/dev/null ; done ; route add default eth0 ; route add default wlan0 ; route add default gw \"\$( /sbin/ifconfig wlan0 | grep.ip | head -n 1 | cut -f'1-3' -d'.' ).1\""
+#alias 2audio="convert2 mp3"
+#alias youtube-mp3="clive -f best --exec=\"echo >&2; echo '[CONVERTING] %f ==> MP3' >&2 ; ffmpeg -loglevel error -i %f -strict experimental %f.mp3 && rm -f %f\""
+#alias youtube="clive -f best --exec=\"( echo %f | grep -qi -e 'webm$' -e 'webm.$' ) && ( echo >&2 ; echo '[CONVERTING] %f ==> MP4' >&2 ; ffmpeg -loglevel error -i %f -strict experimental %f.mp4 && rm -f %f )\""
+#alias image2pdf='convert -adjoin -page A4 *.jpeg multipage.pdf'				# convert images to a multi-page pdf
+#nrg2iso() { dd bs=1k if="$1" of="$2" skip=300 }
+
 
 # }}}
 

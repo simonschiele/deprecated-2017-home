@@ -113,9 +113,9 @@ worldclock() {
 
 # }}}
 
-# {{{ debian_packages_list()
+# {{{ debian_packages_list_custom()
 
-debian_packages_list() {
+debian.packages_list_custom() {
     local listtype="${1}.list"
     local pkglist="${HOME}/.packages/${listtype}"
 
@@ -178,22 +178,6 @@ confirm() {
     fi
 
     whiptail --yesno "${message}" 10 60
-}
-
-# }}}
-
-# {{{ random.integer()
-
-function random.integer() {
-    if [ -n "${2}" ] ; then
-        local from=${1}
-        local to=${2}
-    else
-        local from=1
-        local to=${1:-100}
-    fi
-
-    echo $(( RANDOM % ${to}+ ${from} ))
 }
 
 # }}}
