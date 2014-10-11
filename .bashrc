@@ -61,6 +61,7 @@ fi
 
 # {{{ Icons
 
+alias show.icons="( for key in \"\${!ICON[@]}\" ; do echo -e \" \${ICON[\$key]} : \${key}\" ; done ) | column -c \${COLUMNS:-80}"
 declare -A ICON
 
 ICON[trademark]='\u2122'
@@ -97,12 +98,13 @@ ICON[check]='\u2714'
 ICON[ok]='\u2714'
 ICON[success]='\u2714'
 
-alias show.icons="( for key in \"\${!ICON[@]}\" ; do echo -e \" \${ICON[\$key]} : \${key}\" ; done ) | column -c \${COLUMNS:-80}"
-
 # }}}
 
 # {{{ Coloring
 
+# {{{ Colors
+
+alias show.colors="( for key in \"\${!COLOR[@]}\" ; do echo -e \" \${COLOR[\$key]} == COLORTEST \${key} == \${COLOR[none]}\t\t\" ; done ) | column -c \${COLUMNS:-100}"
 declare -A COLOR
 
 COLOR[none]="\e[0m"
@@ -150,6 +152,8 @@ COLOR[purple_back]="\e[45m"
 COLOR[cyan_back]="\e[46m"
 COLOR[white_back]="\e[47m"
 COLOR[gray_back]="\e[100m"
+
+# }}}
 
 # Color support detection (warning! crap!)
 if [ -x /usr/bin/tput ] && ( tput setaf 1 >&/dev/null ) ; then
@@ -228,7 +232,7 @@ function prompt_func() {
         PS1error=$( test ${lastret} -gt 0 && echo "${COLOR[red_back]}[${lastret}]${COLOR[none]} ")
         PS1user="$( test $( id -u ) -eq 0 && echo ${COLOR[red]})\u${COLOR[none]}"
         PS1host="$( $( pstree -s $$ | grep -qi "ssh" ) && echo ${COLOR[red]})\h${COLOR[none]}"
-        PS1path="${COLOR[gray_back]}\w${COLOR[none]}"
+        PS1path="${COLOR[black]}${COLOR[white_back]}\w${COLOR[none]}"
     else
         PS1error=$( test ${lastret} -gt 0 && echo "[${lastret}] " )
         PS1user="\u"
