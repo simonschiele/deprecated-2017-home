@@ -182,11 +182,10 @@ confirm() {
 
 # }}}
 
-# {{{ random_integer()
+# {{{ random.integer()
 
-function random_integer() {
-    if [ -n "${2}" ]
-    then
+function random.integer() {
+    if [ -n "${2}" ] ; then
         local from=${1}
         local to=${2}
     else
@@ -227,9 +226,9 @@ function verify_su() {
 
 # }}} 
 
-# {{{ debian_add_pubkey()
+# {{{ debian.add_pubkey()
 
-function debian_add_pubkey() {
+function debian.add_pubkey() {
     if ! verify_su ; then
         echo "you need root/sudo permissions to call debian_add_pubkey" 1>&2 
         return 1
@@ -251,6 +250,23 @@ function debian_add_pubkey() {
 }
 
 # }}} 
+
+# {{{ debian.security()
+
+function debian.security() { 
+    wget -q -O- https://www.debian.org/security/dsa \
+        | xml2 \
+        | grep -o -e "item/title=.*$" -e "item/dc:date=.*$" -e "item/link=.*$" \
+        | tac \
+        | cut -f'2-' -d'=' \
+        | sed -e ':a;N;$!ba;s/\n/ /g' -e 's/\(20[0-9]\{2\}-\)/\n\1/g' \
+        | awk {'print $1" "$4" ("$2")"'} \
+        | sed "s|^|\ \ $( echo -e ${ICON[fail]})\ \ |g" \
+        | tac \
+        | head -n ${1:-6}
+}
+
+# }}}
 
 # {{{ google()
 
@@ -327,8 +343,7 @@ function update.repo() {
     else
         echo -en "  ${ICON['blackcircle']}  Updating ${dir}"
         cd "${dir}" 2>/dev/null && local out=$( LANG=C git pull --recurse-submodules=yes 2>&1 )
-        local ret=$?
-        [ $ret -eq 0 ] && cd ${OLDPWD}
+        local ret=$? ; [ $ret -eq 0 ] && cd ${OLDPWD}
     fi
     
     return_unicode $ret
@@ -368,23 +383,14 @@ function echo.header() {
 
 # }}}
 
-# {{{ debian.security()
-
-function debian.security() { 
-    wget -q -O- https://www.debian.org/security/dsa | xml2 | grep -o -e "item/title=.*$" -e "item/dc:date=.*$" -e "item/link=.*$" | tac | cut -f'2-' -d'=' | sed -e ':a;N;$!ba;s/\n/ /g' -e 's/\(20[0-9]\{2\}-\)/\n\1/g' | awk {'print $1" "$4" ("$2")"'} | sed       "s|^|\ \ $( echo -e ${ICON[fail]})\ \ |g" | tac | head -n ${1:-6}
-}
-
-# }}}
-
 # {{{ good_morning()
 
 function good_morning() {
     local status=0
     local has_root=false
     
-    clear
-    echo.header "${COLOR[white_bold]}Good Morning, ${SUDO_USER:-${USER^}}!${COLOR[none]}"
-
+    clear && echo.header "${COLOR[white_bold]}Good Morning, ${SUDO_USER:-${USER^}}!${COLOR[none]}"
+    
     echo -e "${COLOR[white_bold]}Date:${COLOR[none]} $( date +'%d.%m.%Y (%A, %H:%M)' )"
     echo -e "${COLOR[white_bold]}Host:${COLOR[none]} $( hostname )"
     echo -e "${COLOR[white_bold]}Location:${COLOR[none]} $( whereami )"
@@ -409,11 +415,12 @@ function good_morning() {
     fi
     
     echo -e "\n${COLOR[white_under]}${COLOR[white_bold]}Hardware:${COLOR[none]}"
+    
     cpu=$( grep "^model\ name" /proc/cpuinfo | sed -e "s|^[^:]*:\([^:]*\)$|\1|g" -e "s/[\ ]\{2\}//g" -e "s|^\ ||g" )
     echo -e 'CPU: '$( echo -e "$cpu" | wc -l )'x '$( echo "$cpu" | head -n1 )
     
     ram=$( LANG=C free -m | grep ^Mem | awk {'print $2'} )
-    echo -e "Ram: ${ram}mb"
+    echo -e "Ram: ${ram}mb (free: $( free -m | grep cache\: | awk {'print $4'} )mb)"
 
     swap=$( LANG=C free | grep "^Swap" | sed 's|^Swap\:[0\ ]*||g' )
     if [ -z "$swap" ] ; then
