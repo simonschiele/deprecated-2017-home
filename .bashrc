@@ -10,7 +10,7 @@ done
 unset bin 
 
 # source helpers, libs, ...
-for include in ~/.lib/resources.sh ~/.lib/functions.sh /etc/bash_completion ~/.system.conf ; do
+for include in ~/.lib/resources.sh ~/.lib/functions.sh /etc/bash_completion ; do
     [ -r ${include} ] && . ${include}
 done
 
@@ -22,6 +22,20 @@ unset include
 
 # color fixing trap
 trap 'echo -ne "\e[0m"' DEBUG
+
+# fix old-style ~/.system.conf
+if [ -r ~/.system.conf ] && ( grep -v "^system_hostname\|^system_domain\|^system_type\|^system_username" ~/.system.conf | grep -q "^[A-Za-z]" ) ; then
+    echo -ne "$( color yellow )DEBUG:$( color ) Fixing old-style ~/.system.conf\t"
+    ( sed -e 's|^hostname=|system_hostname=|g' \
+          -e 's|^domain=|system_domain=|g' \
+          -e 's|^systemtype=|system_type=|g' \
+          -e 's|^username=|system_username=|g' \
+          -e '/^#\|^system\_/! s|^|#|g' \
+          -i ~/.system.conf ) && color.echo "green" "DONE" || color.echo "red" "FAILED"
+fi
+
+# loading ~/.system.conf
+[ -r ~/.system.conf ] && . ~/.system.conf 
 
 # }}}
 
