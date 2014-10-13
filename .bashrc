@@ -342,12 +342,13 @@ alias speedtest="wget -O- http://cachefly.cachefly.net/200mb.test >/dev/null"
 
 alias show.ip='addr=$( dig +short myip.opendns.com @resolver1.opendns.com | grep.ip ) ; echo ${addr:-$( wget -q -O- icanhazip.com | grep.ip )}'
 alias show.ip_local=''
+alias show.io='echo -n d | nmon -s 1'
 alias show.tcp='sudo netstat -atp'
 alias show.tcp_stats='sudo netstat -st'
 alias show.udp='sudo netstat -aup'
 alias show.udp_stats='sudo netstat -su'
 alias show.window_class='xprop | grep CLASS'
-alias show.open_ports="echo 'User:      Command:   Port:'; echo '----------------------------' ; lsof -i 4 -P -n | grep -i 'listen' | awk '{print \$3, \$1, \$9}' | sed 's/ [a-z0-9\.\*]*:/ /' | sort -k 3 -n |xargs printf '%-10s %-10s %-10s\n' | uniq"
+alias show.open_ports="echo 'User:      Command:   Port:'; echo '----------------------------' ; sudo lsof -i 4 -P -n | grep -i 'listen' | awk '{print \$3, \$1, \$9}' | sed 's/ [a-z0-9\.\*]*:/ /' | sort -k 3 -n |xargs printf '%-10s %-10s %-10s\n' | uniq"
 alias ssh.untrusted='ssh -o "StrictHostKeyChecking no"'
 alias btc.worldwide="wget -q -O- 'https://bitpay.com/api/rates' | json_pp" 
 alias btc="echo -e \"€: \$( btc.worldwide | grep -C2 -e Euro | grep -o \"[0-9\.]*\" )\" ; echo \"$: \$( btc.worldwide | grep -C2 -e USD | grep -o \"[0-9\.]*\" )\""

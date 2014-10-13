@@ -2,4 +2,5 @@
 export DEBIAN_FRONTEND=noninteractive
 yes '' | LANG=C apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade
 yes '' | LANG=C apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" dist-upgrade
+#yes "no" | sudo LANG=C apt-get upgrade | grep "^E: [^\ ]* Try using -f"
 

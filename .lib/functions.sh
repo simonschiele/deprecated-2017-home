@@ -385,13 +385,10 @@ function show.stats() {
     free | awk '/Mem/{printf("used: %.2f%"), $3/$2*100} /buffers\/cache/{printf(", buffers: %.2f%"), $4/($3+$4)*100} /Swap/{printf(", swap: %.2f%"), $3/$2*100}'
     echo ")"
     
-    swap=$( LANG=c free | grep "^swap" | sed 's|^swap\:[0\ ]*||g' )
-    if [ -z "$swap" ] ; then
-        echo -e "swap: no active swap"
-    fi
+    local swap=$( LANG=c free | grep "^swap" | sed 's|^swap\:[0\ ]*||g' )
+    [ -z "$swap" ] && echo "swap: no active swap" || echo "swap: ${swap}"
     
-    hd_root=$( df -h | grep "\ /$" | awk {'print $4"/"$2'} )
-    echo "hd: ${hd_root} (root)" 
+    LANG=C df -h | grep "\ /$" | awk {'print "hd: "$2" (root, free:"$4")"'}
 }
 
 # }}}
