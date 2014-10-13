@@ -309,7 +309,7 @@ alias mirror.images='wget -r -l1 --no-parent -nH -nd -P/tmp -A".gif,.jpg" "$1"'	
 
 # filter
 alias grep.ip='grep -o '"'"'\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}'"'"
-alias grep.urls="sed -e \"s|'|\\\"|g\" -e \"s|src|href|g\" | sed -e \"s|href|\nhref|g\" | grep -i -e \"href[ ]*=\" | sed 's/.*href[ ]*=[ ]*[\"]*\(.*\)[\"\ ].*/\1/g' | cut -f'1' -d'\"'"
+alias grep.url="sed -e \"s|'|\\\"|g\" -e \"s|src|href|g\" | sed -e \"s|href|\nhref|g\" | grep -i -e \"href[ ]*=\" | sed 's/.*href[ ]*=[ ]*[\"]*\(.*\)[\"\ ].*/\1/g' | cut -f'1' -d'\"'"
 alias grep.year="grep -o '[1-2][0-9]\{3\}'"
 alias highlite="grep --color=yes -e ^ -e"
 
@@ -339,7 +339,20 @@ alias synergys.custom="[ -e ~/.synergy/\$( hostname -s ).conf ] && synergys --da
 alias synergyc.custom="[ -e ~/.synergy/\$( hostname -s ).conf ] && synergyc --daemon --restart --display \${DISPLAY:-:0} --name \$( hostname -s ) \$( ls ~/.synergy/ | grep -iv \"\$( hostname -s ).conf\" | head -n1 | sed 's|\.conf$||g' ) 2> ~/.log/synergyc.log >&2"
 alias synergy.start="kill.synergy ; synergys.custom ; synergyc.custom"
 alias kill.synergy="killall -9 synergyc synergys 2>/dev/null ; true"
-alias kill.chrome="kill -9 \$( ps aux | grep -i chrome | awk {'print \$2'} | xargs ) 2>/dev/null"
+
+# show.*
+alias show.ip_remote='addr=$( dig +short myip.opendns.com @resolver1.opendns.com | grep.ip ) ; echo ${addr:-$( wget -q -O- icanhazip.com | grep.ip )}'
+alias show.ip_local='LANG=C /sbin/ifconfig | grep -o -e "^[^\ ]*" -e "^\ *inet addr:[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}" | tr "\n" " " | sed -e "s|\ *inet addr||g" -e "s|\ |\n|g" | grep "\:"'
+alias show.ip="show.ip_local ; echo \"remote:\$( show.ip_remote )\""
+alias show.io='echo -n d | nmon -s 1'
+alias show.tcp='sudo netstat -atp'
+alias show.tcp_stats='sudo netstat -st'
+alias show.udp='sudo netstat -aup'
+alias show.udp_stats='sudo netstat -su'
+alias show.window_class='xprop | grep CLASS'
+alias show.resolution="LANG=C xrandr -q | grep -o \"current [0-9]\{3,4\} x [0-9]\{3,4\}\" | sed -e 's|current ||g' -e 's|\ ||g'"
+alias show.open_ports="echo 'User:      Command:   Port:'; echo '----------------------------' ; sudo lsof -i 4 -P -n | grep -i 'listen' | awk '{print \$3, \$1, \$9}' | sed 's/ [a-z0-9\.\*]*:/ /' | sort -k 3 -n | xargs printf '%-10s %-10s %-10s\n' | uniq"
+
 
 # tools
 alias calculator="bc -l"
@@ -351,21 +364,11 @@ alias battery="upower -d | grep -e state -e percentage -e time | sed -e 's|^.*:\
 alias keycodes="xev | grep 'keycode\|button'"
 alias patch_from_diff="patch -Np0 -i"
 alias list_sticks="udisks --dump | grep device-file | sed 's|^.*\:\ *\(.*\)|\1|g' | while read dev ; do if ( udisks --show-info \${dev} | grep -q \"removable.*1\" ) ; then echo \${dev} ; fi ; done"
-alias whatsmyresolution="LANG=C xrandr -q | grep -o \"current [0-9]\{3,4\} x [0-9]\{3,4\}\" | sed -e 's|current ||g' -e 's|\ ||g'"
-alias speedtest="wget -O- http://cachefly.cachefly.net/200mb.test >/dev/null"
-
-alias show.ip='addr=$( dig +short myip.opendns.com @resolver1.opendns.com | grep.ip ) ; echo ${addr:-$( wget -q -O- icanhazip.com | grep.ip )}'
-alias show.ip_local=''
-alias show.io='echo -n d | nmon -s 1'
-alias show.tcp='sudo netstat -atp'
-alias show.tcp_stats='sudo netstat -st'
-alias show.udp='sudo netstat -aup'
-alias show.udp_stats='sudo netstat -su'
-alias show.window_class='xprop | grep CLASS'
-alias show.open_ports="echo 'User:      Command:   Port:'; echo '----------------------------' ; sudo lsof -i 4 -P -n | grep -i 'listen' | awk '{print \$3, \$1, \$9}' | sed 's/ [a-z0-9\.\*]*:/ /' | sort -k 3 -n |xargs printf '%-10s %-10s %-10s\n' | uniq"
 alias ssh.untrusted="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 alias btc.worldwide="wget -q -O- 'https://bitpay.com/api/rates' | json_pp" 
 alias btc="echo -e \"€: \$( btc.worldwide | grep -C2 -e Euro | grep -o \"[0-9\.]*\" )\" ; echo \"$: \$( btc.worldwide | grep -C2 -e USD | grep -o \"[0-9\.]*\" )\""
+alias speedtest="wget -O- http://cachefly.cachefly.net/200mb.test >/dev/null"
+alias kill.chrome="kill -9 \$( ps aux | grep -i chrome | awk {'print \$2'} | xargs ) 2>/dev/null"
 
 # host/setup specific
 if ( grep -iq "minit" /proc/cmdline ) ; then
@@ -375,20 +378,21 @@ fi
 
 if ( grep -iq work /etc/hostname ) ; then
     alias scp='scp -l 30000'
-    alias windows.boot='wakeonlan 00:1C:C0:8D:0C:73'
+    alias wakeonlan.windows='wakeonlan 00:1C:C0:8D:0C:73'
     alias windows.connect='rdesktop -kde -a 16 -g 1280x1024 -u sschiele 192.168.80.55'
 elif [ $( whereami ) = 'home' ] ; then
-    alias mediacenter.boot="wakeonlan 00:01:2e:27:62:87"
+    alias wakeonlan.mediacenter="wakeonlan 00:01:2e:27:62:87"
+    alias wakeonlan.cstation="wakeonlan 00:19:66:cf:82:04"
+    alias wakeonlan.cbase="wakeonlan 00:50:8d:9c:3f:6e"
 fi
 
-# convert stuff / old stuff
+# old stuff
 #alias route_via_wlan="for i in \`seq 1 10\` ; do route del default 2>/dev/null ; done ; route add default eth0 ; route add default wlan0 ; route add default gw \"\$( /sbin/ifconfig wlan0 | grep.ip | head -n 1 | cut -f'1-3' -d'.' ).1\""
 #alias 2audio="convert2 mp3"
 #alias youtube-mp3="clive -f best --exec=\"echo >&2; echo '[CONVERTING] %f ==> MP3' >&2 ; ffmpeg -loglevel error -i %f -strict experimental %f.mp3 && rm -f %f\""
 #alias youtube="clive -f best --exec=\"( echo %f | grep -qi -e 'webm$' -e 'webm.$' ) && ( echo >&2 ; echo '[CONVERTING] %f ==> MP4' >&2 ; ffmpeg -loglevel error -i %f -strict experimental %f.mp4 && rm -f %f )\""
 #alias image2pdf='convert -adjoin -page A4 *.jpeg multipage.pdf'				# convert images to a multi-page pdf
 #nrg2iso() { dd bs=1k if="$1" of="$2" skip=300 }
-
 
 # }}}
 
