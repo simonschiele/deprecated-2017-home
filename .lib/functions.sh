@@ -113,7 +113,7 @@ worldclock() {
 
 # }}}
 
-# {{{ debian_packages_list_custom()
+# {{{ debian.packages_list_custom()
 
 debian.packages_list_custom() {
     local listtype="${1}.list"
@@ -132,6 +132,16 @@ debian.packages_list_custom() {
 }
 
 # }}}
+
+# {{{ scan.hosts()
+
+function scan.hosts() { 
+    local interface=$( LANG=C /sbin/route -n | grep ' UG ' | grep -o '[^ ]*$' )
+    local network="$( LANG=C /sbin/ifconfig ${interface} | grep -o 'inet addr[^ ]*' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.' )0/24"
+    fping -q -a -g ${network} | while read ip ; do echo "$( host ${ip} | grep -o '[^ ]*.$' | sed 's|\.$||g' ) ($ip)" ; done 
+}
+
+# }}} 
 
 # {{{ convert2()
 
@@ -453,4 +463,10 @@ function good_morning() {
 }
 
 # }}}
+
+# {{{
+
+
+
+# }}} 
 
