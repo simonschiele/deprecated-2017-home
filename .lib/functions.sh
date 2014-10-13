@@ -412,9 +412,9 @@ function good_morning() {
     fi
 
     if ! ( ${has_root} ) ; then
-        echo -e "\n${color[white_under]}${color[white_bold]}sudo:${color[none]}"
+        echo -e "\n${COLOR[white_under]}${COLOR[white_bold]}sudo:${COLOR[none]}"
         if ! ( sudo echo -n ) ; then
-            echo -e "\n${color[red]}error${color[none]}: couldn't unlock sudo\n" >&2
+            echo -e "\n${COLOR[red]}error${COLOR[none]}: couldn't unlock sudo\n" >&2
             return 1
         else
             has_root=true
@@ -422,16 +422,16 @@ function good_morning() {
         fi
     fi
    
-    echo -e "\n${color[white_under]}${color[white_bold]}debian:${color[none]}"
+    echo -e "\n${COLOR[white_under]}${COLOR[white_bold]}Debian:${COLOR[none]}"
     echo "version: $( lsb_release -ds 2>&1 )"
     
     echo -n "updating packagelists: "
     local out=$( ${sudo_cmd} apt-get update 2>&1 )
     local ret=$?
     if [ $ret -eq 0 ] ; then
-        echo -e "success ${color[green]}${icon[ok]}${color[none]}"
+        echo -e "success ${COLOR[green]}${icon[ok]}${COLOR[none]}"
     else
-        echo -e "failed ${color[red]}${icon[fail]}${color[none]}"
+        echo -e "failed ${COLOR[red]}${icon[fail]}${COLOR[none]}"
         let status++
     fi
     
