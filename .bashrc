@@ -7,9 +7,10 @@
 for bin in bin .bin .bin-ypsilon .bin-private ; do
     [ -d ${HOME}/${bin} ] && PATH="${bin/#/${HOME}/}:${PATH}"
 done
+unset bin 
 
 # source helpers, libs, ...
-for include in ~/.lib/functions.sh ; do
+for include in ~/.lib/resources.sh ~/.lib/functions.sh /etc/bash_completion ; do
     [ -r ${include} ] && . ${include}
 done
 
@@ -17,11 +18,10 @@ done
 for include in .logout .bash_logout .shell_logout ; do
     [ -r ${include} ] && trap ${include/#/${HOME}/} 0 && break
 done
+unset include 
 
 # color fixing trap
 trap 'echo -ne "\e[0m"' DEBUG
-
-unset bin include 
 
 # }}}
 
@@ -37,8 +37,9 @@ shopt -s checkwinsize
 # make less more friendly for non-text input files, see lesspipe(1)
 #[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
+# detect chroot (doesn't work)
 if [ -z "${debian_chroot}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
+    debian_chroot=$( cat /etc/debian_chroot )
 fi
 
 # history
@@ -48,114 +49,15 @@ export HISTSIZE=10000
 export HISTIGNORE='&:clear:ls:cd:[bf]g:exit:[ t\]*'
 export HOSTFILE=$HOME/.hosts
 shopt -s histappend
-#shopt -s histappend histreedit histverify
 shopt -s cmdhist        # combine multiline
+#shopt -s histappend histreedit histverify
 export PROMPT_COMMAND='history -a; history -n; $PROMPT_COMMAND'
-
-# bash_completion
-if [ -f /etc/bash_completion ]; then
-    source /etc/bash_completion
-fi
-
-# }}}
-
-# {{{ Icons
-
-alias show.icons="( for key in \"\${!ICON[@]}\" ; do echo -e \" \${ICON[\$key]} : \${key}\" ; done ) | column -c \${COLUMNS:-80}"
-declare -A ICON
-
-ICON[trademark]='\u2122'
-ICON[copyright]='\u00A9'
-ICON[registered]='\u00AE'
-ICON[asterism]='\u2042'
-ICON[voltage]='\u26A1'
-ICON[whitecircle]='\u25CB'
-ICON[blackcircle]='\u25CF'
-ICON[largecircle]='\u25EF'
-ICON[percent]='\u0025'
-ICON[permille]='\u2030'
-ICON[pilcrow]='\u00B6'
-ICON[peace]='\u262E'
-ICON[yinyang]='\u262F'
-ICON[russia]='\u262D'
-ICON[turkey]='\u262A'
-ICON[skull]='\u2620'
-ICON[heavyheart]='\u2764'
-ICON[whiteheart]='\u2661'
-ICON[blackheart]='\u2665'
-ICON[whitesmiley]='\u263A'
-ICON[blacksmiley]='\u263B'
-ICON[female]='\u2640'
-ICON[male]='\u2642'
-ICON[airplane]='\u2708'
-ICON[radioactive]='\u2622'
-ICON[ohm]='\u2126'
-ICON[pi]='\u220F'
-ICON[cross]='\u2717'
-ICON[fail]='\u2717'
-ICON[error]='\u2717'
-ICON[check]='\u2714'
-ICON[ok]='\u2714'
-ICON[success]='\u2714'
 
 # }}}
 
 # {{{ Coloring
 
-# {{{ Colors
-
-alias show.colors="( for key in \"\${!COLOR[@]}\" ; do echo -e \" \${COLOR[\$key]} == COLORTEST \${key} == \${COLOR[none]}\" ; done ) | column -c \${COLUMNS:-120}"
-declare -A COLOR
-
-COLOR[none]="\e[0m"
-COLOR[off]="\e[0m"
-COLOR[false]="\e[0m"
-COLOR[normal]="\e[0m"
-
-# Basic Colors
-COLOR[black]="\e[0;30m"
-COLOR[red]="\e[0;31m"
-COLOR[green]="\e[0;32m"
-COLOR[yellow]="\e[0;33m"
-COLOR[blue]="\e[0;34m"
-COLOR[purple]="\e[0;35m"
-COLOR[cyan]="\e[0;36m"
-COLOR[white]="\e[0;37m"
-
-# Bold Colors
-COLOR[black_bold]="\e[1;30m"
-COLOR[red_bold]="\e[1;31m"
-COLOR[green_bold]="\e[1;32m"
-COLOR[yellow_bold]="\e[1;33m"
-COLOR[blue_bold]="\e[1;34m"
-COLOR[purple_bold]="\e[1;35m"
-COLOR[cyan_bold]="\e[1;36m"
-COLOR[white_bold]="\e[1;37m"
-
-# Underline 
-COLOR[black_under]="\e[4;30m"
-COLOR[red_under]="\e[4;31m"
-COLOR[green_under]="\e[4;32m"
-COLOR[yellow_under]="\e[4;33m"
-COLOR[blue_under]="\e[4;34m"
-COLOR[purple_under]="\e[4;35m"
-COLOR[cyan_under]="\e[4;36m"
-COLOR[white_under]="\e[4;37m"
-
-# Background Colors
-COLOR[black_back]="\e[40m"
-COLOR[red_back]="\e[41m"
-COLOR[green_back]="\e[42m"
-COLOR[yellow_back]="\e[43m"
-COLOR[blue_back]="\e[44m"
-COLOR[purple_back]="\e[45m"
-COLOR[cyan_back]="\e[46m"
-COLOR[white_back]="\e[47m"
-COLOR[gray_back]="\e[100m"
-
-# }}}
-
-# Color support detection (warning! crap!)
+# Color support detection + color count (warning! crap!)
 if [ -x /usr/bin/tput ] && ( tput setaf 1 >&/dev/null ) ; then
     color_support=true
 else
@@ -219,32 +121,24 @@ export LESS_TERMCAP_us=$'\e[01;32m'
 
 # {{{ Prompt
 
-prompt_colored=true
-prompt_git=true
-
-if ( ! $color_support ) ; then
-    prompt_colored=false
-fi
-
 function prompt_func() {
     local lastret=$?
+        
+    PS1error=$( [ ${lastret} -gt 0 ] && echo "[${lastret}] " )
+    PS1user=${SUDO_USER:-${USER}}
+    PS1host="\h"
+    PS1path="\w"
 
-    if ( $prompt_colored ) ; then
-        PS1error=$( test ${lastret} -gt 0 && echo "${COLOR[red_back]}[${lastret}]${COLOR[none]} ")
-        PS1user="$( test $( id -u ) -eq 0 && echo ${COLOR[red]})\u${COLOR[none]}"
-        PS1host="$( $( pstree -s $$ | grep -qi "ssh" ) && echo ${COLOR[red]})\h${COLOR[none]}"
-        PS1path="${COLOR[black]}${COLOR[white_back]}\w${COLOR[none]}"
-    else
-        PS1error=$( test ${lastret} -gt 0 && echo "[${lastret}] " )
-        PS1user="\u"
-        PS1host="\h"
-        PS1path="\w"
+    if ( $color_support ) ; then
+        PS1error=$( color.ps1 red )${PS1error}$( color.ps1 )
+        PS1user=$( [ $( id -u ) -eq 0 ] && color.ps1 red )${col}${PS1user}$( color.ps1 )
+        PS1host=$( pstree -s "$$" | grep -qi 'ssh' && color.ps1 red )${PS1host}$( color.ps1 )
+        PS1path=$( color.ps1 black )$( color.ps1 white_background )${PS1path}$( color.ps1 )
     fi
-
-    if ( $prompt_git ) && [ -e ~/.lib/git_ps1.sh ] && [ -n "$( which timeout )" ] ; then
-        PS1git=$( timeout 1 ~/.lib/git_ps1.sh ${prompt_colored} )
+    
+    if [ -e ~/.lib/git_ps1.sh ] && [ -n "$( which timeout )" ] ; then
+        PS1git=$( timeout 1 ~/.lib/git_ps1.sh ${color_support} )
     else
-        prompt_git=false
         PS1git=
     fi
 
@@ -285,7 +179,7 @@ if [ -r ~/.lib/git-flow-completion/git-flow-completion.bash ] ; then
     . ~/.lib/git-flow-completion/git-flow-completion.bash
 fi
 
-if [[ "$( whereami )" == "work" ]] ; then
+if [ "$( whereami )" = "work" ] ; then
     GIT_COMMITTER_EMAIL='simon.schiele@ypsilon.net'
     GIT_AUTHOR_EMAIL='simon.schiele@ypsilon.net'
 else
@@ -321,14 +215,17 @@ alias mkdir='mkdir -p'
 alias mv='mv -i'
 alias rm='rm -i'
 alias screen='screen -U'
+alias dmesg="dmesg -T --color=auto"
 alias wget='wget -c'
 ( which vim >/dev/null ) && alias vi='vim'
 
 # sudo stuff
 if [ $( id -u ) -eq 0 ] ; then
+    alias vi='sudoedit'
+    alias vim='sudoedit'
+    
     EDITOR='sudoedit'
-    vi='sudoedit'
-    vim='sudoedit'
+    export EDITOR
 fi
 alias sudo='sudo '
 alias sudo.that="eval 'sudo \$(fc -ln -1)'"

@@ -299,9 +299,9 @@ function nzb.queue() {
 
 # }}} 
 
-# {{{ unicode_status()
+# {{{ return.unicode()
 
-function return_unicode() {
+function return.unicode() {
     if [ ${1} -gt 0 ] ; then
         echo -e " ${COLOR[red]}${ICON[fail]}${COLOR[none]}" 
     else
@@ -330,7 +330,7 @@ function update.repo() {
         local ret=$? ; [ $ret -eq 0 ] && cd ${OLDPWD}
     fi
     
-    return_unicode $ret
+    return.unicode $ret
     return $ret
 }
 
@@ -433,7 +433,7 @@ function good_morning() {
     echo -e "Latest Security Advisories: "
     debian.security
 
-    echo -e "\n${COLOR[white_under]}${COLOR[white_bold]}Repos:${COLOR[none]}"
+    echo "$( color white_under )$( color white_bold )Repos:$( color )"
     update.repo git@psaux.de:dot.bin-ypsilon.git ~/.bin-ypsilon/ || let status++
     update.repo git@psaux.de:dot.bin-private.git ~/.bin-private/ || let status++
     update.repo git@simon.psaux.de:dot.fonts.git ~/.fonts/ || let status++
