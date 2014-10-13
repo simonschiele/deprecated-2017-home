@@ -10,7 +10,7 @@ done
 unset bin 
 
 # source helpers, libs, ...
-for include in ~/.lib/resources.sh ~/.lib/functions.sh /etc/bash_completion ; do
+for include in ~/.lib/resources.sh ~/.lib/functions.sh /etc/bash_completion ~/.system.conf ; do
     [ -r ${include} ] && . ${include}
 done
 
@@ -137,7 +137,9 @@ function prompt_func() {
     fi
     
     if [ -e ~/.lib/git_ps1.sh ] && [ -n "$( which timeout )" ] ; then
-        PS1git=$( timeout 1 ~/.lib/git_ps1.sh ${color_support} )
+        PS1git=$( LANG=C timeout 0.5 ~/.lib/git_ps1.sh ${color_support} )
+        local gitret=$?
+        [ $gitret -eq 124 ] && PS1git="($( color.ps1 red )git slow$( color.ps1 ))"
     else
         PS1git=
     fi

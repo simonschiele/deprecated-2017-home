@@ -367,18 +367,45 @@ function echo.header() {
 
 # }}}
 
+# {{{ show.stats()
+
+function show.stats() {
+    color.echon "white_bold" "Date: " ; date +'%d.%m.%Y (%A, %H:%M)'
+    color.echon "white_bold" "Host: " ; hostname
+    color.echon "white_bold" "Location: " ; whereami
+    color.echon "white_bold" "Systemtype: " ; echo "${system_type}"
+    
+    echo -e "\n${COLOR[white_under]}${COLOR[white_bold]}Hardware:${COLOR[none]}"
+    
+    cpu=$( grep "^model\ name" /proc/cpuinfo | sed -e "s|^[^:]*:\([^:]*\)$|\1|g" -e "s/[\ ]\{2\}//g" -e "s|^\ ||g" )
+    echo -e 'cpu: '$( echo -e "$cpu" | wc -l )'x '$( echo "$cpu" | head -n1 )
+    
+    ram=$( LANG=c free -m | grep ^Mem | awk {'print $2'} )
+    echo -ne "ram: ${ram}mb (free: $( free -m | grep cache\: | awk {'print $4'} )mb, "
+    free | awk '/Mem/{printf("used: %.2f%"), $3/$2*100} /buffers\/cache/{printf(", buffers: %.2f%"), $4/($3+$4)*100} /Swap/{printf(", swap: %.2f%"), $3/$2*100}'
+    echo ")"
+    
+    swap=$( LANG=c free | grep "^swap" | sed 's|^swap\:[0\ ]*||g' )
+    if [ -z "$swap" ] ; then
+        echo -e "swap: no active swap"
+    fi
+    
+    hd_root=$( df -h | grep "\ /$" | awk {'print $4"/"$2'} )
+    echo "hd: ${hd_root} (root)" 
+}
+
+# }}}
+
 # {{{ good_morning()
 
 function good_morning() {
     local status=0
     local has_root=false
     
-    clear && echo.header "${COLOR[white_bold]}Good Morning, ${SUDO_USER:-${USER^}}!${COLOR[none]}"
-    
-    echo -e "${COLOR[white_bold]}Date:${COLOR[none]} $( date +'%d.%m.%Y (%A, %H:%M)' )"
-    echo -e "${COLOR[white_bold]}Host:${COLOR[none]} $( hostname )"
-    echo -e "${COLOR[white_bold]}Location:${COLOR[none]} $( whereami )"
-  
+    clear
+    echo.header "${COLOR[white_bold]}Good Morning, ${SUDO_USER:-${USER^}}!${COLOR[none]}"
+    show.stats
+
     if [ $( id -u ) -eq 0 ] ; then
         has_root=true
         sudo_cmd=""
@@ -388,52 +415,36 @@ function good_morning() {
     fi
 
     if ! ( ${has_root} ) ; then
-        echo -e "\n${COLOR[white_under]}${COLOR[white_bold]}sudo:${COLOR[none]}"
+        echo -e "\n${color[white_under]}${color[white_bold]}sudo:${color[none]}"
         if ! ( sudo echo -n ) ; then
-            echo -e "\n${COLOR[red]}ERROR${COLOR[none]}: Couldn't unlock sudo\n" >&2
+            echo -e "\n${color[red]}error${color[none]}: couldn't unlock sudo\n" >&2
             return 1
         else
             has_root=true
             sudo_cmd="sudo"
         fi
     fi
-    
-    echo -e "\n${COLOR[white_under]}${COLOR[white_bold]}Hardware:${COLOR[none]}"
-    
-    cpu=$( grep "^model\ name" /proc/cpuinfo | sed -e "s|^[^:]*:\([^:]*\)$|\1|g" -e "s/[\ ]\{2\}//g" -e "s|^\ ||g" )
-    echo -e 'CPU: '$( echo -e "$cpu" | wc -l )'x '$( echo "$cpu" | head -n1 )
-    
-    ram=$( LANG=C free -m | grep ^Mem | awk {'print $2'} )
-    echo -e "Ram: ${ram}mb (free: $( free -m | grep cache\: | awk {'print $4'} )mb)"
-
-    swap=$( LANG=C free | grep "^Swap" | sed 's|^Swap\:[0\ ]*||g' )
-    if [ -z "$swap" ] ; then
-        echo -e "Swap: No active swap"
-    fi
-    
-    hd_root=$( df -h | grep "\ /$" | awk {'print $4"/"$2'} )
-    echo "HD: ${hd_root} (root)" 
    
-    echo -e "\n${COLOR[white_under]}${COLOR[white_bold]}Debian:${COLOR[none]}"
-    echo "Version: $( lsb_release -ds 2>&1 )"
+    echo -e "\n${color[white_under]}${color[white_bold]}debian:${color[none]}"
+    echo "version: $( lsb_release -ds 2>&1 )"
     
-    echo -en "Updating Packagelists: "
+    echo -n "updating packagelists: "
     local out=$( ${sudo_cmd} apt-get update 2>&1 )
     local ret=$?
     if [ $ret -eq 0 ] ; then
-        echo -e "SUCCESS ${COLOR[green]}${ICON[ok]}${COLOR[none]}"
+        echo -e "success ${color[green]}${icon[ok]}${color[none]}"
     else
-        echo -e "FAILED ${COLOR[red]}${ICON[fail]}${COLOR[none]}"
+        echo -e "failed ${color[red]}${icon[fail]}${color[none]}"
         let status++
     fi
     
-    echo -en "Available Updates: "
+    echo -en "available updates: "
     yes "no" | ${sudo_cmd} apt-get dist-upgrade 2>&1 | grep --color=never "upgraded.*installed.*remove.*upgraded"
     
     echo -e "Latest Security Advisories: "
     debian.security
 
-    echo "$( color white_under )$( color white_bold )Repos:$( color )"
+    echo -e "\n$( color white_under )$( color white_bold )Repos:$( color )"
     update.repo git@psaux.de:dot.bin-ypsilon.git ~/.bin-ypsilon/ || let status++
     update.repo git@psaux.de:dot.bin-private.git ~/.bin-private/ || let status++
     update.repo git@simon.psaux.de:dot.fonts.git ~/.fonts/ || let status++

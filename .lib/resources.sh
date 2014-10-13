@@ -57,11 +57,19 @@ function color.existing() {
 }
 
 function color() {
-    [ ${COLOR[${1:-none}]+isset} ] && echo -ne "${COLOR[${1:-none}]}"
+    ( color.existing ${1:-none} ) && echo -ne "${COLOR[${1:-none}]}"
 }
 
 function color.ps1() {
     ( color.existing ${1:-none} ) && echo -ne "\[${COLOR[${1:-none}]}\]"
+}
+
+function color.echo() {
+    ( color.existing ${1:-black} ) && echo -e "${COLOR[${1:-black}]}${2}${COLOR[none]}"
+}
+
+function color.echon() {
+    ( color.existing ${1:-black} ) && echo -ne "${COLOR[${1:-black}]}${2}${COLOR[none]}"
 }
 
 # }}}
