@@ -138,7 +138,10 @@ debian.packages_list_custom() {
 function scan.hosts() { 
     local interface=$( LANG=C /sbin/route -n | grep ' UG ' | grep -o '[^ ]*$' )
     local network="$( LANG=C /sbin/ifconfig ${interface} | grep -o 'inet addr[^ ]*' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.' )0/24"
-    fping -q -a -g ${network} | while read ip ; do echo "$( host ${ip} | grep -o '[^ ]*.$' | sed 's|\.$||g' ) ($ip)" ; done 
+    fping -q -a -g ${network} | while read ip ; do 
+        echo -ne "${ip}\t"
+        echo -e "$( host -W 1 ${ip} | grep -o '[^ ]*.$' | sed 's|\.$||g' )"
+    done 
 }
 
 # }}} 
@@ -465,7 +468,6 @@ function good_morning() {
 # }}}
 
 # {{{
-
 
 
 # }}} 
