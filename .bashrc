@@ -363,7 +363,7 @@ alias show.udp='sudo netstat -aup'
 alias show.udp_stats='sudo netstat -su'
 alias show.window_class='xprop | grep CLASS'
 alias show.open_ports="echo 'User:      Command:   Port:'; echo '----------------------------' ; sudo lsof -i 4 -P -n | grep -i 'listen' | awk '{print \$3, \$1, \$9}' | sed 's/ [a-z0-9\.\*]*:/ /' | sort -k 3 -n |xargs printf '%-10s %-10s %-10s\n' | uniq"
-alias ssh.untrusted='ssh -o "StrictHostKeyChecking no"'
+alias ssh.untrusted="ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 alias btc.worldwide="wget -q -O- 'https://bitpay.com/api/rates' | json_pp" 
 alias btc="echo -e \"€: \$( btc.worldwide | grep -C2 -e Euro | grep -o \"[0-9\.]*\" )\" ; echo \"$: \$( btc.worldwide | grep -C2 -e USD | grep -o \"[0-9\.]*\" )\""
 
