@@ -237,11 +237,12 @@ alias wget='wget -c'
 
 # sudo stuff
 if [ $( id -u ) -eq 0 ] ; then
-    alias vi='sudoedit'
-    alias vim='sudoedit'
-    
-    EDITOR='sudoedit'
-    export EDITOR
+    # well... this was stupid...
+    #alias vi='sudoedit'
+    #alias vim='sudoedit'
+    #EDITOR='sudoedit'
+    #export EDITOR
+    echo -n
 fi
 alias sudo='sudo '
 alias sudo.that="eval 'sudo \$(fc -ln -1)'"
