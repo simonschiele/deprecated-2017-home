@@ -233,6 +233,7 @@ alias rm='rm -i'
 alias screen='screen -U'
 alias dmesg="dmesg -T --color=auto"
 alias wget='wget -c'
+alias tmux="TERM=screen-256color-bce tmux"
 ( which vim >/dev/null ) && alias vi='vim'
 
 # sudo stuff
@@ -370,6 +371,7 @@ alias btc.worldwide="wget -q -O- 'https://bitpay.com/api/rates' | json_pp"
 alias btc="echo -e \"€: \$( btc.worldwide | grep -C2 -e Euro | grep -o \"[0-9\.]*\" )\" ; echo \"$: \$( btc.worldwide | grep -C2 -e USD | grep -o \"[0-9\.]*\" )\""
 alias speedtest="wget -O- http://cachefly.cachefly.net/200mb.test >/dev/null"
 alias kill.chrome="kill -9 \$( ps aux | grep -i chrome | awk {'print \$2'} | xargs ) 2>/dev/null"
+alias strip.doubleslash="sed 's|[/]\+|/|g'"
 
 # host/setup specific
 if ( grep -iq "minit" /proc/cmdline ) ; then
