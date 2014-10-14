@@ -253,6 +253,7 @@ alias observe.pid="strace -T -f -p"
 
 # package and system-config
 alias debian.version="lsb_release -a"
+alias debian.bugs="bts"
 alias debian.packages_custom="debian.packages_list_custom \$(grep ^systemtype ~/.system.conf | cut -f'2-' -d'=' | sed 's|[\"]||g')"
 alias debian.packages_by_size="dpkg-query -W --showformat='\${Installed-Size;10}\t\${Package}\n' | sort -k1,1n"
 alias debian.package_configfiles="dpkg-query -f '\n\${Package} \n\${Conffiles}\n' -W"
