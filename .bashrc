@@ -255,10 +255,10 @@ alias observe.pid="strace -T -f -p"
 alias debian.version="lsb_release -a"
 alias debian.packages_custom="debian.packages_list_custom \$(grep ^systemtype ~/.system.conf | cut -f'2-' -d'=' | sed 's|[\"]||g')"
 alias debian.packages_by_size="dpkg-query -W --showformat='\${Installed-Size;10}\t\${Package}\n' | sort -k1,1n"
-alias debian.package_configfiles="dpkg-query -f '\n\n\${Package} \n\${Conffiles}' -W"
+alias debian.package_configfiles="dpkg-query -f '\n\${Package} \n\${Conffiles}\n' -W"
 
 # logs
-alias log.dmesg="dmesg -T"
+alias log.dmesg="dmesg -T --color=auto"
 alias log.pidgin="find ~/.purple/logs/ -type f -mtime -1 | xargs tail -n 5"
 alias log.authlog="sudo grep -e \"^\$( LANG=C date -d'now -24 hours' +'%b %e' )\" -e \"^\$( LANG=C date +'%b %e' )\" /var/log/auth.log | grep.ip | sort -n | uniq -c | sort -n | grep -v \"\$( host -4 enkheim.psaux.de | grep.ip | head -n1 )\" | tac | head -n 10"
 
