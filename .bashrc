@@ -71,6 +71,9 @@ export PROMPT_COMMAND='history -a; history -n; $PROMPT_COMMAND'
 
 # {{{ Coloring
 
+export TERM='xterm-256color'
+#export TERM='xterm-color'
+
 # Color support detection + color count (warning! crap!)
 if [ -x /usr/bin/tput ] && ( tput setaf 1 >&/dev/null ) ; then
     color_support=true
@@ -110,7 +113,6 @@ export COLORCOUNT=${COLORCOUNT:-8}
 # dircolors
 if [ -x /usr/bin/dircolors ] ; then
     eval "`dircolors -b`"
-    alias ls='ls --color=auto'
 fi
 
 # dircolors (solarized)
@@ -128,6 +130,7 @@ export LESS_TERMCAP_se=$'\e[0m'
 export LESS_TERMCAP_so=$'\e[01;44;33m'
 export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[01;32m'
+alias ls='ls --color=auto'
 ( which colordiff >/dev/null ) && alias diff="colordiff"
 ( which pacman >/dev/null ) && alias pacman="pacman --color=auto"
 
@@ -381,8 +384,8 @@ fi
 
 if ( grep -iq work /etc/hostname ) ; then
     alias scp='scp -l 30000'
-    alias wakeonlan.windows='wakeonlan 00:1C:C0:8D:0C:73'
     alias windows.connect='rdesktop -kde -a 16 -g 1280x1024 -u sschiele 192.168.80.55'
+    alias wakeonlan.windows='wakeonlan 00:1C:C0:8D:0C:73'
 elif [ $( whereami ) = 'home' ] ; then
     alias wakeonlan.mediacenter="wakeonlan 00:01:2e:27:62:87"
     alias wakeonlan.cstation="wakeonlan 00:19:66:cf:82:04"
