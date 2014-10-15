@@ -122,12 +122,12 @@ fi
 
 # grep/less/diff/... coloring
 export GREP_OPTIONS='--color=auto'
-export GREP_COLOR='1;32'                # green-bold
+export GREP_COLOR='7;34'                # green-bold
 export LESS_TERMCAP_mb=$'\e[01;31m'     # red-bold
 export LESS_TERMCAP_md=$'\e[01;37m'     # white-bold
 export LESS_TERMCAP_me=$'\e[0m'         
 export LESS_TERMCAP_se=$'\e[0m'
-export LESS_TERMCAP_so=$'\e[01;44;33m'
+export LESS_TERMCAP_so=$'\e[01;43;37m'
 export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[01;32m'
 alias ls='ls --color=auto'
@@ -220,6 +220,7 @@ export TERMINAL="gnome-terminal.wrapper --disable-factory"
 export OPEN="gnome-open"
 
 # spacer
+# todo: vert spacer
 export HR="================================================================================"
 alias hr="for i in \$( seq \${COLUMNS:-80} ) ; do echo -n '=' ; done ; echo"
 
