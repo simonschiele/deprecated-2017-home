@@ -357,7 +357,7 @@ alias show.udp_stats='sudo netstat -su'
 alias show.window_class='xprop | grep CLASS'
 alias show.resolution="LANG=C xrandr -q | grep -o \"current [0-9]\{3,4\} x [0-9]\{3,4\}\" | sed -e 's|current ||g' -e 's|\ ||g'"
 alias show.open_ports="echo 'User:      Command:   Port:'; echo '----------------------------' ; sudo lsof -i 4 -P -n | grep -i 'listen' | awk '{print \$3, \$1, \$9}' | sed 's/ [a-z0-9\.\*]*:/ /' | sort -k 3 -n | xargs printf '%-10s %-10s %-10s\n' | uniq"
-
+alias show.certs="openssl s_client -connect "
 
 # tools
 alias calculator="bc -l"
