@@ -214,6 +214,8 @@ function whereami() {
 function verify_su() {
     if [ "$( id -u )" == "0" ] ; then
         return 0 
+    elif ( sudo -n echo -n ) ; then
+        return 0
     elif ( sudo echo -n ) ; then
         return 0
     else
@@ -238,7 +240,7 @@ function debian.add_pubkey() {
         echo "import via keyfile not implemented yet" 1>&2 
         return 1
     else
-        if ( gpg --keyserver pgpkeys.mit.edu --recv-key ${1} ) && ( gpg -a --export ${1} | sudo apt-key add - ) ; then
+        if ( sudo gpg --keyserver pgpkeys.mit.edu --recv-key ${1} ) && ( sudo gpg -a --export ${1} | sudo apt-key add - ) ; then
             return 0
         else
             return 1
@@ -265,9 +267,9 @@ function debian.security() {
 
 # }}}
 
-# {{{ google()
+# {{{ web.google()
 
-function google() {
+function web.google() {
     Q="$@";
     GOOG_URL='https://www.google.com/search?tbs=li:1&q=';
     AGENT="Mozilla/4.0";
@@ -473,4 +475,8 @@ function good_morning() {
 
 
 # }}} 
+
+function no.sleep() {
+    killall -9 xscreensaver 2>/dev/null
+}
 
