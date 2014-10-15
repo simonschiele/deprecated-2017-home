@@ -43,3 +43,6 @@
 [submodule ".lib/geary"]
 	path = .lib/geary
 	url = git://git.gnome.org/geary
+[submodule ".lib/vim-colors-solarized"]
+	path = .lib/vim-colors-solarized
+	url = https://github.com/altercation/vim-colors-solarized.git
