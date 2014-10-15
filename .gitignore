@@ -15,4 +15,7 @@
 !/.packages*
 !/.synergy/**/*
 !/.synergy*
-/.synergy.conf
+!/.certs/**/*
+!/.certs/
+!/.synergy.conf
+!/.wgetrc
