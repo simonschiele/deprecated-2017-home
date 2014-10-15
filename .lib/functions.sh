@@ -284,6 +284,7 @@ function web.google() {
 
 function nzb.queue() {
     local target=/share/.usenet/queue/
+    local delete=true
 
     if [ ! -d ${target} ] ; then
         echo "Local target not available -> will use 'ssh enkheim.psaux.de'" >&2
@@ -291,12 +292,13 @@ function nzb.queue() {
         local target="simon@enkheim.psaux.de:${target}"
     else
         local action="mv -v"
+        local delete=false
     fi
     
     if [[ -z "${@}" ]] ; then
         if ls ~/Downloads/*[nN][zZ][bB] 2>/dev/null >&2 ; then
             if ( ${action} ~/Downloads/*[nN][zZ][bB] ${target} ) ; then
-                rm -ri ~/Downloads/*[nN][zZ][bB]
+                ( ${delete} ) && rm -ri ~/Downloads/*[nN][zZ][bB]
             fi
         else
             echo "No nzb files found in the following dirs:" >&2
@@ -306,7 +308,7 @@ function nzb.queue() {
     else
         if ( ${action} ${@} ${target} ) ; then
             if [[ "$@" != "/" ]] && [[ "$@" != "." ]] && [[ "$@" != "" ]] ; then
-                rm -ri ${@}
+                ( ${delete} ) && rm -ri ${@}
             fi
         fi
     fi

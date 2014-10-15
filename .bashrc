@@ -233,15 +233,17 @@ alias rm='rm -i'
 alias screen='screen -U'
 alias dmesg="dmesg -T --color=auto"
 alias wget='wget -c'
+alias tmux="TERM=screen-256color-bce tmux"
 ( which vim >/dev/null ) && alias vi='vim'
 
 # sudo stuff
 if [ $( id -u ) -eq 0 ] ; then
-    alias vi='sudoedit'
-    alias vim='sudoedit'
-    
-    EDITOR='sudoedit'
-    export EDITOR
+    # well... this was stupid...
+    #alias vi='sudoedit'
+    #alias vim='sudoedit'
+    #EDITOR='sudoedit'
+    #export EDITOR
+    echo -n
 fi
 alias sudo='sudo '
 alias sudo.that="eval 'sudo \$(fc -ln -1)'"
@@ -252,12 +254,13 @@ alias observe.pid="strace -T -f -p"
 
 # package and system-config
 alias debian.version="lsb_release -a"
+alias debian.bugs="bts"
 alias debian.packages_custom="debian.packages_list_custom \$(grep ^systemtype ~/.system.conf | cut -f'2-' -d'=' | sed 's|[\"]||g')"
 alias debian.packages_by_size="dpkg-query -W --showformat='\${Installed-Size;10}\t\${Package}\n' | sort -k1,1n"
-alias debian.package_configfiles="dpkg-query -f '\n\n\${Package} \n\${Conffiles}' -W"
+alias debian.package_configfiles="dpkg-query -f '\n\${Package} \n\${Conffiles}\n' -W"
 
 # logs
-alias log.dmesg="dmesg -T"
+alias log.dmesg="dmesg -T --color=auto"
 alias log.pidgin="find ~/.purple/logs/ -type f -mtime -1 | xargs tail -n 5"
 alias log.authlog="sudo grep -e \"^\$( LANG=C date -d'now -24 hours' +'%b %e' )\" -e \"^\$( LANG=C date +'%b %e' )\" /var/log/auth.log | grep.ip | sort -n | uniq -c | sort -n | grep -v \"\$( host -4 enkheim.psaux.de | grep.ip | head -n1 )\" | tac | head -n 10"
 
@@ -368,6 +371,7 @@ alias btc.worldwide="wget -q -O- 'https://bitpay.com/api/rates' | json_pp"
 alias btc="echo -e \"€: \$( btc.worldwide | grep -C2 -e Euro | grep -o \"[0-9\.]*\" )\" ; echo \"$: \$( btc.worldwide | grep -C2 -e USD | grep -o \"[0-9\.]*\" )\""
 alias speedtest="wget -O- http://cachefly.cachefly.net/200mb.test >/dev/null"
 alias kill.chrome="kill -9 \$( ps aux | grep -i chrome | awk {'print \$2'} | xargs ) 2>/dev/null"
+alias strip.doubleslash="sed 's|[/]\+|/|g'"
 
 # host/setup specific
 if ( grep -iq "minit" /proc/cmdline ) ; then

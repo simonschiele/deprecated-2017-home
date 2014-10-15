@@ -5,14 +5,13 @@
 Network: mosh whois mtr
 Security: snort openvpn
 Compression: p7zip unzip zip rar unrar 
-Shells: zsh bash-completion
-Tools: debian-goodies multitail lshw
+Shells: zsh bash bash-completion
+Tools: multitail lshw
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
 # Development
 Build tools: build-essential make cmake automake1.9 rake 
-Sourceverwaltung: bzr subversion mercurial
 Database: sqlite3
 Tools: xmlstarlet
 # ------------------------------------------------------------------------

@@ -3,10 +3,9 @@
 # ------------------------------------------------------------------------
 # System  
 Filesystems: cifs-utils ntfs-3g
-Shells: zsh
-Compression: p7zip unzip zip rar unrar 
-Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter alsa-base alsa-utils 
-Tools: debian-goodies 
+Shells: bash zsh
+Compression: p7zip unzip zip rar unrar
+Audio: pulseaudio pulseaudio-utils alsa-base alsa-utils 
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------

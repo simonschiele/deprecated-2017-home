@@ -5,7 +5,7 @@
 Network: whois wakeonlan mtr
 Security: snort nmap wireshark openvpn
 Filesystems: gphotofs cifs-utils ntfs-3g jmtpfs
-Shells: zsh bash-completion
+Shells: zsh bash bash-completion
 Compression: p7zip unzip zip rar unrar
 Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter pasystray paprefs paman padevchooser alsa-base alsa-utils
 USB: usb-modeswitch
@@ -34,12 +34,14 @@ Python Libs: python-twisted python-sqlite python-scrapy python-scapy python-web2
 Database: sqlite3
 Tools: xmlstarlet
 Embedded: arduino arduino-mk avrdude android-tools-fastboot android-tools-adb android-tools-fsutils
+Infrastructure: devscripts
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
 # Multimedia
 Musik: audacity
-Video: vlc kino clive youtube-dl
+Video: vlc kino 
 Images: gimp inkscape agave imagemagick
+Download: clive cclive youtube-dl quvi
 # ------------------------------------------------------------------------
 
