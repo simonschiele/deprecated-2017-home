@@ -111,6 +111,7 @@ ICON[error]='\u2717'
 ICON[check]='\u2714'
 ICON[ok]='\u2714'
 ICON[success]='\u2714'
+ICON[warning]='⚠'
 
 alias show.icons="( for key in \"\${!ICON[@]}\" ; do echo -e \" \${ICON[\$key]} : \${key}\" ; done ) | column -c \${COLUMNS:-80}"
 
