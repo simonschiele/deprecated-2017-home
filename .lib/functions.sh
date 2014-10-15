@@ -471,12 +471,17 @@ function good_morning() {
 
 # }}}
 
-# {{{
+# {{{ no.sleep()
 
+function no.sleep() {
+    pkill -f screensaver
+    ( ! pgrep screensaver ) && echo "error: couldn't kill screensaver" && return 1
+    xset -display ${DISPLAY:-:0} -dpms
+}
 
 # }}} 
 
-function no.sleep() {
-    killall -9 xscreensaver 2>/dev/null
-}
+# {{{
+# }}} 
+
 
