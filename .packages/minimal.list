@@ -10,7 +10,7 @@ Network: ethtool ssh netcat fping curl wget traceroute dnsutils telnet tcpdump p
 Filesystems: btrfs-tools xfsprogs sshfs xmount
 Maintainance: etckeeper
 Compression: bzip2
-Tools: hexedit less psmisc hdparm w3m xml2 colordiff nmon
+Tools: hexedit less psmisc hdparm w3m xml2 colordiff nmon file
 Packages: apt-show-versions
 # ------------------------------------------------------------------------
 
