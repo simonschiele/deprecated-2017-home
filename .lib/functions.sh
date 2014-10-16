@@ -484,4 +484,8 @@ function no.sleep() {
 # {{{
 # }}} 
 
+function is.systemd() { 
+    sudo LANG=C lsof -a -p 1 -d txt | grep -q "^systems\ *1\ *"
+    return $?
+}
 

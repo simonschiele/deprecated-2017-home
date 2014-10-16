@@ -1,0 +1,25 @@
+#!/bin/bash
+LANG=C
+
+URL='https://www.torproject.org'
+PATH_DL_PAGE="download/download-easy.html.en"
+DEBUG=true
+
+dir=$( mktemp -d -p ~/.tmp/throwaway/ )
+arch=$( uname -m | grep -o 64 )
+urls=$( wget -O- -q ${URL}/${PATH_DL_PAGE} | grep.url | grep linux${arch:-32} | tac )
+
+for download in $urls ; do
+    echo wget -q ${urls}/${download} -O ${dir}/$( basename $download ) || echo "error while downloading ${download}" >&2
+done
+
+#todo: verify 
+tar -xJf ${dir}/*.tar.xz -C ${dir}/ || echo "error: couldn't decompress"
+
+cd ${dir}
+    # launch
+cd ${OLDPWD}
+
+# href="../dist/torbrowser/3.6.6/tor-browser-linux64-3.6.6_en-US.tar.xz"
+# href="../dist/torbrowser/3.6.6/tor-browser-linux64-3.6.6_en-US.tar.xz.asc"
+

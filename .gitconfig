@@ -19,7 +19,7 @@
     lastlog = log --color -n 20 --pretty=tformat:\"%h - %an, %ar : %s\" HEAD^1..HEAD
     filelog = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat 
     rollback = checkout HEAD^1
-    clone = clone --recursive
+    clone = clone
     wipe = reset –hard HEAD
     praise = blame
     merge = merge --ff
