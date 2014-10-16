@@ -1,12 +1,15 @@
 #!/bin/bash
 
-if [ -n "${1}" ]
-then
-    color=${1}
-else
-    color=false
-fi
+color=${1:-false}
 
+if ( $color ) ; then
+    if [ -e ~/.lib/resources.sh ] ; then
+        . ~/.lib/resources.sh
+    else
+        echo "error: couldn't include resources.sh"
+        exit 1
+    fi
+fi
 ### {{{ Colors 
 
 if ( ${color} )
