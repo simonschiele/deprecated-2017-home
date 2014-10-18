@@ -10,50 +10,29 @@ if ( $color ) ; then
         exit 1
     fi
 fi
-### {{{ Colors 
 
-if ( ${color} )
-then
-    RED="\[\033[0;31m\]"
-    YELLOW="\[\033[0;33m\]"
-    GREEN="\[\033[0;32m\]"
-    BLUE="\[\033[0;34m\]"
-    LIGHT_RED="\[\033[1;31m\]"
-    LIGHT_GREEN="\[\033[1;32m\]"
-    WHITE="\[\033[1;37m\]"
-    LIGHT_GRAY="\[\033[0;37m\]"
-    COLOR_BG_GRAY="\[\e[1;37;100m\]"
-    COLOR_BG_RED="\[\e[41;93m\]"
-    COLOR_NONE="\[\e[0m\]"
-fi
-
-### }}} 
-
-if LANG=C git rev-parse 2>/dev/null ; then
+if $( LANG=C git rev-parse --is-inside-work-tree 2>/dev/null ) ; then
     
+    #gitStatus="LANG=C git diff --quiet --ignore-submodules HEAD"
     gitStatus="$( LANG=C git status 2>/dev/null )"
-    gitBranch="$( LANG=C git branch 2>/dev/null | grep '^*' | sed -e 's|^\*\ *\(.*\)|\1|g' -e 's|[()]||g' )"
+    gitBranch="$( LANG=C git symbolic-ref -q --short HEAD )"
 
-    if [[ "${gitBranch}" == 'master' ]] ; then
+    if [ "${gitBranch}" = 'master' ] ; then
         gitBranch=""
     fi
 
-    if [[ -n "${gitBranch}" ]] ; then
-        gitBranch="${gitBranch} "
-    fi
-
     if [[ ! ${gitStatus} =~ "working directory clean" ]] ; then
-        state="${RED}⚡"
+        state="${COLOR[red]}⚡"
     fi
 
     if [[ "${gitStatus}" =~ "ahead of" ]] ; then
-        ahead="${YELLOW}↑"
+        ahead="${COLOR[yellow]}↑"
     fi
 
     if test -n "${ahead}" || test -n "${state}" ; then
-        echo "(${gitBranch}${ahead}${state}${COLOR_NONE})"
+        echo "(${gitBranch}${ahead}${state}${COLOR[none]})"
     else
-        echo "(${gitBranch}${GREEN}♥${COLOR_NONE})"
+        echo "(${gitBranch}${COLOR[green]}♥${COLOR[none]})"
     fi
 fi
 
