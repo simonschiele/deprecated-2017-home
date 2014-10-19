@@ -22,17 +22,17 @@ if $( LANG=C git rev-parse --is-inside-work-tree 2>/dev/null ) ; then
     fi
 
     if [[ ! ${gitStatus} =~ "working directory clean" ]] ; then
-        state="${COLOR[red]}⚡"
+        state="$( color.ps1 red )⚡"
     fi
 
     if [[ "${gitStatus}" =~ "ahead of" ]] ; then
-        ahead="${COLOR[yellow]}↑"
+        ahead="$( color.ps1 yellow )↑"
     fi
 
     if test -n "${ahead}" || test -n "${state}" ; then
-        echo "(${gitBranch}${ahead}${state}${COLOR[none]})"
+        echo "(${gitBranch}${ahead}${state}$( color.ps1 none ))"
     else
-        echo "(${gitBranch}${COLOR[green]}♥${COLOR[none]})"
+        echo "(${gitBranch}$( color.ps1 green )♥$( color.ps1 none ))"
     fi
 fi
 
