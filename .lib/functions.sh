@@ -330,9 +330,48 @@ function return.unicode() {
 
 # }}} 
 
+function show.repo() {
+    local debug
+}
+
 # {{{ update.repo()
 
 function update.repo() {
+    local debug dir repo
+    shopt -s extglob
+   
+    debug=true
+    dir=${1:-$( pwd )}
+    dir=${dir%%+(/)}
+   
+    repo=false
+    submodule=false
+    below_repo=false
+    
+    if [ -d "${dir}/.git" ] && [ -e "${dir}/.git/index" ] ; then
+        repo=true
+    elif [ -e "${dir}/.git" ] && [ -d "$( head -n 1 "${dir}/.git" | cut -f'2' -d' ' )" ] ; then
+        submodule=true
+    elif ( LANG=C git rev-parse 2>/dev/null ) ; then
+        below_repo=true
+        return 2 
+    else
+        echo "error: '$( pwd )' is not inside a repository" >&2
+        return 1
+    fi
+
+    return 0 
+    
+    if [ -d .git ] && [ -e ${diri} ] ; then
+        echo ${dir}
+    elif [] ; then
+        echo -n
+    else
+        echo -n
+    fi
+    
+    return 0
+    
     local repo="${1}"
     local dir="${2}"
 

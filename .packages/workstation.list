@@ -7,7 +7,7 @@ Security: snort nmap wireshark openvpn
 Filesystems: gphotofs cifs-utils ntfs-3g jmtpfs
 Shells: zsh bash bash-completion
 Compression: p7zip unzip zip rar unrar
-Audio: pulseaudio pulseaudio-utils pavucontrol pavumeter pasystray paprefs paman padevchooser alsa-base alsa-utils
+Audio: pulseaudio pulseaudio-utils pavucontrol pasystray paprefs alsa-base alsa-utils
 USB: usb-modeswitch
 Tools: bchunk debian-goodies debootstrap multitail input-utils lshw
 # ------------------------------------------------------------------------
@@ -20,7 +20,7 @@ Browser: iceweasel
 Communication: icedove pidgin pidgin-otr
 Viewer: evince geeqie libreoffice
 Security: gksu gnome-keyring xscreensaver
-Network: vinagre grdesktop quicksynergy synergy network-manager network-manager-gnome network-manager-openvpn network-manager-openvpn-gnome
+Network: vinagre grdesktop quicksynergy synergy network-manager network-manager-gnome network-manager-openvpn network-manager-openvpn-gnome network-manager-iodine network-manager-iodine-gnome
 Webcam: guvcview
 Tools: gtkterm thunar scrot xsel xcalib gucharmap file-roller screenruler
 # ------------------------------------------------------------------------

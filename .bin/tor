@@ -6,15 +6,23 @@ PATH_DL_PAGE="download/download-easy.html.en"
 DEBUG=true
 
 dir=$( mktemp -d -p ~/.tmp/throwaway/ )
+trap cleanup_trap EXIT
+
+function cleanup_trap() {
+    ( $DEBUG ) && echo "Deleting dir '${dir}'"
+    echo "rm -rf ${dir}/"
+}
+
 arch=$( uname -m | grep -o 64 )
 urls=$( wget -O- -q ${URL}/${PATH_DL_PAGE} | grep.url | grep linux${arch:-32} | tac )
 
 for download in $urls ; do
-    echo wget -q ${urls}/${download} -O ${dir}/$( basename $download ) || echo "error while downloading ${download}" >&2
+    $DEBUG && echo wget -q ${urls}/${download} -O ${dir}/$( basename $download )
+    #wget -q ${urls}/${download} -O ${dir}/$( basename $download ) || echo "error while downloading ${download}" >&2
 done
 
 #todo: verify 
-tar -xJf ${dir}/*.tar.xz -C ${dir}/ || echo "error: couldn't decompress"
+#tar -xJf ${dir}/*.tar.xz -C ${dir}/ || echo "error: couldn't decompress"
 
 cd ${dir}
     # launch
