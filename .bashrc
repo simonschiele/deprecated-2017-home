@@ -41,8 +41,8 @@ fi
 
 # {{{ General Settings
 
-# Vim navigation mode (use ESC)
-# set -o vi
+#set -o vi       # Vim navigation mode (use ESC)
+set -o notify   # report status of terminated bg jobs immediately
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -60,18 +60,41 @@ fi
 export HISTCONTROL=ignoreboth
 export HISTFILESIZE=100000
 export HISTSIZE=10000
-export HISTIGNORE='&:clear:ls:cd:[bf]g:exit:[ t\]*'
+#export HISTIGNORE='&:clear:ls:cd:[bf]g:exit:[ t\]*'
+export HISTIGNORE="ls:l:la:ll:clear:pwd:hist:history:tree"
 export HOSTFILE=$HOME/.hosts
 shopt -s histappend
 shopt -s cmdhist        # combine multiline
 #shopt -s histappend histreedit histverify
 export PROMPT_COMMAND='history -a; history -n; $PROMPT_COMMAND'
 
+[ -z $HISTFILE ] && export HISTFILE="${HOME}/.history";
+[ -z $MYSQL_HISTFILE ] && export MYSQL_HISTFILE="${HOME}/.mysql_history";
+[ -z $SQLITE_HISTFILE ] && export SQLITE_HISTFILE="${HOME}/.sqlite_history";
+
+# shell options
+shopt -s extglob                    # extended pattern matching features
+shopt -s progcomp                   # programmable completion
+shopt -s cdspell                    # correct dir spelling errors on cd
+shopt -s lithist                    # save multi-line commands with newlines
+shopt -s cmdhist                    # save multi-line commands in a single hist entry
+shopt -s checkwinsize               # check the window size after each command
+shopt -s no_empty_cmd_completion    # don't try to complete empty cmds
+shopt -s histappend                 # append new history entries
+if [ "$UNAME" != 'Darwin' ]; then
+    shopt -s autocd                 # if a command is a dir name, cd to it
+    shopt -s checkjobs              # print warning if jobs are running on shell exit
+    shopt -s dirspell               # correct dir spelling errors on completion
+    shopt -s globstar               # ** matches all files, dirs and subdirs
+fi
+
+
 # }}}
 
 # {{{ Coloring
 
 export TERM='xterm-256color'
+export CLICOLOR=1
 
 # Color support detection + color count (warning! crap!)
 if [ -x /usr/bin/tput ] && ( tput setaf 1 >&/dev/null ) ; then

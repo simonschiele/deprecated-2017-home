@@ -27,7 +27,7 @@ Tools: gtkterm thunar scrot xsel xcalib gucharmap file-roller screenruler
 
 # ------------------------------------------------------------------------
 # Development
-Sourceverwaltung: bzr subversion mercurial
+Sourceverwaltung: bzr subversion mercurial git-svn
 Interpreter und Compiler: ipython erlang gcc g++ php5-cli lua5.1
 Build tools: build-essential make cmake automake1.9 rake
 Python Libs: python-twisted python-sqlite python-scrapy python-scapy python-web2py

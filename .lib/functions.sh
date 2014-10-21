@@ -330,9 +330,13 @@ function return.unicode() {
 
 # }}} 
 
+# {{{ show.repo()
+
 function show.repo() {
     local debug
 }
+
+# }}}
 
 # {{{ update.repo()
 
@@ -530,5 +534,27 @@ function no.sleep() {
 function is.systemd() { 
     sudo LANG=C lsof -a -p 1 -d txt | grep -q "^systems\ *1\ *"
     return $?
+}
+
+function git.subupd() {
+    git submodule foreach git fetch origin --tags && git pull && git submodule update --init --recursive
+}
+
+function git.is_submodule() {
+     (cd "$(git rev-parse --show-toplevel)/.." && 
+      git rev-parse --is-inside-work-tree) | grep -q true
+}
+
+function git.dirty_ignore() {
+    local dot_git=$( git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git rev-parse --git-dir 2>/dev/null )
+    
+    if [ -z "$dot_git" ] ; then
+        echo "Couldn't find repo" >&2
+        return 1
+    fi
+    
+     
+    #"config" -> "ignore = dirty"
+    
 }
 

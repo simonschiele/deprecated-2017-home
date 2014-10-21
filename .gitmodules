@@ -52,3 +52,12 @@
 [submodule ".lib/extundelete"]
 	path = .lib/extundelete
 	url = git://git.code.sf.net/p/extundelete/code
+[submodule ".lib/git-extras"]
+	path = .lib/git-extras
+	url = https://github.com/tj/git-extras.git
+[submodule ".lib/giternal"]
+	path = .lib/giternal
+	url = https://github.com/patmaddox/giternal.git
+[submodule ".lib/gitslave"]
+	path = .lib/gitslave
+	url = git://git.code.sf.net/p/gitslave/code
