@@ -438,13 +438,13 @@ function show.stats() {
     
     ram=$( LANG=c free -m | grep ^Mem | awk {'print $2'} )
     echo -ne "ram: ${ram}mb (free: $( free -m | grep cache\: | awk {'print $4'} )mb, "
-    free | awk '/Mem/{printf("used: %.2f%"), $3/$2*100} /buffers\/cache/{printf(", buffers: %.2f%"), $4/($3+$4)*100} /Swap/{printf(", swap: %.2f%"), $3/$2*100}'
-    echo ")"
+    #free | awk '/Mem/{printf("used: %.2f%"), $3/$2*100} /buffers\/cache/{printf(", buffers: %.2f%"), $4/($3+$4)*100} /Swap/{printf(", swap: %.2f%"), $3/$2*100}'
     
     local swap=$( LANG=c free | grep "^swap" | sed 's|^swap\:[0\ ]*||g' )
-    [ -z "$swap" ] && echo "swap: no active swap" || echo "swap: ${swap}"
+    [ -z "$swap" ] && echo -n "swap: no active swap" || echo -n "swap: ${swap}"
+    echo ")" 
     
-    LANG=C df -h | grep "\ /$" | awk {'print "hd: "$2" (root, free:"$4")"'}
+    LANG=C df -h | grep "\ /$" | awk {'print "hd: "$2" (root, free: "$4")"'}
 }
 
 # }}}
@@ -452,6 +452,10 @@ function show.stats() {
 # {{{ good_morning()
 
 function good_morning() {
+    for i in ${@} ; do
+        echo $i
+    done
+
     local status=0
     local has_root=false
     

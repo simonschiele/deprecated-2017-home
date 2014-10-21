@@ -31,6 +31,9 @@ alias tmux='TERM=screen-256color-bce tmux'
 # sudo stuff
 alias sudo='sudo '
 alias sudo.that='eval "sudo $(fc -ln -1)"'
+alias sudo.password_disable='sudo grep -iq "^${SUDO_USER:-${USER}}.*NOPASSWD.*ALL.*$" /etc/sudoers && echo "entry already in /etc/sudoers" >&2 || sudo sed -i "s|\(root[\ \t]\+ALL\)|simon   ALL = NOPASSWD:  ALL\n\1|g" /etc/sudoers'
+alias sudo.password_enable='sudo grep -iq "^${SUDO_USER:-${USER}}.*NOPASSWD.*ALL.*$" /etc/sudoers && sudo sed -i "/^${SUDO_USER:-${USER}}.*NOPASSWD.*ALL.*$/d" /etc/sudoers || echo "entry not in /etc/sudoers" >&2'
+
 
 # system
 alias create.system_user='sudo adduser --no-create-home --disabled-login --shell /bin/false'
