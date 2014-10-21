@@ -117,3 +117,10 @@ alias show.icons="( for key in \"\${!ICON[@]}\" ; do echo -e \" \${ICON[\$key]} 
 
 # }}}
 
+function TMP() {
+    dir=${@:-$( pwd )}
+}
+
+
+
+

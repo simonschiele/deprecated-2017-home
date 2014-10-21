@@ -46,3 +46,6 @@
 [submodule ".lib/vim-colors-solarized"]
 	path = .lib/vim-colors-solarized
 	url = https://github.com/altercation/vim-colors-solarized.git
+[submodule ".lib/zsh-antigen"]
+	path = .lib/zsh-antigen
+	url = https://github.com/zsh-users/antigen.git

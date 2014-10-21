@@ -1,3 +1,6 @@
+
+$include /etc/inputrc
+
 # set show-all-if-ambiguous on
 # set show-all-if-unmodified on
 set bell-style none
@@ -29,6 +32,4 @@ set mark-symlinked-directories on
 "\C-w": unix-filename-rubout
 #"": unix-filename-rubout
 "\C-x*": glob-expand-word
-
-$include /etc/inputrc
 

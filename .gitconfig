@@ -19,7 +19,7 @@
     lastlog = log --color -n 20 --pretty=tformat:\"%h - %an, %ar : %s\" HEAD^1..HEAD
     filelog = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat 
     rollback = checkout HEAD^1
-    clone = clone --recursive
+    clone = clone
     wipe = reset –hard HEAD
     praise = blame
     merge = merge --ff
@@ -33,5 +33,7 @@
     find = "!git ls-files | grep -i"
     graphviz = "!echo 'digraph git {' ; git log --pretty='format:  %h -> { %p }' \"$@\" | sed 's/[0-9a-f][0-9a-f]*/\"&\"/g' ; echo '}';"
     new = !sh -c 'git log $1@{1}..$1@{0} "$@"'
+    serve = daemon --base-path=. --export-all --reuseaddr --informative-errors --verbose
+    hub = daemon --base-path=. --export-all --enable=receive-pack --reuseaddr --informative-errors --verbose
 [push]
     default = matching

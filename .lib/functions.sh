@@ -330,9 +330,48 @@ function return.unicode() {
 
 # }}} 
 
+function show.repo() {
+    local debug
+}
+
 # {{{ update.repo()
 
 function update.repo() {
+    local debug dir repo
+    shopt -s extglob
+   
+    debug=true
+    dir=${1:-$( pwd )}
+    dir=${dir%%+(/)}
+   
+    repo=false
+    submodule=false
+    below_repo=false
+    
+    if [ -d "${dir}/.git" ] && [ -e "${dir}/.git/index" ] ; then
+        repo=true
+    elif [ -e "${dir}/.git" ] && [ -d "$( head -n 1 "${dir}/.git" | cut -f'2' -d' ' )" ] ; then
+        submodule=true
+    elif ( LANG=C git rev-parse 2>/dev/null ) ; then
+        below_repo=true
+        return 2 
+    else
+        echo "error: '$( pwd )' is not inside a repository" >&2
+        return 1
+    fi
+
+    return 0 
+    
+    if [ -d .git ] && [ -e ${diri} ] ; then
+        echo ${dir}
+    elif [] ; then
+        echo -n
+    else
+        echo -n
+    fi
+    
+    return 0
+    
     local repo="${1}"
     local dir="${2}"
 
@@ -399,13 +438,13 @@ function show.stats() {
     
     ram=$( LANG=c free -m | grep ^Mem | awk {'print $2'} )
     echo -ne "ram: ${ram}mb (free: $( free -m | grep cache\: | awk {'print $4'} )mb, "
-    free | awk '/Mem/{printf("used: %.2f%"), $3/$2*100} /buffers\/cache/{printf(", buffers: %.2f%"), $4/($3+$4)*100} /Swap/{printf(", swap: %.2f%"), $3/$2*100}'
-    echo ")"
+    #free | awk '/Mem/{printf("used: %.2f%"), $3/$2*100} /buffers\/cache/{printf(", buffers: %.2f%"), $4/($3+$4)*100} /Swap/{printf(", swap: %.2f%"), $3/$2*100}'
     
     local swap=$( LANG=c free | grep "^swap" | sed 's|^swap\:[0\ ]*||g' )
-    [ -z "$swap" ] && echo "swap: no active swap" || echo "swap: ${swap}"
+    [ -z "$swap" ] && echo -n "swap: no active swap" || echo -n "swap: ${swap}"
+    echo ")" 
     
-    LANG=C df -h | grep "\ /$" | awk {'print "hd: "$2" (root, free:"$4")"'}
+    LANG=C df -h | grep "\ /$" | awk {'print "hd: "$2" (root, free: "$4")"'}
 }
 
 # }}}
@@ -413,6 +452,10 @@ function show.stats() {
 # {{{ good_morning()
 
 function good_morning() {
+    for i in ${@} ; do
+        echo $i
+    done
+
     local status=0
     local has_root=false
     
@@ -471,12 +514,21 @@ function good_morning() {
 
 # }}}
 
-# {{{
+# {{{ no.sleep()
 
+function no.sleep() {
+    pkill -f screensaver
+    ( ! pgrep screensaver ) && echo "error: couldn't kill screensaver" && return 1
+    xset -display ${DISPLAY:-:0} -dpms
+}
 
 # }}} 
 
-function no.sleep() {
-    killall -9 xscreensaver 2>/dev/null
+# {{{
+# }}} 
+
+function is.systemd() { 
+    sudo LANG=C lsof -a -p 1 -d txt | grep -q "^systems\ *1\ *"
+    return $?
 }
 
