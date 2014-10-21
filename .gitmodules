@@ -49,3 +49,6 @@
 [submodule ".lib/zsh-antigen"]
 	path = .lib/zsh-antigen
 	url = https://github.com/zsh-users/antigen.git
+[submodule ".lib/extundelete"]
+	path = .lib/extundelete
+	url = git://git.code.sf.net/p/extundelete/code
