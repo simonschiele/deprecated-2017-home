@@ -41,8 +41,11 @@ fi
 
 # {{{ General Settings
 
-#set -o vi       # Vim navigation mode (use ESC)
-set -o notify   # report status of terminated bg jobs immediately
+# Vim navigation mode (use ESC)
+#set -o vi      
+
+# report status of terminated bg jobs immediately
+set -o notify   
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -61,17 +64,17 @@ export PROMPT_COMMAND=
 
 # history
 export HISTCONTROL=ignoreboth
-export HISTFILESIZE=100000
+export HISTFILESIZE=50000
 export HISTSIZE=10000
-#export HISTIGNORE='&:clear:ls:cd:[bf]g:exit:[ t\]*'
-export HISTIGNORE="ls:l:la:ll:clear:pwd:hist:history:tree"
+export HISTIGNORE='&:clear:ls:cd:[bf]g:exit:[ t\]*'
+# export HISTIGNORE="ls:l:la:ll:clear:pwd:hist:history:tree"
 export HOSTFILE=$HOME/.hosts
 shopt -s histappend
 shopt -s cmdhist        # combine multiline
+
 #shopt -s histappend histreedit histverify
 export PROMPT_COMMAND="history -a ; history -n ; $PROMPT_COMMAND"
 [ -n "$BASH_DEBUG" ] && [ "$BASH_DEBUG" = "true" ] && export PROMPT_COMMAND="source ~/.bashrc ; $PROMPT_COMMAND"
-
 
 [ -z $HISTFILE ] && export HISTFILE="${HOME}/.history";
 [ -z $MYSQL_HISTFILE ] && export MYSQL_HISTFILE="${HOME}/.mysql_history";
@@ -148,6 +151,7 @@ if [ -r ~/.lib/dircolors-solarized/dircolors.256dark ] ; then
 fi
 
 # grep/less/diff/... coloring
+alias ls='ls --color=auto'
 export GREP_OPTIONS='--color=auto'
 export GREP_COLOR='7;34'                # green-bold
 export LESS_TERMCAP_mb=$'\e[01;31m'     # red-bold
@@ -157,7 +161,6 @@ export LESS_TERMCAP_se=$'\e[0m'
 export LESS_TERMCAP_so=$'\e[01;43;37m'
 export LESS_TERMCAP_ue=$'\e[0m'
 export LESS_TERMCAP_us=$'\e[01;32m'
-alias ls='ls --color=auto'
 ( which colordiff >/dev/null ) && alias diff='colordiff'
 ( which pacman >/dev/null ) && alias pacman='pacman --color=auto'
 
