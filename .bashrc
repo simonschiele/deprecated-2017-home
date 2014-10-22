@@ -56,6 +56,9 @@ if [ -z "${debian_chroot}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$( cat /etc/debian_chroot )
 fi
 
+# clear PROMPT_COMMAND
+export PROMPT_COMMAND=
+
 # history
 export HISTCONTROL=ignoreboth
 export HISTFILESIZE=100000
@@ -66,7 +69,9 @@ export HOSTFILE=$HOME/.hosts
 shopt -s histappend
 shopt -s cmdhist        # combine multiline
 #shopt -s histappend histreedit histverify
-export PROMPT_COMMAND='history -a; history -n; $PROMPT_COMMAND'
+export PROMPT_COMMAND="history -a ; history -n ; $PROMPT_COMMAND"
+[ -n "$BASH_DEBUG" ] && [ "$BASH_DEBUG" = "true" ] && export PROMPT_COMMAND="source ~/.bashrc ; $PROMPT_COMMAND"
+
 
 [ -z $HISTFILE ] && export HISTFILE="${HOME}/.history";
 [ -z $MYSQL_HISTFILE ] && export MYSQL_HISTFILE="${HOME}/.mysql_history";
@@ -190,7 +195,7 @@ function prompt_func() {
     PS1="${PS1error}${PS1chroot}${PS1user}@${PS1host} ${PS1path}${PS1git}${PS1prompt}"
 }
 
-PROMPT_COMMAND=prompt_func
+export PROMPT_COMMAND="prompt_func ; $PROMPT_COMMAND"
 
 # }}}
 
