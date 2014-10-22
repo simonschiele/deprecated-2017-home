@@ -104,6 +104,7 @@ alias alsa.unsilent='for mix in PCM MASTER Master ; do amixer -q sset $mix 90% 2
 alias no.sound='alsa.unsilent'
 alias screenshot='import -display :0 -window root ./screenshot-$(date +%Y-%m-%d_%s).png'
 alias screendump='ffmpeg -f x11grab -s wxga -r 25 -i :0.0 -sameq ./screendump-$(date +%Y-%m-%d_%s).mpg'
+alias screendump2='ffmpeg -f alsa -i hw:1,1 -f x11grab -r 30 -s 800x600 -i :0.0 -acodec pcm_s16le -vcodec libx264 -preset ultrafast -threads 0 output.avi'
 alias screenvideo='screendump'
 
 # synergy

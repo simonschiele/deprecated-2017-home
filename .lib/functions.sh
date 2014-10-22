@@ -522,7 +522,7 @@ function good_morning() {
 
 function no.sleep() {
     pkill -f screensaver
-    ( ! pgrep screensaver ) && echo "error: couldn't kill screensaver" && return 1
+    ( pgrep screensaver ) && echo "error: couldn't kill screensaver" && return 1
     xset -display ${DISPLAY:-:0} -dpms
 }
 
