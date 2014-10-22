@@ -113,9 +113,9 @@ worldclock() {
 
 # }}}
 
-# {{{ debian.packages_list_custom()
+# {{{ debian.packages_custom_get()
 
-debian.packages_list_custom() {
+debian.packages_custom_get() {
     local listtype="${1}.list"
     local pkglist="${HOME}/.packages/${listtype}"
 
@@ -182,21 +182,31 @@ function keyboard_kitt() {
 
 # {{{ confirm()
 
-confirm() {
-    if [ "x${@}" == "x" ]
-    then
-        message="Are you sure you want to perform 'unknown action'?"
-    else
-        message="${@}"
-    fi
+function confirm.whiptail_yesno() {
+    whiptail --yesno "${1:-Are you sure you want to perform 'unknown action'?}" 10 60
+}
 
-    whiptail --yesno "${message}" 10 60
+function confirm.yesno() {
+    while read -p "${1:-Are you sure (Y/N)? }" -r -n 1 -s answer; do
+        if [[ $answer = [YyNn] ]]; then
+            [[ $answer = [Yy] ]] && ( echo ; return 0 ) 
+            [[ $answer = [Nn] ]] && ( echo ; return 1 ) 
+            break
+        fi
+    done
+}
+
+function confirm.keypress() {
+    local keypress
+    read -s -r -p "${1:-Press any key to continue...}" -n 1 keypress
 }
 
 # }}}
 
+
 # {{{ whereami()
 function whereami() {
+
     ips=$( /sbin/ifconfig | grep -o "[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}" | sort -u | grep -v -e "^127" -e "^255" )
     if ( echo $ips | grep -q -e "192\.168\.[78]0" -e "195\.4\.7[01]" ) ; then
         echo "work"
@@ -530,6 +540,76 @@ function no.sleep() {
 
 # {{{
 # }}} 
+
+function show.tlds() {
+    [ ! -d ${HOME}/.cache/bash/ ] && mkdir -p ${HOME}/.cache/bash/
+    if [ ! -e ${HOME}/.cache/bash/tlds ] ; then
+        wget -q "http://data.iana.org/TLD/tlds-alpha-by-domain.txt" -O ${HOME}/.cache/bash/tlds
+    fi
+    grep -v -e "^\ *$" -e "^\ *#" ${HOME}/.cache/bash/tlds
+}
+
+function grep.tld() {
+    local input
+     
+    function process() {
+        local iinput
+        echo "${1}" | grep -o "[^\ \"\']\+\.[A-Za-z]\+" | while read iinput ; do
+            local clean_input=${iinput##*.}
+            show.tlds | grep "^${clean_input}$"
+        done
+    }
+    
+    while read -t 1 -r input ; do
+        [ -z "${input}" ] && break 
+        process "${input}"
+    done
+
+    for input in ${@} ; do
+        process "${input}"
+    done
+     
+    unset process    
+}
+
+function show.path() {
+    echo -e "name:\t\t$( color white_bold )${1}$( color none )"
+    echo -e "type:\t\t"$( file -b "${1}" )
+    echo -e "real path:\t"$( realpath "${1}" )
+    echo -e "real type:\t"$( file -b $( realpath "${1}" ))
+    
+}
+alias show.dir=show.path
+alias show.file=show.path
+
+function show.host() {
+    local ip=$( echo "${1}" | grep.ip | head -n 1 )
+    local host=${1}
+    
+    if [ -n "$host" ] && [ -z "$ip" ] ; then
+        ip=$( host ${host} | grep "has address " | grep.ip )
+    elif [ -n "$ip" ] ; then
+        host=$( host ${ip} | grep "domain name pointer" | sed 's|.*pointer\ \(.*\)\.$|\1|g' )
+    else
+        echo "'${1}' neither ip address nor hostname"
+        return 1
+    fi
+    
+    echo "host: ${host}" 
+    echo "ip: ${ip}" 
+}
+
+function show() {
+    if [ -z "${1}" ] ; then
+        echo "usage: show <file|dir|url|ip|int|string>"
+    elif [ -e "${1}" ] ; then
+        show.path "${1}"
+    elif ( echo "${1}" | grep.ip ) ; then
+        show.host "${1}"
+    else
+        echo "input not identified"
+    fi
+}
 
 function is.systemd() { 
     sudo LANG=C lsof -a -p 1 -d txt | grep -q "^systems\ *1\ *"

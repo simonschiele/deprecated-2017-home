@@ -42,13 +42,13 @@ alias observe.pid='strace -T -f -p'
 # package and system-config
 alias debian.version='lsb_release -a'
 alias debian.bugs='bts'
-alias debian.packages_custom='debian.packages_list_custom $(grep ^system_type ~/.system.conf | cut -f"2-" -d"=" | sed "s|[\"]||g")'
+alias debian.packages_custom='debian.packages_custom_get $(grep ^system_type ~/.system.conf | cut -f"2-" -d"=" | sed "s|[\"]||g")'
 alias debian.packages_by_size='dpkg-query -W --showformat="${Installed-Size;10}\t${Package}\n" | sort -k1,1n'
 alias debian.package_configfiles='dpkg-query -f "\n${Package} \n${Conffiles}\n" -W'
 
 # logs
 alias log.dmesg='dmesg -T --color=auto'
-alias log.pidgin='find ~/.purple/logs/ -type f -mtime -1 | xargs tail -n 5'
+alias log.pidgin='find ~/.purple/logs/ -type f -mtime -5 | xargs tail -n 5'
 alias log.NetworkManager='sudo journalctl -u NetworkManager'
 
 # find
@@ -113,9 +113,13 @@ alias synergy.start='kill.synergy ; synergys.custom ; synergyc.custom'
 alias kill.synergy='killall -9 synergyc synergys 2>/dev/null ; true'
 
 # show.*
-alias show.ip_remote='addr=$( dig +short myip.opendns.com @resolver1.opendns.com | grep.ip ) ; echo ${addr:-$( wget -q -O- icanhazip.com | grep.ip )}'
-alias show.ip_local='LANG=C /sbin/ifconfig | grep -o -e "^[^\ ]*" -e "^\ *inet addr:\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}" | tr "\n" " " | sed -e "s|\ *inet addr||g" -e "s|\ |\n|g" -e "s|:|: |g" | grep.ip --color=auto'
-alias show.ip='show.ip_local ; echo -e "remote: $( color red_background )$( show.ip_remote )"'
+alias show.ip_remote='addr=$( dig +short myip.opendns.com @resolver1.opendns.com | grep.ip ) ; echo remote:${addr:-$( wget -q -O- icanhazip.com | grep.ip )}'
+alias show.ip_local='LANG=C /sbin/ifconfig | grep -o -e "^[^\ ]*" -e "^\ *inet addr:\([0-9]\{1,3\}\.\)\{3\}[0-9]\{1,3\}" | tr "\n" " " | sed -e "s|\ *inet addr||g" -e "s|\ |\n|g"' #-e "s|:\(.*\)$|: $( color yellow )\1$( color none )|g"'
+alias show.ip='show.ip_local | sed "s|:\(.*\)$|: $( color yellow )\1$( color none )|g" ; show.ip_remote | sed "s|:\(.*\)$|: $( color green )\1$( color none )|g"'
+for tmpname in $( /sbin/ifconfig | grep -o "^[^ ]*" ) ; do
+    alias show.${tmpname}="$( echo /sbin/ifconfig ${tmpname} )"
+done
+
 alias show.io='echo -n d | nmon -s 1'
 alias show.tcp='sudo netstat -atp'
 alias show.tcp_stats='sudo netstat -st'
@@ -124,6 +128,10 @@ alias show.udp_stats='sudo netstat -su'
 alias show.window_class='xprop | grep CLASS'
 alias show.resolution='LANG=C xrandr -q | grep -o "current [0-9]\{3,4\} x [0-9]\{3,4\}" | sed -e "s|current ||g" -e "s|\ ||g"'
 alias show.certs='openssl s_client -connect ' 
+
+# debug
+alias debug.bashrc='export BASH_DEBUG=true ; . ${HOME}/.bashrc && echo "bashrc reloaded with BASH_DEBUG=true"'
+
 
 # tools
 alias ssh.untrusted='ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
@@ -188,4 +196,6 @@ alias permissions.normalize_web="chown \${SUDO_USER:-\$USER}:www-data . -R ; fin
 #alias youtube="clive -f best --exec=\"( echo %f | grep -qi -e 'webm$' -e 'webm.$' ) && ( echo >&2 ; echo '[CONVERTING] %f ==> MP4' >&2 ; ffmpeg -loglevel error -i %f -strict experimental %f.mp4 && rm -f %f )\""
 #alias image2pdf='convert -adjoin -page A4 *.jpeg multipage.pdf'				# convert images to a multi-page pdf
 #nrg2iso() { dd bs=1k if="$1" of="$2" skip=300 }
+
+unset tmpname
 
