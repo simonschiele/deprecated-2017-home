@@ -240,3 +240,11 @@ GIT_AUTHOR_NAME='Simon Schiele'
 
 # }}}
 
+# {{{ python 
+
+export PYTHONSTARTUP=~/.pythonrc.py
+
+
+# }}}
+
+
