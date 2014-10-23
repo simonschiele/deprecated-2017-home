@@ -136,7 +136,7 @@ debian.packages_custom_get() {
 # {{{ scan.hosts()
 
 function scan.hosts() { 
-    local interface=$( LANG=C /sbin/route -n | grep ' UG ' | grep -o '[^ ]*$' )
+    local interface=$( LANG=C /sbin/route -n | grep ' UG ' | grep -o '[^ ]*$' | head -n 1 )
     local network="$( LANG=C /sbin/ifconfig ${interface} | grep -o 'inet addr[^ ]*' | grep -o '[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.' )0/24"
     fping -q -a -g ${network} | while read ip ; do 
         echo -ne "${ip}\t"
@@ -202,7 +202,6 @@ function confirm.keypress() {
 }
 
 # }}}
-
 
 # {{{ whereami()
 function whereami() {
