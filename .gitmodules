@@ -61,3 +61,6 @@
 [submodule ".lib/gitslave"]
 	path = .lib/gitslave
 	url = git://git.code.sf.net/p/gitslave/code
+[submodule ".lib/markdown2confluence"]
+	path = .lib/markdown2confluence
+	url = https://github.com/jedi4ever/markdown2confluence
