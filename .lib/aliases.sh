@@ -59,6 +59,7 @@ alias find.last_edited='find . -type f -printf "%T@ %T+ %p\n" | sort -n | tail -
 alias find.last_accessed=''
 alias find.tree='find . -print | sed -e "s;[^/]*/;|__;g;s;__|; |;g"'
 alias find.deadlinks='find -L -type l'
+alias find.repos='find . -name ".git" -or -name ".svn" -or -name ".bzr" -or -name ".hg" | while read dir ; do echo "$dir" | sed "s|\(.\+\)/\.\([a-z]\+\)$|\2: \1|g" ; done'
 
 # date/time stuff
 alias date.format='date --help | sed -n "/^FORMAT/,/%Z/p"'
@@ -102,10 +103,6 @@ alias mplayer_right='mplayer -xineramascreen 1'
 alias alsa.silent='for mix in PCM MASTER Master ; do amixer -q sset $mix 0 2>/dev/null ; done'
 alias alsa.unsilent='for mix in PCM MASTER Master ; do amixer -q sset $mix 90% 2>/dev/null ; done'
 alias no.sound='alsa.unsilent'
-alias screenshot='import -display :0 -window root ./screenshot-$(date +%Y-%m-%d_%s).png'
-alias screendump='ffmpeg -f x11grab -s wxga -r 25 -i :0.0 -sameq ./screendump-$(date +%Y-%m-%d_%s).mpg'
-alias screendump2='ffmpeg -f alsa -i hw:1,1 -f x11grab -r 30 -s 800x600 -i :0.0 -acodec pcm_s16le -vcodec libx264 -preset ultrafast -threads 0 output.avi'
-alias screenvideo='screendump'
 
 # synergy
 alias synergys.custom='[ -e ~/.synergy/$( hostname -s ).conf ] && synergys --daemon --restart --display ${DISPLAY:-:0} --config ~/.synergy/$( hostname -s ).conf 2> ~/.log/synergys.log >&2 || echo "no config for this host available"'
@@ -170,6 +167,23 @@ if ( grep -iq 'minit' /proc/cmdline ) ; then
     alias reboot='sudo minit-shutdown -r &'
     alias halt='sudo minit-shutdown -h'
 fi
+
+if ( which recordmydesktop >/dev/null ) ; then
+    alias screendump='recordmydesktop -o screendump_$( date +%s ).ogv'
+else
+    alias screendump='ffmpeg -f x11grab -s wxga -r 25 -i :0.0 -sameq ./screendump-$(date +%Y-%m-%d_%s).mpg'
+    alias screendump2='ffmpeg -f alsa -i hw:1,1 -f x11grab -r 30 -s 800x600 -i :0.0 -acodec pcm_s16le -vcodec libx264 -preset ultrafast -threads 0 output.avi'
+fi
+
+if ( which gnome-screenshot >/dev/null ) ; then
+    alias screenshot=gnome-screenshot
+else
+    alias screenshot='import -display :0 -window root ./screenshot-$(date +%Y-%m-%d_%s).png'
+fi
+
+alias record.screendump=screendump
+alias record.screenvideo=screendump
+alias record.screenshot=screenshot
 
 # sorgenkinder
 alias show.open_ports='echo -e "User:      Command:   Port:\n----------------------------" ; sudo "lsof -i 4 -P -n | grep -i listen | awk {\"print \$3, \$1, \$9\"} | sed \"s| [a-z0-9\.\*]*:| |\" | sort -k 3 -n | xargs printf \"%-10s %-10s %-10s\n\"" | uniq'

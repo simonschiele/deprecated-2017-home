@@ -1,6 +1,0 @@
-#!/bin/bash
-if [ ${1:0:1} == "-" ]; then
-    exec env LANG=en_EN /usr/bin/man $*
-else
-    exec vi --cmd 'let g:loaded_autosess=1' -c "ViewDocMan $*" -c tabonly
-fi

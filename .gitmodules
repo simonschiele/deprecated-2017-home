@@ -4,9 +4,6 @@
 [submodule ".config/awesome"]
 	path = .config/awesome
 	url = http://simon.psaux.de/git/awesome.git
-[submodule ".lib/TickTick"]
-	path = .lib/TickTick
-	url = https://github.com/kristopolous/TickTick
 [submodule ".lib/git-prompt"]
 	path = .lib/git-prompt
 	url = git://github.com/lvv/git-prompt.git
@@ -40,9 +37,6 @@
 [submodule ".lib/gnome-terminal-colors-solarized"]
 	path = .lib/gnome-terminal-colors-solarized
 	url = https://github.com/sigurdga/gnome-terminal-colors-solarized.git
-[submodule ".lib/vim-colors-solarized"]
-	path = .lib/vim-colors-solarized
-	url = https://github.com/altercation/vim-colors-solarized.git
 [submodule ".lib/zsh-antigen"]
 	path = .lib/zsh-antigen
 	url = https://github.com/zsh-users/antigen.git
