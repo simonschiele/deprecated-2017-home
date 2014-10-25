@@ -55,3 +55,6 @@
 [submodule ".lib/markdown2confluence"]
 	path = .lib/markdown2confluence
 	url = https://github.com/jedi4ever/markdown2confluence
+[submodule ".lib/solarized-tmux"]
+	path = .lib/solarized-tmux
+	url = https://github.com/seebi/tmux-colors-solarized.git
