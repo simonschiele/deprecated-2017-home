@@ -58,3 +58,6 @@
 [submodule ".lib/solarized-tmux"]
 	path = .lib/solarized-tmux
 	url = https://github.com/seebi/tmux-colors-solarized.git
+[submodule ".lib/fzf"]
+	path = .lib/fzf
+	url = https://github.com/junegunn/fzf.git
