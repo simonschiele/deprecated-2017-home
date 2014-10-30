@@ -1,0 +1,64 @@
+[global_config]
+  custom_url_handler = google-chrome
+  enabled_plugins = CustomCommandsMenu, SearchPlugin, APTURLHandler
+  focus = mouse
+  use_custom_url_handler = True
+  suppress_multiple_term_dialog = True
+  title_transmit_bg_color = "#3ec800"
+  inactive_color_offset = 0.63
+[keybindings]
+  cycle_prev = None
+  next_tab = None
+  close_window = None
+  group_tab = None
+  resize_left = None
+  rotate_ccw = None
+  reset_clear = None
+  go_right = None
+  resize_right = None
+  resize_down = None
+  toggle_zoom = None
+  group_all = None
+  move_tab_right = None
+  prev_tab = None
+  split_vert = None
+  ungroup_all = None
+  ungroup_tab = None
+  cycle_next = None
+  go_prev = None
+  close_term = None
+  go_next = None
+  go_left = None
+  hide_window = None
+  reset = <Primary><Shift>r
+  go_up = None
+  resize_up = None
+  rotate_cw = None
+  split_horiz = None
+  go_down = None
+  new_window = <Primary><Shift>n
+  move_tab_left = None
+  toggle_scrollbar = None
+[profiles]
+  [[default]]
+    scrollbar_position = hidden
+    palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
+    font = PragmataPro for Powerline 10
+    background_image = None
+    urgent_bell = True
+    use_system_font = False
+    foreground_color = "#839496"
+    show_titlebar = False
+    copy_on_selection = True
+    background_color = "#002b36"
+    scrollback_infinite = True
+[layouts]
+  [[default]]
+    [[[child1]]]
+      type = Terminal
+      parent = window0
+      profile = default
+    [[[window0]]]
+      type = Window
+      parent = ""
+[plugins]
