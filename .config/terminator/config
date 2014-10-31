@@ -47,6 +47,7 @@
     background_image = None
     urgent_bell = True
     use_system_font = False
+    cursor_color = "#59fd5c"
     foreground_color = "#839496"
     show_titlebar = False
     copy_on_selection = True
