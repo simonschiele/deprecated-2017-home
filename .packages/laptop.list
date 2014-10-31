@@ -5,6 +5,6 @@
 # System
 Security: kismet
 Wifi: wireless-tools
-Power: acpid tpb upower
+Power: acpid tpb upower powertop
 Tools: mosh tpb
 # ------------------------------------------------------------------------
