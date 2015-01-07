@@ -1,0 +1,43 @@
+#!/bin/bash
+
+if [[ -z "$@" ]] || ( echo "$@" | grep -q "\-h" ) ; then
+    echo "use like ssh (except commands, they are not supported):"
+    echo "> ssh.dirty [options] [user@]hostname"
+    exit 0
+fi
+
+domain=${@: -1}
+if ( echo "${domain}" | grep -q "@" ) ; then
+    user=$( echo "$domain" | cut -f'1' -d'@' )
+    domain=$( echo "$domain" | cut -f'2' -d'@' )
+fi
+
+if ( ! which fping >/dev/null ) ; then
+    echo "fping not found" >&2
+    exit 1
+fi
+
+while ( ! fping -q $domain ) ; do
+    echo "Waiting for $domain..."
+    sleep 5
+done
+
+if ( which figlet >/dev/null ) ; then
+    echo "$domain online" | figlet
+else
+    echo -e "\n\n !!!!! $domain ONLINE !!!!!!\n\n"
+fi
+
+case "$( basename ${0} )" in
+    ssh.wait) 
+        ssh $@
+        ;; 
+    ssh.wait+untrusted|ssh.untrusted)
+        ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $@
+        ;; 
+    *) 
+        echo "unknown symlink $0"
+        exit 1 
+        ;;
+esac
+
