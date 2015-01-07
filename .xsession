@@ -1,8 +1,21 @@
 #!/bin/sh
 
-cp -f ${HOME}/.xsession-errors ${HOME}/.xsession-errors.old 2>/dev/null >&2
-echo "[date] starting xorg > policy/key stuff > awesome" > ${HOME}/.xsession-errors
+# DOTFILE: ~/.xsession
+# by Simon Schiele <simon.codingmonkey@googlemail.com>
 
+# ghetto-rotate .xsession-errors 
+cp -f ${HOME}/.xsession-errors ${HOME}/.xsession-errors.old 2>/dev/null >&2
+echo "[`date`] starting .xsession" > ${HOME}/.xsession-errors
+
+#########
+# Input
+#########
+
+# Pass -ardelay 250 -arinterval 20 to X server instead.
+#xset r on
+#xset r rate 250 50
+
+# kill keyring
 for process in polkit-gnome-authentication-agent-1 gnome-keyring-daemon
 do
     if ( ps -C $process 2>/dev/null >&2 )
@@ -12,6 +25,7 @@ do
     fi
 done
 
+# start polkit-gnome-authentication-agent + gnome-keyring-daemon
 /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
 eval "$( gnome-keyring-daemon --start --components=keyring,pkcs11,ssh,secrets )"
 export GNOME_KEYRING_PID
@@ -22,6 +36,7 @@ if test "$( hostname -s )" = "simon-work" ; then
     xrandr --output HDMI1 --left-of VGA1
 fi
 
+# launch awesome
 #exec ck-launch-session dbus-launch --sh-syntax --exit-with-session awesome 2>>${HOME}/.xsession-errors >&2
 exec dbus-launch --exit-with-session awesome 2>>${HOME}/.xsession-errors >&2
 
