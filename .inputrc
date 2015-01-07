@@ -1,22 +1,16 @@
 
 $include /etc/inputrc
 
-# set show-all-if-ambiguous on
-# set show-all-if-unmodified on
+# no beep
+set show-all-if-ambiguous on
 set bell-style none
+
+# not sure anymore...
+# set show-all-if-unmodified on
 set prefer-visible-bell off
 set echo-control-characters off
 set bind-tty-special-chars on
 set mark-symlinked-directories on
-
-#$if Bash
-  # F10 toggles mc on and off
-  # Note Ctrl-o toggles panes on and off in mc
-#  "\e[21~": "mc\C-M"
-
-  # do history expansion when space entered
-#  Space: magic-space
-#$endif
 
 # By default up/down are bound to previous-history
 # and next-history respectively. The following does the
@@ -29,7 +23,7 @@ set mark-symlinked-directories on
 #"\e[B": history-search-forward
 #"\e[A": history-search-backward
 
-"\C-w": unix-filename-rubout
-#"": unix-filename-rubout
-"\C-x*": glob-expand-word
+# "\C-w": unix-filename-rubout
+# "": unix-filename-rubout
+# "\C-x*": glob-expand-word
 
