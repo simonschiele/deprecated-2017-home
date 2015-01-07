@@ -61,3 +61,6 @@
 [submodule ".lib/fzf"]
 	path = .lib/fzf
 	url = https://github.com/junegunn/fzf.git
+[submodule ".lib/git-hub"]
+	path = .lib/git-hub
+	url = https://github.com/github/hub
