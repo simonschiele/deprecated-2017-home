@@ -11,7 +11,7 @@ Tools: multitail lshw
 
 # ------------------------------------------------------------------------
 # Development
-Build tools: build-essential make cmake automake1.9 rake 
+Build tools: build-essential make cmake automake1.9 rake module-assistant
 Database: sqlite3
 Tools: xmlstarlet
 # ------------------------------------------------------------------------
