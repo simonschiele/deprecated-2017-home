@@ -1,13 +1,23 @@
 [core]
     quotepath = off
+    editor = vim
 [user]
     email = simon.schiele@ypsilon.net
     name = Simon Schiele
 [merge]
     tool = vimdiff
+    ff = only
 [color]
     ui = auto
     interactive = auto
+    branch = true
+    diff = true
+    grep = true
+    interactive = true
+    pager = true
+    showbranch = true
+    status = true
+    ui = true
 [alias]
     sortdiff = !sh -c 'git diff "$@" | grep "^[+-]" | sort --key=1.2 | uniq -u -s1'
     lastdiff = difftool HEAD^1..HEAD
@@ -37,4 +47,5 @@
     serve = daemon --base-path=. --export-all --reuseaddr --informative-errors --verbose
     hub = daemon --base-path=. --export-all --enable=receive-pack --reuseaddr --informative-errors --verbose
 [push]
-    default = matching
+    default = current
+
