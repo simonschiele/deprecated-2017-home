@@ -64,3 +64,6 @@
 [submodule ".lib/git-hub"]
 	path = .lib/git-hub
 	url = https://github.com/github/hub
+[submodule ".essentials"]
+	path = .essentials
+	url = https://github.com/simonschiele/essentials.git
