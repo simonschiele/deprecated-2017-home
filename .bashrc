@@ -28,23 +28,28 @@ for include in ; do
 done
 
 # verify essentials are loaded
-if [ -z "${ESSENTIALS_DIR}" ] ; then
+if [ -n "${ESSENTIALS_DIR}" ] ; then
+    export ESSENTIALS=true
+
+    # if essential debug is enabled, print banner + infos
+    if ( ${ESSENTIALS_DEBUG} ) ; then
+        es_info
+    fi
+else
     echo "[ERROR] essentials not loaded, loading failover defaults" >&2
     export ESSENTIALS=false
-    
+
     # defaults applications
     export PAGER=more
     export EDITOR=$( which vim.nox )
     export EDITOR=${EDITOR:-$( which vim )}
     export EDITOR=${EDITOR:-$( which vi )}
-    
+
     # applications overwrite
     alias sudo='sudo '
     alias cp='cp -i'
     alias mv='mv -i'
     alias rm='rm -i'
-else
-    export ESSENTIALS=true
 fi
 
 # }}}
