@@ -29,8 +29,20 @@ done
 
 # verify essentials are loaded
 if [ -z "${ESSENTIALS_DIR}" ] ; then
-    echo "[ERROR] essentials not loaded" >&2
+    echo "[ERROR] essentials not loaded, loading failover defaults" >&2
     export ESSENTIALS=false
+    
+    # defaults applications
+    export PAGER=more
+    export EDITOR=$( which vim.nox )
+    export EDITOR=${EDITOR:-$( which vim )}
+    export EDITOR=${EDITOR:-$( which vi )}
+    
+    # applications overwrite
+    alias sudo='sudo '
+    alias cp='cp -i'
+    alias mv='mv -i'
+    alias rm='rm -i'
 else
     export ESSENTIALS=true
 fi
