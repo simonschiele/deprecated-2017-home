@@ -1,13 +1,22 @@
 
-[ -z "$PS1" ] || [ -z "$BASH_VERSION" ] && return
+if [ -z "$PS1" ] || [ -z "$BASH_VERSION" ] ; then
+    echo "ERROR: shell is not BASH" >&2
+    return 1
+fi
 
 # {{{ Includes + PATH
 
 # add local bin-directories to PATH
 tmpname="bin .bin .bin-ypsilon .bin-private"
 tmpname+=" node_modules/.bin .node_modules/.bin"
-for bin in $tmpname ; do
-    [ -d ${HOME}/${bin} ] && PATH="${bin/#/${HOME}/}:${PATH}"
+for dir in $tmpname ; do
+    [ -d ${HOME}/${dir} ] && PATH="${dir/#/${HOME}/}:${PATH}"
+done
+
+# source logout scripts
+tmpname=".logout .bash_logout .shell_logout"
+for include in ; do
+    [ -r ${include} ] && trap ${include/#/${HOME}/} 0 && break
 done
 
 # source helpers, libs, ...
@@ -19,12 +28,6 @@ for include in $tmpname ; do
     else
         echo "[WARNING] include ${include} not found" >&2
     fi
-done
-
-# source logout scripts
-tmpname=".logout .bash_logout .shell_logout"
-for include in ; do
-    [ -r ${include} ] && trap ${include/#/${HOME}/} 0 && break
 done
 
 # verify essentials are loaded
@@ -102,5 +105,5 @@ if [ -z "${debian_chroot}" ] && [ -r /etc/debian_chroot ]; then
 fi
 
 # cleanup
-unset bin include tmpname
+unset dir include tmpname
 
