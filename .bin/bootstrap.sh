@@ -2,7 +2,7 @@
 #
 # Author: Simon Schiele (simon.codingmonkey@googlemail.com)
 #
-# This script creates a ready-to-use debian installation, based on debootstrap, 
+# This script creates a ready-to-use debian installation, based on debootstrap,
 # parted, cryptsetup, ...
 #
 # Check the help text for usage details
@@ -13,7 +13,7 @@ LANG=C
 SCRIPTNAME=$( basename ${0} )
 
 declare -A LAYOUTS
-LAYOUTS=( 
+LAYOUTS=(
     [micro,boot]=64 [micro,swap]=256 [micro,auto_min]=990
     [mini,boot]=128 [mini,swap]=1024 [mini,auto_min]=3990
     [small,boot]=900 [small,swap]=2048 [small,auto_min]=7990
@@ -42,10 +42,11 @@ BOOTSTRAP_PACKAGES=${BOOTSTRAP_PACKAGES}
 REPO_GIT="git@simon.psaux.de"
 REPO_WEB="http://simon.psaux.de/git"
 
-DEPENDS="parted debootstrap cryptsetup"
-DEBIAN_DEPENDS="e2fsprogs qemu-utils git"
+DEPENDS="wget parted debootstrap cryptsetup git"
+DEBIAN_DEPENDS="e2fsprogs qemu-utils"
 MIN_SIZE=1024
 
+SILENT=false
 VERBOSE=false
 NOCOLOR=false
 COLORING=false
@@ -54,8 +55,6 @@ CONFIG=false
 KEEP=false
 SUDO=""
 CLEANUP=( )
-
-# {{{ usage(), settings()
 
 function usage() {
     echo
@@ -68,10 +67,11 @@ function usage() {
     echo " -k | --keep          | dont't umount chroot and don't delete tmpDir"
     echo " -c | --config        | show config values"
     echo " -v | --verbose       | activate verbose mode"
+    echo " -s | --silent        | silent mode (no in-/output at all)"
     echo " -n | --nocolor       | disable coloring"
     echo
     echo "Configuration of the bootstrap settings itself, via environment like this:"
-    echo " > export BOOTSTRAP_SIMON=\"true\""        #todo: remove this line
+    echo " > export BOOTSTRAP_SIMON=\"true\""
     echo " > export BOOTSTRAP_HOSTNAME=\"testhost.cnet.loc\""
     echo " > export BOOTSTRAP_MIRROR=\"http://localhost:3142/debian\""
     echo " > export BOOTSTRAP_SUITE=\"unstable\""
@@ -94,35 +94,35 @@ function usage() {
     echo -e "\tBOOTSTRAP_LAYOUT\t\t(like \"small,medium,big\")"
     echo -e "\tBOOTSTRAP_PACKAGES\t\t(like \"emacs,mercurial\")"
     echo
-    
+
     if ( ! $VERBOSE ) ; then
         echo "To list available layouts, systemtypes, ... call in verbose mode:"
-        echo " > $SCRIPTNAME --help --verbose" 
+        echo " > $SCRIPTNAME --help --verbose"
         echo "The help, verbose and config flag can be used combined:"
-        echo " > $SCRIPTNAME -h -v -c" 
-        echo 
+        echo " > $SCRIPTNAME -h -v -c"
+        echo
     else
         echo "Possible layouts:"
         get_layouts | sed 's|^|\t|g'
         echo -e "\tauto|empty (selects one of the above based on device/image size)"
-        echo 
-    
+        echo
+
         echo "Possible Systemtypes:"
         gitweb_ls "home.git" ".packages" | sort -u | sed -e 's|^|\t|g' -e 's|\.list||g'
-        echo 
+        echo
     fi
 
     if ( ! $CONFIG ) ; then
         echo "To see the actual config, start with --config flag:"
-        echo " > $SCRIPTNAME --config" 
+        echo " > $SCRIPTNAME --config"
         echo ""
         echo "The help, verbose and config flag can be used combined:"
-        echo " > $SCRIPTNAME -h -v -c" 
-        echo 
+        echo " > $SCRIPTNAME -h -v -c"
+        echo
     else
         echo "Settings at the moment:"
         settings | sed 's|^|\t|g'
-        echo 
+        echo
     fi
 
     exit 0
@@ -138,15 +138,11 @@ function settings() {
         | sed 's|@@@|\ |g'
 }
 
-# }}}
-
-# {{{ output(), error(), debug(), warning(), log() 
-
 function output() {
     local msg="${1:-'Unknown Message'}"
     local msgType=${2:-"DEBUG"}
     local newline=${3:-true}
-    
+
     if ( $newline ) ; then
         local echo="echo"
     else
@@ -187,8 +183,6 @@ function log() {
     output "${@:-'Unknown Log'}" "LOG"
 }
 
-# }}}
-
 # {{{ get_layouts(), get_layout_by_size(), get_layout()
 
 function get_layouts() {
@@ -201,12 +195,12 @@ function get_layouts() {
         fi
     done
     unset seen
-} 
+}
 
 function get_layout_by_size() {
     local size=${1:-${BOOTSTRAP_TARGET_SIZE}}
     local nearest=0
-    
+
     for lay in $( get_layouts ) ; do
         auto=$( get_layout $lay "auto_min" )
         if [ ${auto:-0} -gt ${nearest:-0} ] && [ ${auto:-0} -le ${size:-0} ]; then
@@ -221,7 +215,7 @@ function get_layout() {
     local layout=${1:-unknown}
     local part=${2:-all}
     get_layouts | grep -q "^${layout}$" || error "layout not found"
-    
+
     [ "$part" = "all" ] || [ "$part" = "boot" ] && echo "${LAYOUTS[$layout,boot]}"
     [ "$part" = "all" ] || [ "$part" = "swap" ] && echo "${LAYOUTS[$layout,swap]}"
     [ "$part" = "all" ] || [ "$part" = "spare" ] && echo "${LAYOUTS[$layout,spare]}"
@@ -277,12 +271,12 @@ function get_credentials() {
     fi
 
     output "Password for user '${BOOTSTRAP_USERNAME}', first time: " "CREDENTIALS" "false"
-    read -s pass_user ; echo 
+    read -s pass_user ; echo
     output "Password for user '${BOOTSTRAP_USERNAME}', second time: " "CREDENTIALS" "false"
     read -s pass_user_again ; echo
 
     if [ "x${pass_user}" != "x${pass_user_again}" ] ; then
-        error "user pass missmatch"
+        error "passwords weren't the same"
     fi
 }
 
@@ -296,14 +290,14 @@ function get_confirmation() {
     else
         return 0
     fi
-} 
+}
 
 # }}}
 
 # {{{ gitweb_ls(), gitweb_file(), gitweb_packagelist()
 
 function gitweb_ls() {
-    wget -q -O- ${REPO_WEB}/${1:-home.git}/tree/${2} | tr '\n' ' ' | grep -o '<a[^\<]*</a>' | grep 'ls-' | sed 's|.*>\(.*\)<.*|\1|g' 
+    wget -q -O- ${REPO_WEB}/${1:-home.git}/tree/${2} | tr '\n' ' ' | grep -o '<a[^\<]*</a>' | grep 'ls-' | sed 's|.*>\(.*\)<.*|\1|g'
 }
 
 function gitweb_file() {
@@ -324,45 +318,28 @@ function gitweb_packagelist() {
 
 # }}}
 
-# {{{ check_systemtype(), check_config(), check_target_type(), check_target()
-
 function check_systemtype() {
     gitweb_ls "home.git" ".packages" | grep -q "^${BOOTSTRAP_SYSTEMTYPE}.list$"
 }
 
 function check_config() {
-    [ -z "${BOOTSTRAP_SIMON}" ] && BOOTSTRAP_SIMON=false
     [ "${BOOTSTRAP_SIMON}" != "true" ] && [ "${BOOTSTRAP_SIMON}" != "false" ] && BOOTSTRAP_SIMON=false
-
-    [ -z "${BOOTSTRAP_RAID}" ] && BOOTSTRAP_RAID=false
     [ "${BOOTSTRAP_RAID}" != "true" ] && [ "${BOOTSTRAP_RAID}" != "false" ] && BOOTSTRAP_RAID=false
-
     [ "${BOOTSTRAP_SSD}" != "true" ] && [ "${BOOTSTRAP_SSD}" != "false" ] && BOOTSTRAP_SSD=false
-    [ -z "${BOOTSTRAP_SSD}" ] && BOOTSTRAP_SSD=false
-    
     [ "${BOOTSTRAP_SWAP}" != "true" ] && [ "${BOOTSTRAP_SWAP}" != "false" ] && BOOTSTRAP_SWAP=false
-    [ -z "${BOOTSTRAP_SWAP}" ] && BOOTSTRAP_SWAP=false
-
     [ "${BOOTSTRAP_PACKAGES_SYSTEMTYPE}" != "true" ] && [ "${BOOTSTRAP_PACKAGES_SYSTEMTYPE}" != "false" ] && BOOTSTRAP_PACKAGES_SYSTEMTYPE=false
-    [ -z "${BOOTSTRAP_PACKAGES_SYSTEMTYPE}" ] && BOOTSTRAP_PACKAGES_SYSTEMTYPE=false
+    [ -z "${BOOTSTRAP_USERNAME}" ] && error "BOOTSTRAP_USERNAME empty. please configure. have a look at --help."
+    [ -z "${BOOTSTRAP_TARGET}" ] && error "BOOTSTRAP_TARGET empty. please configure. have a look at --help."
+    [ -z "${BOOTSTRAP_ARCH}" ] && error "BOOTSTRAP_ARCH empty. please configure. have a look at --help."
+    [ -z "${BOOTSTRAP_SUITE}" ] && error "BOOTSTRAP_SUITE empty. please configure. have a look at --help."
+    [ -z "${BOOTSTRAP_MIRROR}" ] && error "BOOTSTRAP_MIRROR empty. please configure. have a look at --help."
+    [ -z "${BOOTSTRAP_COMPONENTS}" ] && error "BOOTSTRAP_COMPONENTS empty. please configure. have a look at --help."
 
     [ -z "${BOOTSTRAP_HOSTNAME}" ] && error "BOOTSTRAP_HOSTNAME empty. please configure. have a look at --help."
     [[ "$BOOTSTRAP_HOSTNAME" =~ "." ]] || warning "Configured Hostname 'BOOTSTRAP_HOSTNAME' without domain"
 
     [ -z "${BOOTSTRAP_SYSTEMTYPE}" ] && error "BOOTSTRAP_SYSTEMTYPE empty. please configure. have a look at --help."
     check_systemtype "${BOOTSTRAP_SYSTEMTYPE}" || error "no packagelist for systemtype '${BOOTSTRAP_SYSTEMTYPE}'"
-
-    [ -z "${BOOTSTRAP_USERNAME}" ] && error "BOOTSTRAP_USERNAME empty. please configure. have a look at --help."
-
-    [ -z "${BOOTSTRAP_TARGET}" ] && error "BOOTSTRAP_TARGET empty. please configure. have a look at --help."
-
-    [ -z "${BOOTSTRAP_ARCH}" ] && error "BOOTSTRAP_ARCH empty. please configure. have a look at --help."
-
-    [ -z "${BOOTSTRAP_SUITE}" ] && error "BOOTSTRAP_SUITE empty. please configure. have a look at --help."
-
-    [ -z "${BOOTSTRAP_MIRROR}" ] && error "BOOTSTRAP_MIRROR empty. please configure. have a look at --help."
-
-    [ -z "${BOOTSTRAP_COMPONENTS}" ] && error "BOOTSTRAP_COMPONENTS empty. please configure. have a look at --help."
 
     if ( ${BOOTSTRAP_PACKAGES_SYSTEMTYPE} ) ; then
         debug "BOOTSTRAP_PACKAGES loaded via systemtype '$BOOTSTRAP_SYSTEMTYPE'"
@@ -380,7 +357,7 @@ function check_target_type() {
     else
         error "couldn't define BOOTSTRAP_TARGET_TYPE"
     fi
-} 
+}
 
 function check_target() {
     if [ "${BOOTSTRAP_TARGET}" = "/dev/sdX" ] ; then
@@ -388,12 +365,12 @@ function check_target() {
     elif [ ! -e ${BOOTSTRAP_TARGET} ] ; then
         error "target device ${BOOTSTRAP_TARGET} not found"
     fi
-    
+
     check_target_type
     debug "target device type: ${BOOTSTRAP_TARGET_TYPE}"
-    
+
     if [ "${BOOTSTRAP_TARGET_TYPE}" = "image" ] ; then
-        
+
         if ! ( file "${BOOTSTRAP_TARGET}" | grep -qi -e "image" -e "boot sector" ) ; then
             error "'${BOOTSTRAP_TARGET}' doesn't seem to be a valid image file"
         fi
@@ -405,10 +382,10 @@ function check_target() {
     fi
 
     if [ "${BOOTSTRAP_TARGET_TYPE}" != "dir" ] ; then
-        
+
         BOOTSTRAP_TARGET_SIZE=$( ${SUDO} parted -sm ${BOOTSTRAP_TARGET} unit mb print 2>&1 | grep -o "^${BOOTSTRAP_TARGET}:[0-9]*" | cut -f'2' -d':' )
         debug "target device size: ${BOOTSTRAP_TARGET_SIZE}MB"
-        
+
         if [ ${BOOTSTRAP_TARGET_SIZE} -lt ${MIN_SIZE} ] ; then
             error "target device ${BOOTSTRAP_TARGET} to small. at least ${MIN_SIZE}MB are needed"
         fi
@@ -416,7 +393,7 @@ function check_target() {
         if [ -z "${BOOTSTRAP_LAYOUT}" ] ; then
             BOOTSTRAP_LAYOUT=$( get_layout_by_size )
         fi
-    
+
         if [ -z "${BOOTSTRAP_MOUNT}" ] ; then
             CLEANUP+=( temp_dir )
             BOOTSTRAP_MOUNT=$( mktemp -d )
@@ -431,20 +408,18 @@ function check_target() {
         elif [ $( ls -d ${BOOTSTRAP_TARGET}/* | wc -l ) -gt 0 ] ; then
             error "target dir '${BOOTSTRAP_TARGET}' not empty"
         fi
-        
+
         log "checking disk space on matching partition"
         free_space=$( df -m /boot/images/grml/boot/addons/bsd4grml/loopback.3 | tail -n 1 | awk {'print $4'} )
-        
+
         if [ ${MIN_SIZE} -lt ${free_space} ] ; then
             error "target device ${BOOTSTRAP_TARGET} to small. at least ${MIN_SIZE}MB are needed"
         fi
-        
+
         BOOTSTRAP_MOUNT=$BOOTSTRAP_TARGET
         BOOTSTRAP_LAYOUT=$( get_layout_by_size $free_space )
     fi
 }
-
-# }}}
 
 # {{{ getFreeDevice(), partition()
 
@@ -463,7 +438,7 @@ function getFreeDevice() {
 }
 
 function partition() {
-    
+
     boot=$( get_layout ${BOOTSTRAP_LAYOUT} boot )
     swap=$( get_layout ${BOOTSTRAP_LAYOUT} swap )
     spare=$( get_layout ${BOOTSTRAP_LAYOUT} spare )
@@ -472,23 +447,23 @@ function partition() {
 
     debug "writing gpt label to target"
     $SUDO parted -s ${BOOTSTRAP_TARGET} mklabel gpt #>> log/step1.log
-    
+
     debug "writing boot partition (${boot}mb)"
     $SUDO parted -s ${BOOTSTRAP_TARGET} mkpart primary 1M ${boot}M #>> log/step1.log
-    
+
     debug "writing root partition ($(( ${size} - ${swap:-0} - ${spare:-0} ))mb)"
     $SUDO parted -s ${BOOTSTRAP_TARGET} mkpart primary ${boot}M $(( ${size} - ${swap:-0} - ${spare:-0} ))M #>> log/step1.log
-    
+
     debug "writing swap partition (${swap}mb)"
     $SUDO parted -s ${BOOTSTRAP_TARGET} mkpart primary $(( ${size} - ${swap:-0} - ${spare:-0} ))M $(( ${size} - ${spare:-0} ))M #>> log/step1.log
-    
+
     if [ "$BOOTSTRAP_TARGET_TYPE" = 'image' ] ; then
         debug "setting sufix for image devices"
         suffix="p"
     else
         suffix=
     fi
-    
+
     # *sigh*
     sync >/dev/null 2>&1
     $SUDO sync >/dev/null 2>&1
@@ -497,9 +472,9 @@ function partition() {
     $SUDO partx -a /dev/nbd0 >/dev/null 2>&1
     kpartx /dev/nbd0 >/dev/null 2>&1
     $SUDO kpartx /dev/nbd0 >/dev/null 2>&1
-    
+
     if [ ! -e ${BOOTSTRAP_TARGET}${suffix}1 ] || [ ! -e ${BOOTSTRAP_TARGET}${suffix}2 ] || [ ! -e ${BOOTSTRAP_TARGET}${suffix}3 ] ; then
-        error "at least one partition not available: $( ls ${BOOTSTRAP_TARGET}${suffix}* )" 
+        error "at least one partition not available: $( ls ${BOOTSTRAP_TARGET}${suffix}* )"
     fi
 
 }
@@ -535,7 +510,7 @@ function cleanup_trap() {
                     output "skipping umounting bind mounts" "CLEANUP"
                 else
                     for d in boot/ proc sys dev/pts dev/ ; do
-                        output "umount ${BOOTSTRAP_MOUNT}/${d}" "CLEANUP" >/dev/null 2>&1 
+                        output "umount ${BOOTSTRAP_MOUNT}/${d}" "CLEANUP" >/dev/null 2>&1
                         $SUDO umount ${BOOTSTRAP_MOUNT}/${d} || warning "couldn't umount ${BOOTSTRAP_MOUNT}/${d}"
                     done
                 fi
@@ -570,10 +545,17 @@ function cleanup_trap() {
 
 # }}}
 
-# {{{ main 
+# {{{ check depends
 
-log "Starting Bootstrap"
-depends "wget" || error "depends 'wget' missing"
+for dep in ${DEPENDS} ; do
+    depends "${dep}" || error "depends '${dep}' missing"
+done
+
+for dep in ${DEBIAN_DEPENDS} ; do
+    depends "${dep}" "debian" || error "depends '${dep}' (debian package) missing"
+done
+
+# }}}
 
 # {{{ getopts
 
@@ -582,10 +564,11 @@ for arg ; do
     case "$arg" in
         --help)    args="${args}-h " ;;
         --verbose) args="${args}-v " ;;
+        --silent) args="${args}-s " ;;
         --nocolor) args="${args}-n " ;;
         --config)  args="${args}-c " ;;
         --keep)    args="${args}-k " ;;
-        
+
         # pass through anything else
         *) [[ "${arg:0:1}" == "-" ]] || delim="\""
             args="${args}${delim}${arg}${delim} ";;
@@ -597,6 +580,7 @@ while getopts ":hvnkc" opt ; do
     case $opt in
         h|\?) USAGE=true ;;
         v)  VERBOSE=true ;;
+        s)  SILENT=true ;;
         n)  NOCOLOR=true ;;
         c)  CONFIG=true ;;
         k)  KEEP=true ;;
@@ -607,16 +591,22 @@ done
 if ( $USAGE ) ; then
     usage
 elif ( $CONFIG ) ; then
-    echo "Settings at the moment:"
+    log "Settings at the moment:"
     settings | sed 's|^|\t|g'
-    echo 
-    exit 0 
+    echo
+    exit 0
 fi
 
 # }}}
 
-eval "$( gitweb_file 'home.git' '.lib/resources.sh' | grep -v '^#' )"
+# {{{ main
 
+log "Starting Bootstrap"
+
+# source 'resources.sh' from simons bash essentials, for color-stuff
+eval "$( gitweb_file 'essentials.git' 'resources.sh' | grep -v '^#' )" || NOCOLOR=true
+
+# set coloring
 if ( $NOCOLOR ) ; then
     debug "disabled coloring"
 else
@@ -624,41 +614,47 @@ else
     debug "activated coloring"
 fi
 
+# verify root permissions
 check_sudo
 
-for dep in ${DEPENDS} ; do
-    depends "${dep}" || error "depends '${dep}' missing"
-done
-
-for dep in ${DEBIAN_DEPENDS} ; do
-    depends "${dep}" "debian" || error "depends '${dep}' missing"
-done
-
+# verify & complete configuration
 check_config
+
+# verify target
 check_target
+
+# print settings
+log "Using these settings:"
+settings | while read i ; do
+    log "    ${i}"
+done
+
+# cleanup trap
+debug "starting cleanup_trap"
+trap cleanup_trap EXIT
+
+echo "....."
+echo "....."
+echo "....."
+echo "....."
+
+exit 23
 
 if ( ! $VERBOSE ) ; then
     get_credentials
     get_confirmation || error "Canceled by user"
 fi
 
-settings | while read i ; do
-    log "${i}"
-done
-
-debug "starting cleanup_trap"
-trap cleanup_trap EXIT
-
 if [ "${BOOTSTRAP_TARGET_TYPE}" != 'dir' ] ; then
     partition
     #todo: mount
 fi
 
-#todo: bootstrap
+#todo: bootstrap itself
 
 if ( ${BOOTSTRAP_SIMON} ) ; then
-    echo
-    #todo: repos, ...
+    echo -n
+    #todo: setup repos, ...
 fi
 
 #todo: system
