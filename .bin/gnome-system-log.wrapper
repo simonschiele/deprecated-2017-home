@@ -1,0 +1,18 @@
+#!/bin/bash
+LANG=C
+
+if ( ! which gksudo >/dev/null ) ; then
+    echo "gksudo not found"
+    exit 1
+fi
+
+if ( ! which gnome-system-log >/dev/null ) ; then
+    echo "gnome-system-log not found"
+    exit 1
+fi
+
+gksudo --preserve-env --description 'gnome-system-log' gnome-system-log \
+    /var/log/apache/** \
+    /var/log/snort/* \
+    /var/log/*.*
+
