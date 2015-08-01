@@ -2,7 +2,7 @@
     quotepath = off
     editor = vim
 [user]
-    email = simon.schiele@ypsilon.net
+    email = simon.codingmonkey@googlemail.com
     name = Simon Schiele
 [merge]
     tool = vimdiff
