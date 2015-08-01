@@ -43,24 +43,22 @@ else
     export ESSENTIALS=false
 
     # defaults applications
-    export PAGER=more
+    export PAGER=$( which less )
+    export PAGER=${PAGER:-more}
     export EDITOR=$( which vim.nox )
     export EDITOR=${EDITOR:-$( which vim )}
     export EDITOR=${EDITOR:-$( which vi )}
+    export EDITOR=${EDITOR:-$( which nano )}
 
     # applications overwrite
     alias sudo='sudo '
     alias cp='cp -i'
     alias mv='mv -i'
     alias rm='rm -i'
+
+    # <ctrl> + <e> - remove till last seperator
+    bind '\C-e:unix-filename-rubout'
 fi
-
-# }}}
-
-# {{{ Keybinds
-
-# ctrl+e - remove till last seperator
-bind '\C-e:unix-filename-rubout'
 
 # }}}
 
@@ -99,11 +97,14 @@ shopt -s histappend                 # append new history entries
 shopt -s progcomp                   # programmable completion
 #shopt -s no_empty_cmd_completion    # don't try to complete empty cmds
 
-# detect chroot (doesn't work)
+# detect chroot (doesn't work, need to find a better way...)
 if [ -z "${debian_chroot}" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$( cat /etc/debian_chroot )
 fi
 
 # cleanup
 unset dir include tmpname
+
+# can't remember what this was about
+export DE=generic
 
