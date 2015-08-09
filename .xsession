@@ -27,6 +27,7 @@ echo "[`date`] starting .xsession" > ${HOME}/.xsession-errors
 
 # start polkit-gnome-authentication-agent + gnome-keyring-daemon
 #/usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
+echo "starting + exporting gnome-keyring-daemon" >> ${HOME}/.xsession-errors
 pkill -9 gnome-keyring-daemon 2>/dev/null
 eval "$( gnome-keyring-daemon --start --components=keyring,pkcs11,ssh,secrets )"
 export GNOME_KEYRING_PID
@@ -39,5 +40,9 @@ fi
 
 # launch awesome
 #exec ck-launch-session dbus-launch --sh-syntax --exit-with-session awesome 2>>${HOME}/.xsession-errors >&2
+
+# launch i3
 exec dbus-launch --exit-with-session i3 2>>${HOME}/.xsession-errors >&2
+
+echo "[`date`] .xsession done" >> ${HOME}/.xsession-errors
 
