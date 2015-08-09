@@ -1,69 +1,69 @@
 [submodule ".vim"]
-	path = .vim
-	url = http://simon.psaux.de/git/dot.vim.git
+    path = .vim
+    url = https://github.com/simonschiele/dot.vim.git
 [submodule ".config/awesome"]
-	path = .config/awesome
-	url = http://simon.psaux.de/git/awesome.git
+    path = .config/awesome
+    url = https://github.com/simonschiele/awesome.git
 [submodule ".lib/git-prompt"]
-	path = .lib/git-prompt
-	url = git://github.com/lvv/git-prompt.git
+    path = .lib/git-prompt
+    url = git://github.com/lvv/git-prompt.git
 [submodule ".lib/git-flow-completion"]
-	path = .lib/git-flow-completion
-	url = https://github.com/bobthecow/git-flow-completion.git
+    path = .lib/git-flow-completion
+    url = https://github.com/bobthecow/git-flow-completion.git
 [submodule ".lib/powerline-fonts"]
-	path = .lib/powerline-fonts
-	url = https://github.com/Lokaltog/powerline-fonts.git
+    path = .lib/powerline-fonts
+    url = https://github.com/Lokaltog/powerline-fonts.git
 [submodule ".lib/gitflow"]
-	path = .lib/gitflow
-	url = https://github.com/nvie/gitflow
+    path = .lib/gitflow
+    url = https://github.com/nvie/gitflow
 [submodule ".lib/Smyck-Color-Scheme"]
-	path = .lib/Smyck-Color-Scheme
-	url = https://github.com/hukl/Smyck-Color-Scheme/
+    path = .lib/Smyck-Color-Scheme
+    url = https://github.com/hukl/Smyck-Color-Scheme/
 [submodule ".lib/vils-ng"]
-	path = .lib/vils-ng
-	url = https://github.com/simonschiele/vils-ng.git
+    path = .lib/vils-ng
+    url = https://github.com/simonschiele/vils-ng.git
 [submodule ".lib/cosmic-sans-neue"]
-	path = .lib/cosmic-sans-neue
-	url = https://github.com/belluzj/cosmic-sans-neue
+    path = .lib/cosmic-sans-neue
+    url = https://github.com/belluzj/cosmic-sans-neue
 [submodule ".lib/git-gui.git"]
-	path = .lib/git-gui.git
-	url = http://repo.or.cz/r/git-gui.git
+    path = .lib/git-gui.git
+    url = http://repo.or.cz/r/git-gui.git
 [submodule ".lib/dircolors-solarized"]
-	path = .lib/dircolors-solarized
-	url = https://github.com/seebi/dircolors-solarized.git
+    path = .lib/dircolors-solarized
+    url = https://github.com/seebi/dircolors-solarized.git
 [submodule ".lib/solarized"]
-	path = .lib/solarized
-	url = git://github.com/altercation/solarized.git
+    path = .lib/solarized
+    url = git://github.com/altercation/solarized.git
 [submodule ".lib/gnome-terminal-colors-solarized"]
-	path = .lib/gnome-terminal-colors-solarized
-	url = https://github.com/sigurdga/gnome-terminal-colors-solarized.git
+    path = .lib/gnome-terminal-colors-solarized
+    url = https://github.com/sigurdga/gnome-terminal-colors-solarized.git
 [submodule ".lib/zsh-antigen"]
-	path = .lib/zsh-antigen
-	url = https://github.com/zsh-users/antigen.git
+    path = .lib/zsh-antigen
+    url = https://github.com/zsh-users/antigen.git
 [submodule ".lib/extundelete"]
-	path = .lib/extundelete
-	url = git://git.code.sf.net/p/extundelete/code
+    path = .lib/extundelete
+    url = git://git.code.sf.net/p/extundelete/code
 [submodule ".lib/git-extras"]
-	path = .lib/git-extras
-	url = https://github.com/tj/git-extras.git
+    path = .lib/git-extras
+    url = https://github.com/tj/git-extras.git
 [submodule ".lib/giternal"]
-	path = .lib/giternal
-	url = https://github.com/patmaddox/giternal.git
+    path = .lib/giternal
+    url = https://github.com/patmaddox/giternal.git
 [submodule ".lib/gitslave"]
-	path = .lib/gitslave
-	url = git://git.code.sf.net/p/gitslave/code
+    path = .lib/gitslave
+    url = git://git.code.sf.net/p/gitslave/code
 [submodule ".lib/markdown2confluence"]
-	path = .lib/markdown2confluence
-	url = https://github.com/jedi4ever/markdown2confluence
+    path = .lib/markdown2confluence
+    url = https://github.com/jedi4ever/markdown2confluence
 [submodule ".lib/solarized-tmux"]
-	path = .lib/solarized-tmux
-	url = https://github.com/seebi/tmux-colors-solarized.git
+    path = .lib/solarized-tmux
+    url = https://github.com/seebi/tmux-colors-solarized.git
 [submodule ".lib/fzf"]
-	path = .lib/fzf
-	url = https://github.com/junegunn/fzf.git
+    path = .lib/fzf
+    url = https://github.com/junegunn/fzf.git
 [submodule ".lib/git-hub"]
-	path = .lib/git-hub
-	url = https://github.com/github/hub
+    path = .lib/git-hub
+    url = https://github.com/github/hub
 [submodule ".essentials"]
-	path = .essentials
-	url = https://github.com/simonschiele/essentials.git
+    path = .essentials
+    url = https://github.com/simonschiele/essentials.git
