@@ -107,5 +107,3 @@ unset dir include tmpname
 # can't remember what this was about - most likely java on i3
 export DE=generic
 
-echo "[running] $HOME/.bashrc" >&2
-
