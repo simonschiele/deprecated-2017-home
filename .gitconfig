@@ -2,7 +2,7 @@
     quotepath = off
     editor = vim
 [user]
-    email = simon.codingmonkey@googlemail.com
+    email = simon.codingmonkey@gmail.com
     name = Simon Schiele
 [merge]
     tool = vimdiff
@@ -43,9 +43,10 @@
     find = "!git ls-files | grep -i"
     graphviz = "!echo 'digraph git {' ; git log --pretty='format:  %h -> { %p }' \"$@\" | sed 's/[0-9a-f][0-9a-f]*/\"&\"/g' ; echo '}';"
     new = !sh -c 'git log $1@{1}..$1@{0} "$@"'
-    subdel = "!f(){ git rm --cached \"$1\";rm -r \"$1\";git config -f .gitmodules --remove-section \"submodule.$1\";git config -f .git/config --remove-section \"submodule.$1\";git add .gitmodules; }; f"
     serve = daemon --base-path=. --export-all --reuseaddr --informative-errors --verbose
     hub = daemon --base-path=. --export-all --enable=receive-pack --reuseaddr --informative-errors --verbose
+    subdel = "!f(){ git rm --cached \"$1\";rm -r \"$1\";git config -f .gitmodules --remove-section \"submodule.$1\";git config -f .git/config --remove-section \"submodule.$1\";git add .gitmodules; }; f"
+    subupdate = submodule update --init --remote --recursive
 [push]
     default = current
 
