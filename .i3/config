@@ -1,6 +1,3 @@
-# set wallpaper
-exec_always /home/simon/.essentials/bin/set.wallpaper
-
 # main modkey
 set $mod Mod4
 set $alt Mod1
@@ -10,7 +7,7 @@ set $terminal terminator
 set $filer nautilus
 set $browser chromium
 set $browser_incognito chromium --incognito
-set $lock i3lock -e -d 30 -c 000022
+set $lock i3lock -e -d -c 000022 && sleep 1
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
@@ -29,16 +26,20 @@ floating_modifier $mod
 
 # general settings
 focus_follows_mouse yes
-# floating_minimum_size 75 x 50
-# floating_maximum_size -1 x -1
+force_focus_wrapping yes
+floating_minimum_size 75 x 50
+floating_maximum_size -1 x -1
+
+# new_window <normal|1pixel|none|pixel>   # border
+# new_float <normal|1pixel|none|pixel>    # border
+new_window 1pixel
+new_float 1pixel
+
 # default_orientation <horizontal|vertical|auto>
 # workspace_layout <default|stacking|tabbed>   # set the default for new containers
-# new_window <normal|1pixel|none|pixel>   # border 
-# new_float <normal|1pixel|none|pixel>    # border
 # hide_edge_borders <none|vertical|horizontal|both>
-# mouse_warping <output|none>   # center cursor on window 
+# mouse_warping <output|none>   # center cursor on window
 # popup_during_fullscreen <smart|ignore|leave_fullscreen>
-# force_focus_wrapping <yes|no>
 # force_xinerama <yes|no>
 
 # kill/quit/...
@@ -47,28 +48,20 @@ focus_follows_mouse yes
 bindsym $mod+x kill
 
 # change focus
-bindsym $mod+j focus left
-bindsym $mod+k focus down
-bindsym $mod+l focus up
-bindsym $mod+odiaeresis focus right
-
-# alternatively, you can use the cursor keys:
 bindsym $mod+Left focus left
 bindsym $mod+Down focus down
 bindsym $mod+Up focus up
 bindsym $mod+Right focus right
 
-# move focused window
-bindsym $mod+Shift+j move left
-bindsym $mod+Shift+k move down
-bindsym $mod+Shift+l move up
-bindsym $mod+Shift+odiaeresis move right
+# focus left|right
+bindsym $mod+Tab focus right
+bindsym Control+Tab focus left
 
-# alternatively, you can use the cursor keys:
-bindsym $mod+Shift+Left move left
-bindsym $mod+Shift+Down move down
-bindsym $mod+Shift+Up move up
-bindsym $mod+Shift+Right move right
+# move focused window
+bindsym $mod+Shift+Left move left 20px
+bindsym $mod+Shift+Down move down 20px
+bindsym $mod+Shift+Up move up 20px
+bindsym $mod+Shift+Right move right 20px
 
 # split in horizontal orientation
 bindsym $mod+h split h
@@ -79,42 +72,41 @@ bindsym $mod+v split v
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen
 
-# change container layout (stacked, tabbed, toggle split)
-bindsym $mod+s layout stacking
-bindsym $mod+w layout tabbed
-bindsym $mod+e layout toggle split
-
 # toggle tiling / floating
 bindsym $mod+Shift+f floating toggle
 
+# change container layout (stacked, tabbed, toggle split)
+bindsym $mod+w layout toggle
+#bindsym $mod+s layout stacking
+#bindsym $mod+w layout tabbed
+#bindsym $mod+e layout toggle split
+
 # change focus between tiling / floating windows
-bindsym $mod+space focus mode_toggle
+# bindsym $mod+space focus mode_toggle
 
 # focus the parent container
-bindsym $mod+a focus parent
+#bindsym $mod+a focus parent
 
 # focus the child container
 #bindsym $mod+d focus child
 
-# workspace cstation
+# default workspace 
+workspace 1 output LVDS1
 #workspace 1 output HDMI-1
 
-# workspace cpad
-workspace 1 output LVDS1
-#workspace "2: vim" output VGA1
-
-
-# switch to workspace
-bindsym $mod+1 workspace 1
-bindsym $mod+2 workspace 2
-bindsym $mod+3 workspace 3
-bindsym $mod+4 workspace 4
-bindsym $mod+5 workspace 5
-bindsym $mod+6 workspace 6
-bindsym $mod+7 workspace 7
-bindsym $mod+8 workspace 8
-bindsym $mod+9 workspace 9
-bindsym $mod+0 workspace 10
+#switch to workspace
+bindsym $mod+1 exec --no-startup-id "i3-msg workspace 1; i3-msg scratchpad show"
+bindsym $mod+2 exec --no-startup-id "i3-msg workspace 2; i3-msg scratchpad show"
+bindsym $mod+3 exec --no-startup-id "i3-msg workspace 3; i3-msg scratchpad show"
+bindsym $mod+4 exec --no-startup-id "i3-msg workspace 4; i3-msg scratchpad show"
+bindsym $mod+5 exec --no-startup-id "i3-msg workspace 5; i3-msg scratchpad show"
+bindsym $mod+6 exec --no-startup-id "i3-msg workspace 6; i3-msg scratchpad show"
+bindsym $mod+7 exec --no-startup-id "i3-msg workspace 7; i3-msg scratchpad show"
+bindsym $mod+8 exec --no-startup-id "i3-msg workspace 8; i3-msg scratchpad show"
+bindsym $mod+9 exec --no-startup-id "i3-msg workspace 9; i3-msg scratchpad show"
+bindsym $mod+0 exec --no-startup-id "i3-msg workspace 10; i3-msg scratchpad show"
+bindsym $mod+Shift+a exec --no-startup-id "i3-msg move scratchpad; i3-msg scratchpad show"
+bindsym $mod+a scratchpad show
 
 # move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace 1
@@ -131,12 +123,23 @@ bindsym $mod+Shift+0 move container to workspace 10
 # workspace back+forth
 workspace_auto_back_and_forth yes
 
-# reload the configuration file
-bindsym $mod+Shift+c reload
-# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
-bindsym $mod+Shift+r restart
-# exit i3 (logs you out of your X session)
-bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+# system mode - logout, reload, suspend, reboot, ...
+set $mode_system System (l) lock, (q) logout, (r) reload, (shift+r) restart, (s) suspend, (ctrl+shift+r) reboot, (h) halt
+mode "$mode_system" {
+    bindsym l exec --no-startup-id $lock, mode "default"
+    bindsym q exec --no-startup-id i3-msg exit, mode "default"
+    bindsym r exec --no-startup-id i3-msg reload, mode "default"
+    bindsym Shift+r exec --no-startup-id i3-msg restart, mode "default"
+    bindsym s exec --no-startup-id $lock && systemctl suspend, mode "default"
+    bindsym Control+Shift+r exec --no-startup-id systemctl reboot, mode "default"
+    bindsym Shift+h exec --no-startup-id systemctl poweroff -i, mode "default"  
+    #bindsym h exec --no-startup-id $lock && systemctl hibernate, mode "default"
+
+    # back to normal: Enter or Escape
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+q mode "$mode_system"
 
 # resize window (you can also use the mouse for that)
 mode "resize" {
@@ -172,65 +175,63 @@ bar {
 }
 
 # launcher
-
-# normal dmenu launcher
-bindsym $mod+d exec dmenu_run -nb red
-
-# i3-dmenu-desktop (only applications with .desktop file)
+bindsym $mod+e exec --no-startup-id dmenu_run # -nb red
 #bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
-# shellex (https://github.com/Merovius/shellex)
-#bindsym $mod+d exec shellex -bg brown -fg yellow
-
 # SSH
-bindsym $mod+Shift+s exec $terminal -e ssh $( history | grep "[0-9]  ssh " | rev | cut -d' ' -f1 | rev | sort -u | dmenu -i -nb black -nf red -sb red -sf black -l 12 )
+bindsym $mod+s exec --no-startup-id $terminal -e ssh $( history | grep "[0-9]  ssh " | rev | cut -d' ' -f1 | rev | sort -u | dmenu -i -nb black -nf red -sb red -sf black -l 12 )
 
 # applications
-bindsym $mod+Shift+Return exec $filer
-bindsym $mod+Return exec $terminal
-bindsym $mod+BackSpace exec $browser 
-bindsym $mod+Shift+BackSpace exec $browser_incognito
-bindsym $mod+F12 exec $lock 
-bindsym Print exec gnome-screenshot -f ./screenshot-$(date +%Y-%m-%d_%s)
-bindsym $mod+Print exec gnome-screenshot -a -f ./screenshot-$(date +%Y-%m-%d_%s)
-bindsym $mod+Shift+Print exec gnome-screenshot -i
+bindsym $mod+F1 exec --no-startup-id $terminal -e less ~/.i3/README.md
+bindsym $mod+F2 exec --no-startup-id $lock
+bindsym $mod+Shift+Return exec --no-startup-id $filer
+bindsym $mod+Return exec --no-startup-id $terminal
+bindsym $mod+BackSpace exec --no-startup-id $browser
+bindsym $mod+Shift+BackSpace exec --no-startup-id $browser_incognito
+bindsym $mod+m exec --no-startup-id gnome-maps
 
-# start iceweasel 'once' on startup
-# exec --no-startup-id i3-msg 'workspace 3; exec iceweasel; workspace 1'
-
-# for_window [title="x200: ~/work"] floating enable
-# for_window [class="urxvt"] border 1pixel
-# for_window [class="XTerm"] floating enable
-# assign [class="^URxvt$"] 2    # assign to workspace
-# assign [class="^URxvt$"] → work  # assign to a named workspace
-# assign [class="^URxvt$" instance="^irssi$"] → 3
+# screenshot
+bindsym Print exec --no-startup-id gnome-screenshot -f ./screenshot-$(date +%Y-%m-%d_%s)
+bindsym $mod+Print exec --no-startup-id gnome-screenshot -a -f ./screenshot-$(date +%Y-%m-%d_%s)
+bindsym $mod+Shift+Print exec --no-startup-id gnome-screenshot -i
 
 # multimedia keys
-#bindsym XF86AudioRaiseVolume exec "amixer -D pulse sset Master '5%+'"
-#bindsym XF86AudioLowerVolume exec "amixer -D pulse sset Master '5%-'"
-bindsym XF86AudioRaiseVolume exec pactl set-sink-volume 0 +5%
-bindsym XF86AudioLowerVolume exec pactl set-sink-volume 0 -- -5%
-bindsym XF86AudioMute exec "amixer -D pulse set Master toggle"
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5%
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -- -5%
+bindsym XF86AudioMute exec --no-startup-id "amixer -D pulse set Master toggle"
+
+# chat 
+#for_window [title="(?i)pidgin"] move left; resize shrink right 31px or 31 ppt
+for_window [title="^Call with*"] move scratchpad; show scratchpad
+for_window [class="(?i)pidgin"] floating enable
+assign [class="(?i)pidgin"] 10
+for_window [class="(?i)skype"] floating enable
+assign [class="(?i)skype"] 10
+assign [title="irssi"] 10
 
 # floating
 for_window [window_role="pop-up"] floating enable
-for_window [class="notify"] floating enable border 1pixel
-for_window [class="^Skype$"] floating enable
-for_window [class="Pidgin"] floating enable
-#for_window [title="Pidgin"] move left; resize shrink right 31px or 31 ppt
-for_window [class="MPlayer"] floating enable
-for_window [class="gimp"] floating enable
-for_window [class="Gmrun"] floating enable
-for_window [title="Cinelerra: "] floating enable
-for_window [title="Wicd Network Manager"] floating enable
+for_window [window_role="task_dialog"] floating enable
+for_window [class="(?i)notify"] floating enable border 1pixel
+for_window [class="(?i)qemu-system*"] floating enable
+for_window [title="(?i)cinelerra*"] floating enable
+for_window [class="(?i)mplayer"] floating enable
+for_window [class="(?i)gimp"] floating enable
+for_window [class="(?i)gmrun"] floating enable
+for_window [title="(?i)wicd network manager"] floating enable
 for_window [class="(?i)nautilus"] floating enable
 for_window [class="(?i)thunar"] floating enable
-
+for_window [class="(?i)pavucontrol"] floating enable
+for_window [title="Terminator Preferences"] floating enable
 #for_window [class="Firefox"] floating enable
 #for_window [class="Firefox" instance="Navigator"] floating disable
 
 # autostart
-exec nm-applet
-exec synergy
-exec pasystray
-
+exec_always --no-startup-id /home/simon/.essentials/bin/set.wallpaper
+exec --no-startup-id i3-msg 'workspace 10; exec icedove; workspace 1'
+exec --no-startup-id compton --backend glx --vsync opengl -b
+exec --no-startup-id nm-applet
+exec --no-startup-id synergy
+exec --no-startup-id pasystray
+exec --no-startup-id unclutter -idle 20
+# force_focus_wrapping
