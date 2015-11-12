@@ -2,7 +2,7 @@
     quotepath = off
     editor = vim
 [user]
-    email = simon.codingmonkey@gmail.com
+    email = simon.schiele@profitbricks.com
     name = Simon Schiele
 [merge]
     tool = vimdiff
@@ -17,36 +17,20 @@
     pager = true
     showbranch = true
     status = true
-    ui = true
 [alias]
-    sortdiff = !sh -c 'git diff "$@" | grep "^[+-]" | sort --key=1.2 | uniq -u -s1'
-    lastdiff = difftool HEAD^1..HEAD
-    sdiff = diff --cached
-    changed = diff --stat HEAD..origin/HEAD
-    details = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
+    praise = blame
+    ls = ls-files
     plog = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
-    glog = log --graph
+    vlog = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
     lastlog = log --color -n 20 --pretty=tformat:\"%h - %an, %ar : %s\" HEAD^1..HEAD
     filelog = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat 
-    rollback = checkout HEAD^1
-    clone = clone
-    wipe = reset –hard HEAD
-    praise = blame
-    merge = merge --ff
-    pull = pull --ff
-    grep = grep -Ii
-    stat = status -sb
     lasttag = describe --tags --abbrev=0
     ignored = ls-files --others -i --exclude-standard
-    ignore = !([ ! -r .gitignore ] && touch .gitignore) | echo $1 >>.gitignore
     all = "!git log --name-status --oneline --all | grep '^[A|M|D]' | awk '{print $2}' | sort -u"
     find = "!git ls-files | grep -i"
     graphviz = "!echo 'digraph git {' ; git log --pretty='format:  %h -> { %p }' \"$@\" | sed 's/[0-9a-f][0-9a-f]*/\"&\"/g' ; echo '}';"
-    new = !sh -c 'git log $1@{1}..$1@{0} "$@"'
-    serve = daemon --base-path=. --export-all --reuseaddr --informative-errors --verbose
-    hub = daemon --base-path=. --export-all --enable=receive-pack --reuseaddr --informative-errors --verbose
+    serve = daemon --base-path=. --export-all --enable=receive-pack --reuseaddr --informative-errors --verbose
     subdel = "!f(){ git rm --cached \"$1\";rm -r \"$1\";git config -f .gitmodules --remove-section \"submodule.$1\";git config -f .git/config --remove-section \"submodule.$1\";git add .gitmodules; }; f"
     subupdate = submodule update --init --remote --recursive
 [push]
     default = current
-
