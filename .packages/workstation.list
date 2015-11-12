@@ -29,7 +29,7 @@ Tools: gtkterm thunar scrot xsel xcalib gucharmap file-roller screenruler
 # Development
 Sourceverwaltung: bzr subversion mercurial git-svn
 Interpreter und Compiler: ipython erlang gcc g++ php5-cli lua5.1
-Build tools: build-essential make cmake automake1.9 rake module-assistant
+Build tools: build-essential make cmake rake module-assistant
 Python Libs: python-twisted python-sqlite python-scrapy python-scapy python-web2py
 Database: sqlite3
 Tools: xmlstarlet
@@ -42,6 +42,6 @@ Infrastructure: devscripts
 Musik: audacity
 Video: vlc kino 
 Images: gimp inkscape agave imagemagick
-Download: clive cclive youtube-dl quvi
+Download: youtube-dl quvi
 # ------------------------------------------------------------------------
 
