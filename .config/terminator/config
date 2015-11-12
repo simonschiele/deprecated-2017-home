@@ -1,5 +1,5 @@
 [global_config]
-  enabled_plugins = APTURLHandler,
+  enabled_plugins = CustomCommandsMenu, APTURLHandler
   focus = mouse
   inactive_color_offset = 0.69
 [keybindings]

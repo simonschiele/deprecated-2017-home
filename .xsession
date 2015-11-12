@@ -1,48 +1,47 @@
-#!/bin/sh
+#!/bin/bash --login
 
-# DOTFILE: ~/.xsession
-# by Simon Schiele <simon.codingmonkey@googlemail.com>
+export XSESSION_ERRORS="$HOME"/.xsession-errors
 
-# ghetto-rotate .xsession-errors 
-cp -f ${HOME}/.xsession-errors ${HOME}/.xsession-errors.old 2>/dev/null >&2
-echo "[`date`] starting .xsession" > ${HOME}/.xsession-errors
+function log_rotate() {
+    log "logfile rotated"
+    cat "$XSESSION_ERRORS" >> "$XSESSION_ERRORS".old
+    rm -f "$XSESSION_ERRORS"
+    
+    log "logfile created"
+}
 
-#########
-# Input
-#########
+function log() {
+    local msg=$1
+    echo "[$( date )] $msg" >> "$XSESSION_ERRORS"
+}
 
-# Pass -ardelay 250 -arinterval 20 to X server instead.
-#xset r on
-#xset r rate 250 50
+function main() {
+    log_rotate
+    log "starting xsession"
 
-# kill keyring
-#for process in polkit-gnome-authentication-agent-1 gnome-keyring-daemon
-#do
-    #if ( ps -C $process 2>/dev/null >&2 )
-    #then
-        #echo "killing running '$process'" >> $HOME/.xsession-errors
-        #killall -9 $process 2>/dev/null >&2
-    #fi
-#done
+    #### replace this with systemd
+    # start polkit-gnome-authentication-agent + gnome-keyring-daemon
+    #/usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
+    pkill -9 gnome-keyring-daemon 2>/dev/null
+    eval "$( gnome-keyring-daemon --start --components=keyring,pkcs11,ssh,secrets )"
+    export GNOME_KEYRING_PID
+    export GNOME_KEYRING_SOCKET
 
-# start polkit-gnome-authentication-agent + gnome-keyring-daemon
-#/usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
-echo "starting + exporting gnome-keyring-daemon" >> ${HOME}/.xsession-errors
-pkill -9 gnome-keyring-daemon 2>/dev/null
-eval "$( gnome-keyring-daemon --start --components=keyring,pkcs11,ssh,secrets )"
-export GNOME_KEYRING_PID
-export GNOME_KEYRING_SOCKET
+    # start window manager
+    window_managers="i3 awesome fluxbox"
+    for wm in $window_managers ; do
+        log "trying to start window manager: $wm"
+        dbus-launch --sh-syntax --exit-with-session "$wm" 2>> "$XSESSION_ERRORS" >&2
+        break
+    done
 
-# setting multihead at work
-if test "$( hostname -s )" = "simon-work" ; then
-    xrandr --output HDMI1 --left-of VGA1
-fi
+    # source bash_logout for cleanup purposes
+    if [ -e "$HOME"/.bash_logout ] ; then
+        log "executing $HOME/.bash_logout"
+        . "$HOME"/.bash_logout
+    fi
 
-# launch awesome
-#exec ck-launch-session dbus-launch --sh-syntax --exit-with-session awesome 2>>${HOME}/.xsession-errors >&2
+    log "finished running xsession"
+}
 
-# launch i3
-exec dbus-launch --exit-with-session i3 2>>${HOME}/.xsession-errors >&2
-
-echo "[`date`] .xsession done" >> ${HOME}/.xsession-errors
-
+main "$@"

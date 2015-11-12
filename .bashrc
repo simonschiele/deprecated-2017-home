@@ -1,3 +1,4 @@
+#!/bin/bash
 
 if [ -z "$PS1" ] || [ -z "$BASH_VERSION" ] ; then
     echo "ERROR: shell is not BASH" >&2
@@ -7,35 +8,30 @@ fi
 # {{{ Includes + PATH
 
 # add local bin-directories to PATH
-tmpname="bin .bin .bin-ypsilon .bin-private"
-tmpname+=" node_modules/.bin .node_modules/.bin"
+tmpname="bin .bin .bin-ypsilon .bin-pb .bin-private"
+tmpname+=" node_modules/.bin .node_modules/.bin .node/bin"
 for dir in $tmpname ; do
-    [ -d ${HOME}/${dir} ] && PATH="${dir/#/${HOME}/}:${PATH}"
-done
-
-# source logout scripts
-tmpname=".logout .bash_logout .shell_logout"
-for include in ; do
-    [ -r ${include} ] && trap ${include/#/${HOME}/} 0 && break
+    [ -d "$HOME"/"$dir" ] && PATH="${dir/#/${HOME}/}:${PATH}"
 done
 
 # source helpers, libs, ...
 tmpname="/etc/bash_completion ${HOME}/.private/etc/bashrc"
 tmpname+=" ${HOME}/.essentials/essentials.sh"
 for include in $tmpname ; do
-    if [ -r ${include} ] ; then
-        . ${include}
+    if [ -r "$include" ] ; then
+        . "$include"
     else
-        echo "[WARNING] include ${include} not found" >&2
+        #echo "[WARNING] include ${include} not found" >&2
+        echo -n
     fi
 done
 
 # verify essentials are loaded
-if [ -n "${ESSENTIALS_DIR}" ] ; then
+if [ -n "$ESSENTIALS_DIR" ] ; then
     export ESSENTIALS=true
 
     # if essential debug is enabled, print banner + infos
-    if ( ${ESSENTIALS_DEBUG} ) ; then
+    if ( "$ESSENTIALS_DEBUG" ) ; then
         es_info
     fi
 else
@@ -43,12 +39,15 @@ else
     export ESSENTIALS=false
 
     # defaults applications
-    export PAGER=$( which less )
-    export PAGER=${PAGER:-more}
-    export EDITOR=$( which vim.nox )
-    export EDITOR=${EDITOR:-$( which vim )}
-    export EDITOR=${EDITOR:-$( which vi )}
-    export EDITOR=${EDITOR:-$( which nano )}
+    PAGER=$( which less )
+    PAGER=${PAGER:-more}
+    EDITOR=$( which vim.nox )
+    EDITOR=${EDITOR:-$( which vim )}
+    EDITOR=${EDITOR:-$( which vi )}
+    EDITOR=${EDITOR:-$( which nano )}
+    EDITOR=${EDITOR:-$( which mcedit )}
+    EDITOR=${EDITOR:-$( which joe )}
+    export EDITOR PAGER
 
     # applications overwrite
     alias sudo='sudo '
@@ -105,6 +104,8 @@ fi
 # cleanup
 unset dir include tmpname
 
-# can't remember what this was about
+# can't remember what this was about - most likely java on i3
 export DE=generic
+
+echo "[running] $HOME/.bashrc" >&2
 
