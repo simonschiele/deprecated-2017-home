@@ -4,18 +4,9 @@
 [submodule ".config/awesome"]
     path = .config/awesome
     url = https://github.com/simonschiele/awesome.git
-[submodule ".lib/git-prompt"]
-    path = .lib/git-prompt
-    url = git://github.com/lvv/git-prompt.git
-[submodule ".lib/git-flow-completion"]
-    path = .lib/git-flow-completion
-    url = https://github.com/bobthecow/git-flow-completion.git
 [submodule ".lib/powerline-fonts"]
     path = .lib/powerline-fonts
     url = https://github.com/Lokaltog/powerline-fonts.git
-[submodule ".lib/gitflow"]
-    path = .lib/gitflow
-    url = https://github.com/nvie/gitflow
 [submodule ".lib/Smyck-Color-Scheme"]
     path = .lib/Smyck-Color-Scheme
     url = https://github.com/hukl/Smyck-Color-Scheme/
@@ -25,9 +16,6 @@
 [submodule ".lib/cosmic-sans-neue"]
     path = .lib/cosmic-sans-neue
     url = https://github.com/belluzj/cosmic-sans-neue
-[submodule ".lib/git-gui.git"]
-    path = .lib/git-gui.git
-    url = http://repo.or.cz/r/git-gui.git
 [submodule ".lib/dircolors-solarized"]
     path = .lib/dircolors-solarized
     url = https://github.com/seebi/dircolors-solarized.git
@@ -40,30 +28,9 @@
 [submodule ".lib/zsh-antigen"]
     path = .lib/zsh-antigen
     url = https://github.com/zsh-users/antigen.git
-[submodule ".lib/extundelete"]
-    path = .lib/extundelete
-    url = git://git.code.sf.net/p/extundelete/code
-[submodule ".lib/git-extras"]
-    path = .lib/git-extras
-    url = https://github.com/tj/git-extras.git
-[submodule ".lib/giternal"]
-    path = .lib/giternal
-    url = https://github.com/patmaddox/giternal.git
-[submodule ".lib/gitslave"]
-    path = .lib/gitslave
-    url = git://git.code.sf.net/p/gitslave/code
-[submodule ".lib/markdown2confluence"]
-    path = .lib/markdown2confluence
-    url = https://github.com/jedi4ever/markdown2confluence
 [submodule ".lib/solarized-tmux"]
     path = .lib/solarized-tmux
     url = https://github.com/seebi/tmux-colors-solarized.git
-[submodule ".lib/fzf"]
-    path = .lib/fzf
-    url = https://github.com/junegunn/fzf.git
 [submodule ".lib/git-hub"]
     path = .lib/git-hub
     url = https://github.com/github/hub
-[submodule ".essentials"]
-    path = .essentials
-    url = https://github.com/simonschiele/essentials.git
