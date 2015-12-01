@@ -1,0 +1,3 @@
+#!/bin/bash
+LANG=C
+wget -O- http://cachefly.cachefly.net/200mb.test > /dev/null

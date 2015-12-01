@@ -1,0 +1,70 @@
+#!/bin/bash
+LANG=C
+RUNNING=false
+
+function error() {
+    echo "$1" >&2
+    exit 1
+}
+
+function verify_queue() {
+    if [ -f "$1" ] ; then
+        return 0
+    elif [ ! -e "$1" ] && ( touch "$1" ) ; then
+        return 0
+    fi
+
+    return 1
+}
+
+function watch_downloadlist() {
+    local filename eventlist eventfile
+    
+    inotifywait -e close_write -m "$1" | \
+    while read filename eventlist eventfile ; do
+        process_downloadlist "$1"
+    done
+}
+
+function process_downloadlist() {
+    if ! ( $RUNNING ) ; then
+        RUNNING=true
+        local queue="$1"
+        
+        while [ "$( head -n1 "$queue" )" != "" ] ; do
+            url="$( cut -f'1' -d' ' "$queue" | head -n1 )"
+            name="$( cut -f'2-' -d' ' "$queue" | head -n1 )"
+   
+            if ( download "$url" "$name" ) ; then
+                sed -i '1d' "$queue"
+            fi
+        done
+        RUNNING=false
+    fi
+}
+
+function download() {
+    local url="$1"
+    local name="$2"
+    
+    # test if youtube-dl compatible
+    if ( youtube-dl -q -s "$url" 2>/dev/null ) ; then 
+        echo youtube-dl "$url" "${name:+-o $name}"
+    else
+        echo wget "$url" "${name:+-O $name}"
+    fi
+}
+
+function main() {
+    queue="${1:-/home/simon/.download}"
+    
+    if ( ! verify_queue "$queue" ) ; then
+        error "Couldn't find or create quefile '$queue'."
+    fi
+
+    process_downloadlist "$queue"
+    watch_downloadlist "$queue" 
+}
+
+main "$@"
+

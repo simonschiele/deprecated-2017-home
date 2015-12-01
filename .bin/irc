@@ -1,0 +1,2 @@
+#!/bin/bash
+terminator -T irssi -x mosh -- simon@psaux.de screen -x 2>/dev/null >&2

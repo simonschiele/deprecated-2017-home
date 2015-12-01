@@ -1,0 +1,11 @@
+#!/bin/bash
+
+release='testing'
+filename=$( mktemp -u /tmp/apt-speedtest.XXXXXXXX )
+
+netselect-apt --ftp --nonfree --sources --outfile "$filename" $release >/dev/null 2>&1
+grep -v -e "^[[:space:]]*#" -e "^[[:space:]]*$" "$filename"
+echo "deb http://security.debian.org/ $release/updates main contrib non-free"
+echo "deb-src http://security.debian.org/ $release/updates main contrib non-free"
+rm -f "$filename" 2>/dev/null
+

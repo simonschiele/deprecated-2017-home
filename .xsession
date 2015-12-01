@@ -27,8 +27,12 @@ function main() {
     export GNOME_KEYRING_PID
     export GNOME_KEYRING_SOCKET
 
+    # java fixes for awesome/i3
+    export DE=generic
+    export _JAVA_AWT_WM_NONREPARENTING=1
+
     # start window manager
-    window_managers="i3 awesome fluxbox"
+    local window_managers="i3 awesome fluxbox"
     for wm in $window_managers ; do
         log "trying to start window manager: $wm"
         dbus-launch --sh-syntax --exit-with-session "$wm" 2>> "$XSESSION_ERRORS" >&2

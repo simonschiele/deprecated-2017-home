@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [[ -z "$1" || -n "$2" ]] ; then
+    usage
+    exit 0
+elif echo "$@" | grep -i -e "help" -e "\-h" ; then
+    usage
+    exit 0 
+elif [[ ! -d "$1" ]] ; then
+    usage
+    exit 1
+fi
+
+grep -R -i \
+    -e fuck \
+    -e mad \
+    -e bad \
+    -e ":(" \
+    -e ":-(" \
+        "$1"
+

@@ -1,0 +1,2 @@
+#!/bin/bash
+openssl req -newkey 2048 -keyout cert.key -nodes -x509 -out cert.pem -batch

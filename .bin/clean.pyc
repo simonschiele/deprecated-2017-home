@@ -1,0 +1,3 @@
+#!/bin/bash
+find . \( -name "*.py[co]" ! -name "clean.pyc" \) -delete
+find . -type d -name "__pycache__" -delete

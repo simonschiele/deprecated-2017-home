@@ -9,7 +9,8 @@ Shells: zsh bash bash-completion
 Compression: p7zip unzip zip rar unrar
 Audio: pulseaudio pulseaudio-utils pavucontrol pasystray paprefs alsa-base alsa-utils
 USB: usb-modeswitch
-Tools: bchunk debian-goodies debootstrap multitail input-utils lshw lolcat figlet
+Packages: netselect-apt
+Tools: bchunk debian-goodies debootstrap multitail input-utils lshw lolcat figlet toilet toilet-fonts moreutils
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
@@ -40,7 +41,7 @@ Infrastructure: devscripts
 # ------------------------------------------------------------------------
 # Multimedia
 Musik: audacity
-Video: vlc kino 
+Video: vlc kino
 Images: gimp inkscape agave imagemagick
 Download: youtube-dl quvi
 # ------------------------------------------------------------------------
