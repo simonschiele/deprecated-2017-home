@@ -228,10 +228,9 @@ for_window [title="Terminator Preferences"] floating enable
 
 # autostart
 exec_always --no-startup-id /home/simon/.bin/set.wallpaper
-# exec --no-startup-id i3-msg 'workspace 10; exec icedove; workspace 1'
 exec --no-startup-id compton --backend glx --vsync opengl -b
 exec --no-startup-id nm-applet
-exec --no-startup-id synergy
 exec --no-startup-id pasystray
 exec --no-startup-id unclutter -idle 20
-# force_focus_wrapping
+# exec --no-startup-id i3-msg 'workspace 10; exec icedove; workspace 1'
+# exec --no-startup-id synergy
