@@ -35,7 +35,7 @@ renameFiles() {
 
     find "${backgroundDir}" -type f -not -path "*/.git*" | grep -v "[0-9]\{3,5\}x[0-9]\{3,5\}" | while read img
     do
-        res=$( identify "$img" | awk {'print $3'} )
+        res=$( identify "$img" | awk '{print $3}' )
         target=$( echo "$img" | sed "s|\.\([A-Za-z]\{3,4\}\)$|_$res\.\1|g" )
         mv -v "$img" "$target"
     done
