@@ -20,6 +20,6 @@ Editor: vim-nox exuberant-ctags cscope python-xlrd
 Sourceverwaltung: git
 Shells: bash
 Debug: strace
-Tools: ack-grep
+Tools: ack-grep shellcheck tofrodos
 # ------------------------------------------------------------------------
 

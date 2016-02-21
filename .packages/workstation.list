@@ -23,7 +23,7 @@ Viewer: evince geeqie libreoffice
 Security: gksu gnome-keyring xscreensaver
 Network: vinagre grdesktop quicksynergy synergy network-manager network-manager-gnome network-manager-openvpn network-manager-openvpn-gnome network-manager-iodine network-manager-iodine-gnome
 Webcam: guvcview
-Tools: gtkterm thunar scrot xsel xcalib gucharmap file-roller screenruler
+Tools: gtkterm thunar scrot xsel xcalib gucharmap file-roller screenruler libsecret-tools
 # ------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------
@@ -45,4 +45,3 @@ Video: vlc kino
 Images: gimp inkscape agave imagemagick
 Download: youtube-dl quvi
 # ------------------------------------------------------------------------
-
