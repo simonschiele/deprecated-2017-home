@@ -1,0 +1,16 @@
+#!/bin/bash
+LANG=C
+
+function main() {
+    local in="${@}"
+    local part1=$( echo "$in" | sed 's|^\(.*\) \!\= \(.*\)$|\1|g' | sed 's|^{||g' | sed 's|}$||g' | tr ',' '\n' )
+    local part2=$( echo "$in" | sed 's|^\(.*\) \!\= \(.*\)$|\2|g' | sed 's|^{||g' | sed 's|}$||g' | tr ',' '\n' )
+    
+    echo -e "$part1" | sed 's|^\ *||g' | sort > /tmp/tmpdiff1
+    echo -e "$part2" | sed 's|^\ *||g' | sort > /tmp/tmpdiff2
+
+    vimdiff /tmp/tmpdiff1 /tmp/tmpdiff2
+    rm -f /tmp/tmpdiff*
+}
+
+main "${@}"
