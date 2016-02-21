@@ -8,6 +8,9 @@ set $filer nautilus
 set $browser chromium
 set $browser_incognito chromium --incognito
 set $lock i3lock -e -d -c 000022 && sleep 1
+set $screenshot gnome-screenshot -f ./screenshot-$(date +%Y-%m-%d_%s).png
+set $screenshotui gnome-screenshot -i
+
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
@@ -191,9 +194,9 @@ bindsym $mod+Shift+BackSpace exec --no-startup-id $browser_incognito
 bindsym $mod+m exec --no-startup-id gnome-maps
 
 # screenshot
-bindsym Print exec --no-startup-id gnome-screenshot -f ./screenshot-$(date +%Y-%m-%d_%s)
-bindsym $mod+Print exec --no-startup-id gnome-screenshot -a -f ./screenshot-$(date +%Y-%m-%d_%s)
-bindsym $mod+Shift+Print exec --no-startup-id gnome-screenshot -i
+bindsym Print exec --no-startup-id $screenshot
+bindsym $mod+Print exec --no-startup-id $screenshotui
+bindsym Shift+Print exec --no-startup-id $screenshotui
 
 # multimedia keys
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5%
