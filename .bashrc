@@ -5,23 +5,19 @@ if [ -z "$PS1" ] || [ -z "$BASH_VERSION" ] ; then
     return 1
 fi
 
-# {{{ PATH
+# {{{ PATH + Includes
 
 # add local bin-directories to PATH
 possible_bins="node_modules/.bin .node_modules/.bin .node/bin bin .bin"
-possible_bins+=".private/bin .private/ypsilon/bin .private/profitbricks/bin"
+possible_bins+=" .private/bin .private/ypsilon/bin .private/profitbricks/bin"
 
 for dir in $possible_bins ; do
     [ -d "$HOME"/"$dir" ] && PATH="${dir/#/${HOME}/}:${PATH}"
 done
 unset dir possible_bins
 
-# }}}
-
-# {{{ Includes
-
 # source helpers, libs, ...
-mandatory_includes="${HOME}/.bash_functions ${HOME}/.bash_prompt"
+mandatory_includes="${HOME}/.bash_functions ${HOME}/.bash_prompt ${HOME}/.bash_aliases"
 for include in $mandatory_includes ; do
     if [ -r "$include" ] ; then
         . "$include" || echo "[WARNING] Error while including ${include}" >&2
@@ -31,12 +27,19 @@ for include in $mandatory_includes ; do
 done
 unset include mandatory_includes
 
-optional_includes="${HOME}/.private/bashrc ${HOME}/.private/profitbricks/bashrc"
-optional_includes+=" ${HOME}/.bash_aliases"
+# check every dir in path for bashrc - if found, include it
+for i in $( echo "$PATH" | sed 's|:| |g' ) ; do
+    i=$( dirname $i )
+    if [ -r "$i/bashrc" ] ; then
+        . "$i/bashrc" || echo "[WARNING] Couldn't include ${i}/bashrc" >&2
+    fi
+done
+
+# if optional_includes is set, include them...
 for include in $optional_includes ; do
     [ -r "$include" ] && . "$include"
 done
-unset include optional_includes
+unset i include optional_includes
 
 # }}}
 
@@ -83,6 +86,46 @@ elif ( ps -U "${ESSENTIALS_USER}" | grep -v grep | grep -q ssh-agent ) ; then
 elif [ -z "${SSH_AGENT_PID}" ] || ! ( ps ${SSH_AGENT_PID} >/dev/null ) ; then
     echo "no ssh-agent detected - starting new one"
     export SSH_AGENT_PID=$( eval `ssh-agent` | grep -o "[0-9]*" )
+fi
+
+# }}}
+
+# {{{ Colors
+
+# application colors
+export GREP_COLOR='7;34'
+
+export LESS_TERMCAP_mb=$'\e[01;31m'
+export LESS_TERMCAP_md=$'\e[01;37m'
+export LESS_TERMCAP_me=$'\e[0m'
+export LESS_TERMCAP_se=$'\e[0m'
+export LESS_TERMCAP_so=$'\e[01;43;37m'
+export LESS_TERMCAP_ue=$'\e[0m'
+export LESS_TERMCAP_us=$'\e[01;32m'
+
+es_depends "colordiff" && alias diff='colordiff'
+es_depends "pacman" && alias pacman='pacman --color=auto'
+
+# dircolors
+if es_depends dircolors ; then
+    eval "`dircolors -b`"
+
+    # dircolors (solarized)
+    if [ -r ~/.lib/dircolors-solarized/dircolors.256dark ] ; then
+        eval "`dircolors ~/.lib/dircolors-solarized/dircolors.256dark`"
+    fi
+fi
+
+# }}}
+
+# {{{ Display
+
+if [ -z "${DISPLAY}" ] ; then
+    if ( pidof Xorg >/dev/null || pidof X >/dev/null ) ; then
+        DISPLAY=:$( ps ax | grep -i -e Xorg -e "/usr/bin/X" | grep -o " :[0-9]* " | head -n 1 | grep -o "[0-9]*" )
+        DISPLAY=${DISPLAY:-:0}
+        export DISPLAY
+    fi
 fi
 
 # }}}
@@ -146,15 +189,6 @@ bind '\C-e:unix-filename-rubout'
 
 # }}}
 
-# DISPLAY
-if [ -z "${DISPLAY}" ] ; then
-    if ( pidof Xorg >/dev/null || pidof X >/dev/null ) ; then
-        DISPLAY=:$( ps ax | grep -i -e Xorg -e "/usr/bin/X" | grep -o " :[0-9]* " | head -n 1 | grep -o "[0-9]*" )
-        DISPLAY=${DISPLAY:-:0}
-        export DISPLAY
-    fi
-fi
-
 # application overwrites
 alias cp='cp -i -r'
 alias mv='mv -i'
@@ -166,30 +200,3 @@ alias tmux='TERM=screen-256color-bce tmux'
 alias sudo='sudo '
 alias ls='LC_COLLATE=C ls --color=auto --group-directories-first -p'
 
-# {{{ Colors
-
-# application colors
-export GREP_COLOR='7;34'
-
-export LESS_TERMCAP_mb=$'\e[01;31m'
-export LESS_TERMCAP_md=$'\e[01;37m'
-export LESS_TERMCAP_me=$'\e[0m'
-export LESS_TERMCAP_se=$'\e[0m'
-export LESS_TERMCAP_so=$'\e[01;43;37m'
-export LESS_TERMCAP_ue=$'\e[0m'
-export LESS_TERMCAP_us=$'\e[01;32m'
-
-es_depends "colordiff" && alias diff='colordiff'
-es_depends "pacman" && alias pacman='pacman --color=auto'
-
-# dircolors
-if es_depends dircolors ; then
-    eval "`dircolors -b`"
-
-    # dircolors (solarized)
-    if [ -r ~/.lib/dircolors-solarized/dircolors.256dark ] ; then
-        eval "`dircolors ~/.lib/dircolors-solarized/dircolors.256dark`"
-    fi
-fi
-
-# }}}
