@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo fc-cache -f -v
