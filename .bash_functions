@@ -462,5 +462,5 @@ export ESSENTIALS_IS_TMUX=$( pstree -s "$$" | grep -qi 'tmux' ; echo ${BOOLEAN[$
 export ESSENTIALS_IS_SCREEN=$( pstree -s "$$" | grep -qi 'screen' ; echo ${BOOLEAN[$?]} )
 export ESSENTIALS_HAS_SSHAGENT=$( [ -n "$( ps hp ${SSH_AGENT_PID} 2>/dev/null )" ] ; echo ${BOOLEAN[$?]} )
 
-[ -r .bash_functions_old ] && . .bash_functions_old
+[ -r ~/.bash_functions_old ] && . ~/.bash_functions_old
 
