@@ -85,7 +85,7 @@ function es_prompt() {
     PS1="${PS1error}${PS1chroot}${PS1user}@${PS1host} ${PS1path}${PS1git}${PS1schroot}${PS1virtualenv}${PS1prompt}"
 }
 
-if [[ "${0}" != '-bash' ]] && [[ "$( readlink -f ${0} )" == "$( readlink -f ${BASH_SOURCE[0]} )" ]] ; then
+if [[ "${0}" != '-bash' ]] && [[ "$( readlink -f "${0}" )" == "$( readlink -f "${BASH_SOURCE[0]}" )" ]] ; then
     # called directly - give output
     es_prompt_status ${1:-git} ${ESSENTIALS_COLORS:-${2:-false}}
 else

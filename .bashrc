@@ -1,9 +1,16 @@
 #!/bin/bash
 
+# test if shell is bash
 if [ -z "$PS1" ] || [ -z "$BASH_VERSION" ] ; then
     echo "ERROR: shell is not BASH" >&2
     return 1
 fi
+
+# test if interactive
+case $- in
+    *i*) ;;
+    *) return ;;
+esac
 
 # {{{ PATH + Includes
 
@@ -49,9 +56,9 @@ export HISTFILE="${HOME}/.bash_history"
 export MYSQL_HISTFILE="${HOME}/.mysql_history"
 export SQLITE_HISTFILE="${HOME}/.sqlite_history"
 
-export HISTCONTROL=ignoreboth:erasedups
-export HISTFILESIZE=30000
-export HISTSIZE=6000
+export HISTCONTROL="ignoreboth:erasedups"
+export HISTSIZE=500000
+export HISTFILESIZE=100000
 export HISTIGNORE='&:clear:ls:[bf]g:exit:hist:history:tree:[ t\]*'
 export HISTTIMEFORMAT='%F %T '
 shopt -s histappend
@@ -72,6 +79,15 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
+# completion case insensitive
+bind "set completion-ignore-case on"
+
+# treat hyphens and underscores as equivalent
+bind "set completion-map-case on"
+
+# display matches for ambiguous patterns at first tab press
+bind "set show-all-if-ambiguous on"
 
 # }}}
 
@@ -118,7 +134,7 @@ fi
 
 # }}}
 
-# {{{ Display
+# {{{ X11
 
 if [ -z "${DISPLAY}" ] ; then
     if ( pidof Xorg >/dev/null || pidof X >/dev/null ) ; then
@@ -163,12 +179,8 @@ else
     export EDITOR PAGER
 
     # applications overwrite
-    alias sudo='sudo '
     alias ls='ls --color=auto'
     alias grep='grep --color=auto'
-    alias cp='cp -i'
-    alias mv='mv -i'
-    alias rm='rm -i'
 fi
 
 # general settings
@@ -191,12 +203,12 @@ bind '\C-e:unix-filename-rubout'
 
 # application overwrites
 alias cp='cp -i -r'
+alias ls='LC_COLLATE=C ls --color=auto --group-directories-first -p'
+alias mkdir='mkdir -p'
 alias mv='mv -i'
 alias rm='rm -i'
-alias mkdir='mkdir -p'
-alias wget='wget -c'
 alias screen='screen -U'
-alias tmux='TERM=screen-256color-bce tmux'
 alias sudo='sudo '
-alias ls='LC_COLLATE=C ls --color=auto --group-directories-first -p'
+alias tmux='TERM=screen-256color-bce tmux'
+alias wget='wget -c'
 
