@@ -1,16 +1,24 @@
-\set PROMPT1 '%n@%m[%/]%# '
-\set PROMPT2 :PROMPT1
+-- Don't display the "helpful" message on startup.
+\set QUIET 1
+\pset null '[NULL]'
+
+-- Nicer Prompt
+-- \set PROMPT1 '%n@%m[%/]%# '
+-- \set PROMPT2 :PROMPT1
+\set PROMPT1 '%[%033[1m%]%M %n@%/%R%[%033[0m%]%# '
+\set PROMPT2 '[more] %R > '
 \set PROMPT3 ''
 
-/* Don't use pager by default */
+-- Don't use pager by default
 \pset pager off
 
-/* Display null-values as "NULL" */
+-- Display null-values as "NULL"
 \pset null 'NULL'
 
-/* Show timing for each query */
+-- Show timing for each query
 \timing
 
-/* Set history-size to 2000 and don't save duplicated queries to the history */
+-- Set history-size to 2000 and don't save duplicated queries to the history
 \set HISTSIZE 2000
 \set HISTCONTROL ignoredups
+
