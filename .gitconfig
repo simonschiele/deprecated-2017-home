@@ -4,9 +4,15 @@
 [user]
     email = simon.schiele@profitbricks.com
     name = Simon Schiele
+[github]
+    username = simonschiele
 [merge]
     tool = vimdiff
     ff = only
+[status]
+    submodulesummary = false
+[push]
+    default = current
 [color]
     ui = auto
     interactive = auto
@@ -32,5 +38,5 @@
     serve = daemon --base-path=. --export-all --enable=receive-pack --reuseaddr --informative-errors --verbose
     subdel = "!f(){ git rm --cached \"$1\";rm -r \"$1\";git config -f .gitmodules --remove-section \"submodule.$1\";git config -f .git/config --remove-section \"submodule.$1\";git add .gitmodules; }; f"
     subupdate = submodule update --init --remote --recursive
-[push]
-    default = current
+[include]
+    path = ~/.pb/gitconfig
