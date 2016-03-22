@@ -3,20 +3,20 @@
 function es_prompt_status() {
     local status_type=${1:-git}
     local color=${2:-false}
-    es_prompt_status ${status_type} ${color}
+    es_prompt_status_git "${status_type}" "${color}"
 }
 
 function es_prompt_status_git() {
     local color=${1:-false}
 
-    if ( $color ) && [ -z "${COLORS['red']}" ] ; then
-        if [ -r ~/.essentials/colors.sh ] ; then
-            . ~/.essentials/colors.sh
-        else
-            echo "error: couldn't include colors.sh from resources"
-            exit 1
-        fi
-    fi
+    #if ( $color ) && [ -z "${COLORS['red']}" ] ; then
+        #if [ -r ~/.essentials/colors.sh ] ; then
+            #. ~/.essentials/colors.sh
+        #else
+            #echo "error: couldn't include colors.sh from resources"
+            #exit 1
+        #fi
+    #fi
 
     if $( LANG=C git rev-parse --is-inside-work-tree 2>/dev/null ) ; then
 
@@ -72,18 +72,23 @@ function es_prompt() {
         fi
     fi
 
-    #if [ -e ${ESSENTIALS_DIR}/prompt.sh ] && [ -n "$( which timeout )" ] ; then
-        #PS1git=$( LANG=C timeout 0.5 ${ESSENTIALS_DIR}/prompt.sh git ${ESSENTIALS_COLORS} )
-        #local gitret=$?
-        #[ $gitret -eq 124 ] && 
-        #PS1git="($( color.ps1 red )git slow$( color.ps1 ))"
-    #fi
+    if [ -e ~/.bash_prompt ] && [ -n "$( which timeout )" ] ; then
+        PS1git=$( LANG=C timeout 0.5 ~/.bash_prompt git "${ESSENTIALS_COLORS}" )
+        local gitret=$?
+        if [ $gitret -eq 124 ] ; then
+            PS1git="($( color.ps1 red )git slow$( color.ps1 ))"
+        fi
+    fi
 
     PS1error=${PS1error:+[${PS1error}] }
     PS1git=${PS1git:+ ${PS1git}}
 
     PS1="${PS1error}${PS1chroot}${PS1user}@${PS1host} ${PS1path}${PS1git}${PS1schroot}${PS1virtualenv}${PS1prompt}"
 }
+
+if [[ -r ~/.bash_functions ]] ; then
+    source ~/.bash_functions
+fi
 
 if [[ "${0}" != '-bash' ]] && [[ "$( readlink -f "${0}" )" == "$( readlink -f "${BASH_SOURCE[0]}" )" ]] ; then
     # called directly - give output
