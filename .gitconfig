@@ -2,15 +2,19 @@
     quotepath = off
     editor = vim
 [user]
-    email = simon.schiele@profitbricks.com
     name = Simon Schiele
+    email = simon.codingmonkey@gmail.com
 [github]
     username = simonschiele
 [merge]
     tool = vimdiff
     ff = only
-[status]
-    submodulesummary = false
+[diff]
+    renames = copies
+[diff "bin"]
+    textconv = hexdump -v -C
+[rerere]
+    enabled = true
 [push]
     default = current
 [color]
@@ -24,19 +28,15 @@
     showbranch = true
     status = true
 [alias]
-    praise = blame
-    ls = ls-files
-    plog = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
-    vlog = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
-    lastlog = log --color -n 20 --pretty=tformat:\"%h - %an, %ar : %s\" HEAD^1..HEAD
+    contributors = shortlog --summary --numbered
     filelog = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat 
-    lasttag = describe --tags --abbrev=0
-    ignored = ls-files --others -i --exclude-standard
-    all = "!git log --name-status --oneline --all | grep '^[A|M|D]' | awk '{print $2}' | sort -u"
-    find = "!git ls-files | grep -i"
     graphviz = "!echo 'digraph git {' ; git log --pretty='format:  %h -> { %p }' \"$@\" | sed 's/[0-9a-f][0-9a-f]*/\"&\"/g' ; echo '}';"
+    ignored = ls-files --others -i --exclude-standard
+    lastlog = log --color -n 20 --pretty=tformat:\"%h - %an, %ar : %s\" HEAD^1..HEAD
+    lasttag = describe --tags --abbrev=0
+    plog = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    praise = blame
     serve = daemon --base-path=. --export-all --enable=receive-pack --reuseaddr --informative-errors --verbose
-    subdel = "!f(){ git rm --cached \"$1\";rm -r \"$1\";git config -f .gitmodules --remove-section \"submodule.$1\";git config -f .git/config --remove-section \"submodule.$1\";git add .gitmodules; }; f"
     subupdate = submodule update --init --remote --recursive
 [include]
     path = ~/.pb/gitconfig

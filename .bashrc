@@ -16,15 +16,14 @@ esac
 
 # add local bin-directories to PATH
 possible_bins="node_modules/.bin .node_modules/.bin .node/bin bin .bin"
-possible_bins+=" .private/bin .private/ypsilon/bin .private/profitbricks/bin"
-
 for dir in $possible_bins ; do
     [ -d "$HOME"/"$dir" ] && PATH="${dir/#/${HOME}/}:${PATH}"
 done
 unset dir possible_bins
 
 # source helpers, libs, ...
-mandatory_includes="${HOME}/.bash_functions ${HOME}/.bash_prompt ${HOME}/.bash_aliases"
+mandatory_includes="${HOME}/.bash_functions ${HOME}/.bash_prompt"
+mandatory_includes+=" ${HOME}/.bash_aliases ${HOME}/.private/bashrc"
 for include in $mandatory_includes ; do
     if [ -r "$include" ] ; then
         . "$include" || echo "[WARNING] Error while including ${include}" >&2
@@ -33,20 +32,6 @@ for include in $mandatory_includes ; do
     fi
 done
 unset include mandatory_includes
-
-# check every dir in path for bashrc - if found, include it
-for i in $( echo "$PATH" | sed 's|:| |g' ) ; do
-    i=$( dirname $i )
-    if [ -r "$i/bashrc" ] ; then
-        . "$i/bashrc" || echo "[WARNING] Couldn't include ${i}/bashrc" >&2
-    fi
-done
-
-# if optional_includes is set, include them...
-for include in $optional_includes ; do
-    [ -r "$include" ] && . "$include"
-done
-unset i include optional_includes
 
 # }}}
 

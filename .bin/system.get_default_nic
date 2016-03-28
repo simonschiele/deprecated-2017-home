@@ -1,0 +1,3 @@
+#!/bin/bash
+LANG=C
+/sbin/route -n | grep "UG" | awk {'print $8'}

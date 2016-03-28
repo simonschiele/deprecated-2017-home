@@ -599,6 +599,8 @@ function convert.nrg2iso() {
 
 # }}}
 
+# {{{ screenshot
+
 if ( which recordmydesktop >/dev/null ) ; then
     alias screenrecord='recordmydesktop -o screendump_$( date +%s ).ogv'
 elif ( which ffmpeg >/dev/null ) ; then
@@ -611,4 +613,6 @@ if ( which gnome-screenshot >/dev/null ) ; then
 else
     alias screenshot='import -display :0 -window root ./screenshot-$(date +%Y-%m-%d_%s).png'
 fi
+
+# }}}
 
