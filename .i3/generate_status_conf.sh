@@ -1,6 +1,0 @@
-#!/bin/bash
-LANG=C
-
-
-
-
