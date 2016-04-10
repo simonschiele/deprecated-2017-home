@@ -15,8 +15,6 @@
 !/.packages*
 !/.synergy/**/*
 !/.synergy*
-!/.i3/**/*
-!/.i3*
 !/.certs/**/*
 !/.certs/
 !/.synergy.conf
