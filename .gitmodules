@@ -34,3 +34,6 @@
 [submodule ".lib/git-hub"]
     path = .lib/git-hub
     url = https://github.com/github/hub
+[submodule ".i3"]
+	path = .i3
+	url = https://github.com/simonschiele/dot.i3.git
