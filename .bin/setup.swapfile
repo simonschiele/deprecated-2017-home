@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sudo fallocate -l "${1:-4G}" swap0
+sudo mkswap swap0 
+sudo swapon swap0

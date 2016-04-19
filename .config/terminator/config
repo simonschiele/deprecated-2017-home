@@ -1,29 +1,29 @@
 [global_config]
-  enabled_plugins = CustomCommandsMenu, APTURLHandler
+  enabled_plugins = LaunchpadCodeURLHandler, APTURLHandler
   focus = mouse
   inactive_color_offset = 0.69
 [keybindings]
   next_tab = None
   prev_tab = None
-[profiles]
-  [[default]]
-    scrollbar_position = hidden
-    palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
-    background_image = None
-    use_system_font = False
-    foreground_color = "#839496"
-    scroll_on_output = False
-    show_titlebar = False
-    font = PragmataPro for Powerline 8
-    background_color = "#002b36"
-    scrollback_infinite = True
 [layouts]
   [[default]]
     [[[child1]]]
-      type = Terminal
       parent = window0
       profile = default
+      type = Terminal
     [[[window0]]]
-      type = Window
       parent = ""
+      type = Window
 [plugins]
+[profiles]
+  [[default]]
+    background_color = "#002b36"
+    background_image = None
+    font = PragmataPro for Powerline 8
+    foreground_color = "#839496"
+    palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
+    scroll_on_output = False
+    scrollback_infinite = True
+    scrollbar_position = hidden
+    show_titlebar = False
+    use_system_font = False
