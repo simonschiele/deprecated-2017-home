@@ -15,12 +15,12 @@ function es_prompt_status_git() {
     local gitBranch gitReflogId gitUntracked gitModified gitRemoteBranchExists
     local gitLastlogId ahead modified untracked ok
 
-    if LANG=C git rev-parse --is-inside-work-tree 2>/dev/null ; then
+    if LANG=C git rev-parse --is-inside-work-tree 2>/dev/null >&2 ; then
         gitBranch="$( LANG=C git symbolic-ref -q --short HEAD )"
         gitReflogId="$( LANG=C git reflog --pretty=format:'%h' -1 )"
         gitUntracked="$( git ls-files --other --exclude-standard --directory | egrep -v '/$' | head -n 1 )"
         gitModified="$( git ls-files -m | head -n 1 )"
-        gitRemoteBranchExists="$( git branch -r | grep origin/"${gitBranch}$" )"
+        gitRemoteBranchExists="$( git branch -r | grep "origin/${gitBranch}$" )"
 
         if [[ -n "$gitRemoteBranchExists" ]] ; then
             gitLastlogId="$( LANG=C git log --pretty=format:'%h' origin/${gitBranch} -1 )"
