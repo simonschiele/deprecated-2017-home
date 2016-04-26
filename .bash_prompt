@@ -4,42 +4,40 @@
 # todo: async fetch (after pwd)
 
 function color.exists() {
-    [ ${COLORS[${1:-none}]+isset} ] && return 0 || return 1
+    [ "${COLORS[${1:-none}]+isset}" ] && return 0 || return 1
 }
 
 function color.ps1() {
-    ( color.exists ${1:-none} ) && echo -ne "\[${COLORS[${1:-none}]}\]"
+    ( color.exists "${1:-none}" ) && echo -ne "\[${COLORS[${1:-none}]}\]"
 }
 
 function es_prompt_status_git() {
-    local color=${1:-true}
+    local gitBranch gitReflogId gitUntracked gitModified gitRemoteBranchExists
+    local gitLastlogId ahead modified untracked ok
 
-    if $( LANG=C git rev-parse --is-inside-work-tree 2>/dev/null ) ; then
+    if LANG=C git rev-parse --is-inside-work-tree 2>/dev/null ; then
+        gitBranch="$( LANG=C git symbolic-ref -q --short HEAD )"
+        gitReflogId="$( LANG=C git reflog --pretty=format:'%h' -1 )"
+        gitUntracked="$( git ls-files --other --exclude-standard --directory | egrep -v '/$' | head -n 1 )"
+        gitModified="$( git ls-files -m | head -n 1 )"
+        gitRemoteBranchExists="$( git branch -r | grep origin/"${gitBranch}$" )"
 
-        # local gitStatus="LANG=C git diff --quiet --ignore-submodules HEAD"
-        # local gitStatus="$( LANG=C git status 2>/dev/null )"
-        local gitBranch="$( LANG=C git symbolic-ref -q --short HEAD )"
-        local gitReflogId="$( LANG=C git reflog --pretty=format:'%h' -1 )"
-        local gitUntracked="$( git ls-files --other --exclude-standard --directory | egrep -v '/$' | head -n 1 )"
-        local gitModified="$( git ls-files -m | head -n 1 )"
-
-        local gitRemoteBranchExists="$( git branch -r | grep origin/${gitBranch} )"
         if [[ -n "$gitRemoteBranchExists" ]] ; then
-            local gitLastlogId="$( LANG=C git log --pretty=format:'%h' origin/${gitBranch} -1 )"
+            gitLastlogId="$( LANG=C git log --pretty=format:'%h' origin/${gitBranch} -1 )"
 
             if [[ "${gitReflogId}" != "${gitLastlogId}" ]] ; then
-                local ahead="$( color.ps1 yellow )↑"
+                ahead="$( color.ps1 yellow )↑"
             fi
         else
-            local ahead="$( color.ps1 yellow )?"
+            ahead="$( color.ps1 yellow )?"
         fi
 
         if [[ -n "${gitModified}" ]] ; then
-            local modified="$( color.ps1 red )⚡"
+            modified="$( color.ps1 red )⚡"
         fi
 
         if [[ -n "${gitUntracked}" ]] ; then
-            local untracked="$( color.ps1 red )?"
+            untracked="$( color.ps1 red )?"
         fi
 
         if [[ "${gitBranch}" == 'master' ]] ; then
@@ -49,7 +47,7 @@ function es_prompt_status_git() {
         fi
 
         if [[ -z "${ahead}" ]] && [[ -z "${modified}" ]] ; then
-            local ok="$( color.ps1 green )♥"
+            ok="$( color.ps1 green )♥"
         fi
         echo "(${gitBranch}${ok}${modified}${ahead}${untracked}$( color.ps1 none ))"
     fi
