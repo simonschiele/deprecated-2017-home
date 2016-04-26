@@ -13,9 +13,11 @@ function es_prompt_status_git() {
 
     if $( LANG=C git rev-parse --is-inside-work-tree 2>/dev/null ) ; then
 
-        #local gitStatus="LANG=C git diff --quiet --ignore-submodules HEAD"
+        # local gitStatus="LANG=C git diff --quiet --ignore-submodules HEAD"
         # local gitStatus="$( LANG=C git status 2>/dev/null )"
         local gitBranch="$( LANG=C git symbolic-ref -q --short HEAD )"
+        local gitReflogId="$( LANG=C git reflog --pretty=format:'%h' -1 )"
+        local gitLastlogId="$( LANG=C git log --pretty=format:'%h' origin/${gitBranch} -1 )"
 
         if [ "${gitBranch}" = 'master' ] ; then
             gitBranch=""
@@ -25,9 +27,9 @@ function es_prompt_status_git() {
         #    local state="$( color.ps1 red )⚡"
         # fi
 
-        # if [[ "${gitStatus}" =~ "ahead of" ]] ; then
-        #    local ahead="$( color.ps1 yellow )↑"
-        # fi
+        if [[ "${gitReflogId}" != "${gitLastlogId}" ]] ; then
+            local ahead="$( color.ps1 yellow )↑"
+        fi
 
         if test -n "${ahead}" || test -n "${state}" ; then
             echo "(${gitBranch}${ahead}${state}$( color.ps1 none ))"
