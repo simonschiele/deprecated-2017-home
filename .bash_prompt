@@ -48,11 +48,10 @@ function es_prompt_status_git() {
             gitBranch="$gitBranch "
         fi
 
-        if test -n "${ahead}" || test -n "${modified}" ; then
-            echo "(${gitBranch}${modified}${ahead}${untracked}$( color.ps1 none ))"
-        else
-            echo "(${gitBranch}$( color.ps1 green )♥$( color.ps1 none ))"
+        if [[ -z "${ahead}" ]] && [[ -z "${modified}" ]] ; then
+            local ok="$( color.ps1 green )♥"
         fi
+        echo "(${gitBranch}${ok}${modified}${ahead}${untracked}$( color.ps1 none ))"
     fi
 }
 
