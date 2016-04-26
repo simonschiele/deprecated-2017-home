@@ -1,4 +1,7 @@
 #!/bin/bash
+# todo: config flags (icons, enable/disable colors, enable/disable untracked-seperated)
+# todo: "pwd"-prolem + flag for "directory context prompt"
+# todo: async fetch (after pwd)
 
 function color.exists() {
     [ ${COLORS[${1:-none}]+isset} ] && return 0 || return 1
@@ -17,22 +20,36 @@ function es_prompt_status_git() {
         # local gitStatus="$( LANG=C git status 2>/dev/null )"
         local gitBranch="$( LANG=C git symbolic-ref -q --short HEAD )"
         local gitReflogId="$( LANG=C git reflog --pretty=format:'%h' -1 )"
-        local gitLastlogId="$( LANG=C git log --pretty=format:'%h' origin/${gitBranch} -1 )"
+        local gitUntracked="$( git ls-files --other --exclude-standard --directory | egrep -v '/$' | head -n 1 )"
+        local gitModified="$( git ls-files -m | head -n 1 )"
 
-        if [ "${gitBranch}" = 'master' ] ; then
+        local gitRemoteBranchExists="$( git branch -r | grep origin/${gitBranch} )"
+        if [[ -n "$gitRemoteBranchExists" ]] ; then
+            local gitLastlogId="$( LANG=C git log --pretty=format:'%h' origin/${gitBranch} -1 )"
+
+            if [[ "${gitReflogId}" != "${gitLastlogId}" ]] ; then
+                local ahead="$( color.ps1 yellow )↑"
+            fi
+        else
+            local ahead="$( color.ps1 yellow )?"
+        fi
+
+        if [[ -n "${gitModified}" ]] ; then
+            local modified="$( color.ps1 red )⚡"
+        fi
+
+        if [[ -n "${gitUntracked}" ]] ; then
+            local untracked="$( color.ps1 red )?"
+        fi
+
+        if [[ "${gitBranch}" == 'master' ]] ; then
             gitBranch=""
+        else
+            gitBranch="$gitBranch "
         fi
 
-        # if [[ ! ${gitStatus} =~ "working directory clean" ]] ; then
-        #    local state="$( color.ps1 red )⚡"
-        # fi
-
-        if [[ "${gitReflogId}" != "${gitLastlogId}" ]] ; then
-            local ahead="$( color.ps1 yellow )↑"
-        fi
-
-        if test -n "${ahead}" || test -n "${state}" ; then
-            echo "(${gitBranch}${ahead}${state}$( color.ps1 none ))"
+        if test -n "${ahead}" || test -n "${modified}" ; then
+            echo "(${gitBranch}${modified}${ahead}${untracked}$( color.ps1 none ))"
         else
             echo "(${gitBranch}$( color.ps1 green )♥$( color.ps1 none ))"
         fi
@@ -90,59 +107,15 @@ function es_prompt() {
 
 
 if [[ "${0}" != '-bash' ]] && [[ "$( readlink -f "${0}" )" == "$( readlink -f "${BASH_SOURCE[0]}" )" ]] ; then
-    # called by source - export PROMPT_COMMAND git prompt if not already set
-
-    # {{{ Colors
+    # called by exec - give git status with timeout
 
     declare -g -A COLORS
-
     COLORS[none]="\e[0m"
-    COLORS[off]="\e[0m"
-    COLORS[false]="\e[0m"
-    COLORS[normal]="\e[0m"
-
-    # Basic Colors
     COLORS[black]="\e[0;30m"
     COLORS[red]="\e[0;31m"
     COLORS[green]="\e[0;32m"
     COLORS[yellow]="\e[0;33m"
-    COLORS[blue]="\e[0;34m"
-    COLORS[purple]="\e[0;35m"
-    COLORS[cyan]="\e[0;36m"
-    COLORS[white]="\e[0;37m"
-
-    # Bold Colors
-    COLORS[black_bold]="\e[1;30m"
-    COLORS[red_bold]="\e[1;31m"
-    COLORS[green_bold]="\e[1;32m"
-    COLORS[yellow_bold]="\e[1;33m"
-    COLORS[blue_bold]="\e[1;34m"
-    COLORS[purple_bold]="\e[1;35m"
-    COLORS[cyan_bold]="\e[1;36m"
-    COLORS[white_bold]="\e[1;37m"
-
-    # Underline
-    COLORS[black_under]="\e[4;30m"
-    COLORS[red_under]="\e[4;31m"
-    COLORS[green_under]="\e[4;32m"
-    COLORS[yellow_under]="\e[4;33m"
-    COLORS[blue_under]="\e[4;34m"
-    COLORS[purple_under]="\e[4;35m"
-    COLORS[cyan_under]="\e[4;36m"
-    COLORS[white_under]="\e[4;37m"
-
-    # Background Colors
-    COLORS[black_background]="\e[40m"
-    COLORS[red_background]="\e[41m"
-    COLORS[green_background]="\e[42m"
-    COLORS[yellow_background]="\e[43m"
-    COLORS[blue_background]="\e[44m"
-    COLORS[purple_background]="\e[45m"
-    COLORS[cyan_background]="\e[46m"
     COLORS[white_background]="\e[47m"
-    COLORS[gray_background]="\e[100m"
-
-    # }}}
 
     es_prompt_status_git ${1:-true}
 else
