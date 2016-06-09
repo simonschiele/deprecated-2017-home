@@ -13,9 +13,6 @@
 [submodule ".lib/vils-ng"]
     path = .lib/vils-ng
     url = https://github.com/simonschiele/vils-ng.git
-[submodule ".lib/cosmic-sans-neue"]
-    path = .lib/cosmic-sans-neue
-    url = https://github.com/belluzj/cosmic-sans-neue
 [submodule ".lib/dircolors-solarized"]
     path = .lib/dircolors-solarized
     url = https://github.com/seebi/dircolors-solarized.git
@@ -31,9 +28,6 @@
 [submodule ".lib/solarized-tmux"]
     path = .lib/solarized-tmux
     url = https://github.com/seebi/tmux-colors-solarized.git
-[submodule ".lib/git-hub"]
-    path = .lib/git-hub
-    url = https://github.com/github/hub
 [submodule ".i3"]
 	path = .i3
 	url = https://github.com/simonschiele/dot.i3.git
