@@ -88,8 +88,8 @@ function es_prompt() {
         fi
     fi
 
-    if [ -e ~/.bash_prompt ] && [ -n "$( which timeout )" ] ; then
-        PS1git=$( LANG=C timeout 0.1 ~/.bash_prompt "${colors}" )
+    if [ -x ~/.bashrc.d/prompt.sh ] && [ -n "$( which timeout )" ] ; then
+        PS1git=$( LANG=C timeout 0.1 ~/.bashrc.d/prompt.sh "${colors}" )
         local gitret=$?
         if [ $gitret -eq 124 ] ; then
             PS1git="($( color.ps1 red )git slow$( color.ps1 ))"
@@ -114,7 +114,7 @@ if [[ "${0}" != '-bash' ]] && [[ "$( readlink -f "${0}" )" == "$( readlink -f "$
     COLORS[yellow]="\e[0;33m"
     COLORS[white_background]="\e[47m"
 
-    es_prompt_status_git ${1:-true}
+    es_prompt_status_git "${1:-true}"
 else
     # called by source - export PROMPT_COMMAND git prompt if not already set
     if ! ( echo "$PROMPT_COMMAND" | grep -q "es_prompt" ) ; then
