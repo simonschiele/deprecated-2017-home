@@ -41,6 +41,10 @@ exported PROMPT_COMMAND that calls ~/.bash_prompt by execution (including a
 timeout). I'm not happy with this - maybe somebody else found a nicer
 solution for this...
 
+## Thirdparty sources
+
+.fonts-failover/        https://github.com/ryanoasis/nerd-fonts/
+
 
 ## License
 
