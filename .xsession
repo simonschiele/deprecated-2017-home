@@ -43,6 +43,11 @@ function main() {
     log "disabling bell"
     xset -b
 
+    # work
+    if [[ "$HOSTNAME" =~ work ]] ; then
+        xrandr --output DP1 --left-of DP2
+    fi
+
     # log "Enable zapping (C-A-<Bksp> kills X)"
     #setxkbmap -option terminate:ctrl_alt_bksp
 

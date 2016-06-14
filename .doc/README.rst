@@ -31,7 +31,6 @@ Overview
 .. _website dotfiles awesome: https://github.com/simonschiele/dot.awesome.git
 .. _website dotfiles i3: https://github.com/simonschiele/dot.i3.git
 
-
 Repositories
 ============
 
@@ -67,7 +66,8 @@ Setup / How to use this config
 
 Install
 -------
-To use this configuration, just replace your home directory with 
+
+To use this configuration, just replace your home directory with
 this configset ;-)
 
 .. code-block:: bash
@@ -96,6 +96,60 @@ hack. ~/.bash_prompt gets sourced by the usual bashrc logic and prepares a
 exported PROMPT_COMMAND that calls ~/.bash_prompt by execution (including a
 timeout). I'm not happy with this - maybe somebody else found a nicer
 solution for this...
+
+
+Documentation
+=============
+
+relevant config files
+---------------------
+
+.. list-table::
+    :header-rows: 1
+
+    * - /etc/profile
+      - The systemwide initialization file, executed for login shells
+    * - /etc/bash.bashrc
+      - The systemwide per-interactive-shell startup file
+    * - /etc/bash.bash.logout
+      - The systemwide login shell cleanup file, executed when a login shell exits
+    * - ~/.bash_profile, ~/.bash_login, ~/.profile
+      - Personal initialization file, executed for most login shells,
+        in that order, and reads and executes commands from the first one
+        that is readable and existing
+    * - ~/.bashrc
+      - The individual per-interactive-shell startup file
+    * - ~/.bash_logout
+      - The individual login shell cleanup file, executed when a login shell exits
+    * - ~/.inputrc
+      - Individual readline initialization file
+
+
+man pages
+---------
+
+Use "man [section] <application>" to view a man page from a specific section or
+use "man -a <application>" to get all available man pages in a row.
+
+manual sections:
+ 1   Executable programs or shell commands
+ 2   System calls (functions provided by the kernel)
+ 3   Library calls (functions within program libraries)
+ 4   Special files (usually found in /dev)
+ 5   File formats and conventions eg /etc/passwd
+ 6   Games
+ 7   Miscellaneous (including macro packages and conventions (man(7), groff(7)))
+ 8   System administration commands (usually only for root)
+ 9   Kernel routines [Non standard]
+
+.. list-table::
+    :header-rows: 1
+
+    * - man page
+      - description
+    * - environ(7)
+      - user environment (overview env variables)
+
 
 Thirdparty sources
 ==================

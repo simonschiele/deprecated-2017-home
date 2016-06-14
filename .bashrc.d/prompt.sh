@@ -55,17 +55,19 @@ function es_prompt_status_git() {
 
 function es_prompt() {
     local lastret=$?
-    local colors=${1:-true}
-    local PS1prompt=" > "
-    local PS1error=$( [ ${lastret} -gt 0 ] && echo "${lastret}" )
-    local PS1user="${SUDO_USER:-${USER}}"
-    local PS1host="\h"
-    local PS1path="\w"
-    local PS1git=
-    local PS1chroot=
-    local PS1schroot=${SCHROOT_CHROOT_NAME:+(schroot:$SCHROOT_CHROOT_NAME)}
-    local PS1virtualenv=${VIRTUAL_ENV:+(virtualenv:$VIRTUAL_ENV)}
-    PS1chroot=${PS1chroot:+(chroot) }
+    local colors PS1prompt PS1error PS1user PS1host PS1path PS1git PS1chroot \
+          PS1schroot PS1virtualenv
+
+    colors=${1:-true}
+    PS1prompt=" > "
+    PS1error=$( [ ${lastret} -gt 0 ] && echo "${lastret}" )
+    PS1user="${SUDO_USER:-${USER}}"
+    PS1host="\h"
+    PS1path="\w"
+    PS1git=
+    PS1chroot=${debian_chroot:+(chroot:$debian_chroot)}
+    PS1schroot=${SCHROOT_CHROOT_NAME:+(schroot:$SCHROOT_CHROOT_NAME)}
+    PS1virtualenv=${VIRTUAL_ENV:+(virtualenv:$VIRTUAL_ENV)}
 
     if ( ${colors} ) ; then
         PS1error=${PS1error:+$( color.ps1 red )${PS1error}$( color.ps1 )}
@@ -74,10 +76,10 @@ function es_prompt() {
         PS1chroot=${PS1chroot:+($( color.ps1 red )chroot$( color.ps1 ))}
 
         BOOLEAN=(true false)
-        IS_SUDO=$( pstree -s "$$" | grep -qi 'sudo' ; echo ${BOOLEAN[$?]} )
-        IS_ROOT=$( [ $( id -u ) -eq 0 ] && ! ${IS_SUDO} ; echo ${BOOLEAN[$?]} )
-        IS_UID0=$( ${IS_SUDO} || ${IS_ROOT} ; echo ${BOOLEAN[$?]} )
-        IS_SSH=$( pstree -s "$$" | grep -qi 'sshd' ; echo ${BOOLEAN[$?]} )
+        IS_SUDO=$( pstree -s "$$" | grep -qi 'sudo' ; echo "${BOOLEAN[$?]}" )
+        IS_ROOT=$( [[ "$( id -u )" == 0 ]] && ! ${IS_SUDO} ; echo "${BOOLEAN[$?]}" )
+        IS_UID0=$( ${IS_SUDO} || ${IS_ROOT} ; echo "${BOOLEAN[$?]}" )
+        IS_SSH=$( pstree -s "$$" | grep -qi 'sshd' ; echo "${BOOLEAN[$?]}" )
 
         if ${IS_UID0} ; then
             PS1user=${PS1user:+$( color.ps1 red )${PS1user}$( color.ps1 )}

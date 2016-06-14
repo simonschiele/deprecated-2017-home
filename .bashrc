@@ -1,199 +1,258 @@
 #!/bin/bash
 
-# test if shell is bash
-if [ -z "$PS1" ] || [ -z "$BASH_VERSION" ] ; then
-    echo "ERROR: shell is not BASH" >&2
+echo "[running] ~/.bashrc" >&2
+
+already.imported () {
+    local this_file source_file found
+
+    found=0
+    this_file=$( readlink --canonicalize --no-newline "${BASH_SOURCE[0]}" )
+
+    i=0
+    for source_file in "${BASH_SOURCE[@]}"; do  # ${a[@]:1} ->
+        i=$(( i + 1 ))
+    done
+    
+    echo "[$this_file] checking if already imported ($i candidates) before doing anything else" >&2
+    echo "[$this_file] FN: ${!FUNCNAME[*]} | ${FUNCNAME[*]}" >&2
+    echo "[$this_file] B_S: ${!BASH_SOURCE[*]} | ${BASH_SOURCE[*]}" >&2
+    j="false"
+    for source_file in "${!BASH_SOURCE[@]}"; do  # ${a[@]:1} ->
+        echo "[$this_file] testing ${BASH_SOURCE[$source_file]}" >&2
+        if [[ "$this_file" == "${BASH_SOURCE[$source_file]}" ]] ; then
+            found=true
+        fi
+    done
+    echo "[$this_file] Found: $found" >&2
+
     return 1
-fi
+}
 
-# test if interactive
-case $- in
-    *i*) ;;
-    *) return ;;
-esac
+# already.imported && return
 
-# {{{ PATH + Includes
+function verify_bash() {
+    # test if shell is bash
+    if [[ -z "$PS1" ]] || [[ -z "$BASH_VERSION" ]] ; then
+        echo "ERROR: shell is not BASH" >&2
+        return 1
+    fi
 
-# add local bin-directories to PATH
-possible_bins="node_modules/.bin .node_modules/.bin .node/bin bin .bin"
-for dir in $possible_bins ; do
-    [ -d "$HOME"/"$dir" ] && PATH="${dir/#/${HOME}/}:${PATH}"
-done
-unset dir possible_bins
+    # test if interactive
+    [[ "$-" != *i* ]] && return 1
 
-# source helpers, libs, ...
-mandatory_includes="${HOME}/.bash_functions ${HOME}/.bash_prompt"
-mandatory_includes+=" ${HOME}/.bash_aliases ${HOME}/.private/bashrc"
-for include in $mandatory_includes ; do
-    if [ -r "$include" ] ; then
+    return 0
+}
+
+function setup_profile() {
+    if ! shopt -q login_shell && [[ "$-" == *i* ]] ; then
+        [ -r /etc/profile ] && . /etc/profile
+    fi
+}
+
+function setup_includes_and_path() {
+    local possible_bins dir include
+
+    possible_bins=( .bin bin .private/bin/ .private/profitbricks/bin/ )
+    for dir in "${possible_bins[@]}" ; do
+        [ -d "$HOME"/"$dir" ] && PATH="${dir/#/${HOME}/}:${PATH}"
+    done
+
+    for include in .bashrc.d/*.sh ; do
         . "$include" || echo "[WARNING] Error while including ${include}" >&2
+    done
+}
+
+function setup_history() {
+    export HISTFILE="${HOME}/.bash_history"
+    export MYSQL_HISTFILE="${HOME}/.mysql_history"
+    export SQLITE_HISTFILE="${HOME}/.sqlite_history"
+
+    export HISTCONTROL="ignoreboth:erasedups"
+    export HISTSIZE=5000
+    export HISTFILESIZE=20000
+    export HISTIGNORE='&:clear:ls:[bf]g:exit:hist:history:tree:w: '
+    export HISTTIMEFORMAT='%F %T '
+    shopt -s histappend
+    shopt -s cmdhist        # combine multiline
+
+    # sync history between all terminals
+    # export PROMPT_COMMAND="history -a;history -c;history -r;$PROMPT_COMMAND"
+}
+
+function setup_completion() {
+    # enable programmable completion features
+    if ! shopt -oq posix; then
+      if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+      elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+      fi
+    fi
+
+    # completion case insensitive
+    bind "set completion-ignore-case on"
+
+    # treat hyphens and underscores as equivalent
+    bind "set completion-map-case on"
+
+    # display matches for ambiguous patterns at first tab press
+    bind "set show-all-if-ambiguous on"
+}
+
+function setup_colors() {
+    export GREP_COLOR='7;34'
+
+    export LESS_TERMCAP_mb=$'\e[01;31m'
+    export LESS_TERMCAP_md=$'\e[01;37m'
+    export LESS_TERMCAP_me=$'\e[0m'
+    export LESS_TERMCAP_se=$'\e[0m'
+    export LESS_TERMCAP_so=$'\e[01;43;37m'
+    export LESS_TERMCAP_ue=$'\e[0m'
+    export LESS_TERMCAP_us=$'\e[01;32m'
+
+    es_depends "colordiff" && alias diff='colordiff'
+    es_depends "pacman" && alias pacman='pacman --color=auto'
+
+    # dircolors
+    if es_depends dircolors ; then
+        eval "$( dircolors -b )"
+
+        # dircolors (solarized)
+        if [ -r ~/.lib/dircolors-solarized/dircolors.256dark ] ; then
+            eval "$( dircolors ~/.lib/dircolors-solarized/dircolors.256dark )"
+        fi
+    fi
+}
+
+function setup_ssh() {
+    # siehe auch:
+    # https://gist.github.com/octocat/2a6851cde24cdaf4b85b 
+
+    ### Test whether you have a running agent.
+    #$ ssh-add -l >& /dev/null; [ $? = 2 ] && echo no-agent
+    #no-agent
+    ### If not, start one.
+    #$ eval $(ssh-agent)
+    ### Now, add your key to the agent.
+    #$ ssh-add
+
+    if [ -n "$SSH_AGENT_PID" ] && ps "$SSH_AGENT_PID" 2>/dev/null >&2 ; then
+        # found, running and exported - all fine
+        echo -n
+    elif ( pgrep -u "${SUDO_USER:-$USER}" ssh-agent >/dev/null ) ; then
+        # reuse already running agent for active user
+        SSH_AGENT_PID=$( ps -U "${SUDO_USER:-$USER}" | awk '{print $1}' | tail -n1 )
+    elif [ -z "${SSH_AGENT_PID}" ] || ! ( ps "${SSH_AGENT_PID}" >/dev/null ) ; then
+        echo "no ssh-agent detected - starting new one" >&2
+        SSH_AGENT_PID=$( eval "$( ssh-agent )" | grep -o "[0-9]*" )
+    fi
+    export SSH_AGENT_PID
+
+    if [ -e /usr/lib/openssh/gnome-ssh-askpass ] ; then
+        export SUDO_ASKPASS=/usr/lib/openssh/gnome-ssh-askpass
+    fi
+}
+
+function setup_x11() {
+    # If $DISPLAY is not set, try to find running xserver and export it
+    if [ -z "${DISPLAY}" ] ; then
+        if ( pidof Xorg >/dev/null || pidof X >/dev/null ) ; then
+            DISPLAY=:$( ps ax | grep -i -e Xorg -e "/usr/bin/X" | grep -o " :[0-9]* " | head -n 1 | grep -o "[0-9]*" )
+            DISPLAY=${DISPLAY:-:0}
+            export DISPLAY
+        fi
+    fi
+}
+
+function setup_applications() {
+    local browser='chromium, google-chrome, google-chrome-unstable, chrome, '
+          browser+='iceweasel, firefox, epiphany, opera, dillo'
+    local mailer='icedove, thunderbird'
+    local terminals='terminator, gnome-terminal, rxvt-unicode, rxvt, xterm'
+    local editors='vim.nox, vim, vi, emacs -nw, nano, joe, mcedit'
+    local x11_editors='gvim, vim.gnome, gedit, emacs, mousepad'
+
+    OPEN='gnome-open'
+    BROWSER="$( es_depends_first "$browser" )"
+    MAILER="$( es_depends_first "$mailer" )"
+    TERMINAL="$( es_depends_first "$terminals" )"
+    EDITOR="$( es_depends_first "$editors" )"
+    VISUAL="$( es_depends_first "$x11_editors" )"
+    SUDO_EDITOR="$EDITOR"
+    GIT_EDITOR="$EDITOR"
+    SVN_EDITOR="$EDITOR"
+    TZ="${TZ:-$( head -n1 /etc/timezone )}"
+    TZ="${TZ:-Europe/Berlin}"
+
+    if es_depends "less" ; then
+        PAGER="less -i"
+        MANPAGER="less -X"   # no clear afterwards
     else
-        echo "[WARNING] Couldn't read/find ${include}" >&2
-    fi
-done
-unset include mandatory_includes
-
-# }}}
-
-# {{{ History
-
-export HISTFILE="${HOME}/.bash_history"
-export MYSQL_HISTFILE="${HOME}/.mysql_history"
-export SQLITE_HISTFILE="${HOME}/.sqlite_history"
-
-export HISTCONTROL="ignoreboth:erasedups"
-export HISTSIZE=500000
-export HISTFILESIZE=100000
-export HISTIGNORE='&:clear:ls:[bf]g:exit:hist:history:tree:[ t\]*'
-export HISTTIMEFORMAT='%F %T '
-shopt -s histappend
-shopt -s cmdhist        # combine multiline
-
-# sync history between all terminals
-# export PROMPT_COMMAND="history -a;history -c;history -r;$PROMPT_COMMAND"
-
-# }}}
-
-# {{{ Completion
-
-# enable programmable completion features
-if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
-fi
-
-# completion case insensitive
-bind "set completion-ignore-case on"
-
-# treat hyphens and underscores as equivalent
-bind "set completion-map-case on"
-
-# display matches for ambiguous patterns at first tab press
-bind "set show-all-if-ambiguous on"
-
-# }}}
-
-# {{{ SSH
-
-if [ -n "$SSH_AGENT_PID" ] && ps "$SSH_AGENT_PID" 2>/dev/null >&2 ; then
-    # found, running and exported - all fine
-    echo -n
-elif ( ps -U "${ESSENTIALS_USER}" | grep -v grep | grep -q ssh-agent ) ; then
-    # reuse already running agent for active user
-    export SSH_AGENT_PID=$( ps -U "${ESSENTIALS_USER}" | awk {'print $1'} | tail -n1 )
-elif [ -z "${SSH_AGENT_PID}" ] || ! ( ps ${SSH_AGENT_PID} >/dev/null ) ; then
-    echo "no ssh-agent detected - starting new one"
-    export SSH_AGENT_PID=$( eval `ssh-agent` | grep -o "[0-9]*" )
-fi
-
-# }}}
-
-# {{{ Colors
-
-# application colors
-export GREP_COLOR='7;34'
-
-export LESS_TERMCAP_mb=$'\e[01;31m'
-export LESS_TERMCAP_md=$'\e[01;37m'
-export LESS_TERMCAP_me=$'\e[0m'
-export LESS_TERMCAP_se=$'\e[0m'
-export LESS_TERMCAP_so=$'\e[01;43;37m'
-export LESS_TERMCAP_ue=$'\e[0m'
-export LESS_TERMCAP_us=$'\e[01;32m'
-
-es_depends "colordiff" && alias diff='colordiff'
-es_depends "pacman" && alias pacman='pacman --color=auto'
-
-# dircolors
-if es_depends dircolors ; then
-    eval "`dircolors -b`"
-
-    # dircolors (solarized)
-    if [ -r ~/.lib/dircolors-solarized/dircolors.256dark ] ; then
-        eval "`dircolors ~/.lib/dircolors-solarized/dircolors.256dark`"
-    fi
-fi
-
-# }}}
-
-# {{{ X11
-
-if [ -z "${DISPLAY}" ] ; then
-    if ( pidof Xorg >/dev/null || pidof X >/dev/null ) ; then
-        DISPLAY=:$( ps ax | grep -i -e Xorg -e "/usr/bin/X" | grep -o " :[0-9]* " | head -n 1 | grep -o "[0-9]*" )
-        DISPLAY=${DISPLAY:-:0}
-        export DISPLAY
-    fi
-fi
-
-# }}}
-
-# {{{ Settings
-
-## verify expected ~/.bash_functions is loaded
-if [ -n "$ESSENTIALS_HOME" ] ; then
-    export ESSENTIALS=true
-
-    # if essential debug is enabled, print banner + infos
-    if ( "$ESSENTIALS_DEBUG" ) ; then
-        es_info
+        PAGER="more"
+        MANPAGER="more"
     fi
 
-    # default applications
-    export PAGER=${CONFIG['pager']:-$( es_depends_first "less more" )}
-    export BROWSER=${CONFIG['browser']:-$( es_depends_first "chromium iceweasel" )}
-    export MAILER=${CONFIG['mailer']:-icedove}
-    export OPEN=${CONFIG['open']:-gnome-open}
-    export VISUAL=${CONFIG['visual']:-$( es_depends_first "gvim gedit" )}
-    export EDITOR=${CONFIG['editor']:-$( es_depends_first "vim.nox vim vi nano" )}
+    export OPEN BROWSER MAILER TERMINAL EDITOR VISUAL SUDO_EDITOR \
+           GIT_EDITOR SVN_EDITOR TZ PAGER MANPAGER
 
-    terminals="terminator gnome-terminal rxvt-unicode xfce-terminal rxvt xterm"
-    export TERMINAL=${CONFIG['terminal']:-$( es_depends_first "$terminals" )}
-    unset terminals
-
-else
-    echo "[ERROR] essentials not loaded, loading failover defaults" >&2
-    export ESSENTIALS=false
-
-    # defaults applications
-    PAGER=${CONFIG[pager]:-$( which less more | head -n 1 )}
-    EDITOR=${CONFIG[editor]:-$( which vim.nox vim vi nano mcedit joe | head -n1 )}
-    export EDITOR PAGER
-
-    # applications overwrite
-    alias ls='ls --color=auto'
+    alias cp='cp -i -r'
     alias grep='grep --color=auto'
-fi
+    alias ls='LC_COLLATE=C ls --color=auto --group-directories-first -p'
+    alias mkdir='mkdir -p'
+    alias mv='mv -i'
+    alias rm='rm -i'
+    alias screen='screen -U'
+    alias sudo='sudo '
+    alias tmux='TERM=screen-256color-bce tmux'
+    alias vi='$EDITOR'
+    alias wget='wget -c'
+}
 
-# general settings
-shopt -s checkjobs                  # print warning if jobs are running on shell exit
-shopt -s globstar                   # ** matches all files, dirs and subdirs
-shopt -s extglob                    # extended pattern matching features
-shopt -s autocd                     # if a command is a dir name, cd to it
-shopt -s cdspell                    # correct dir spelling errors on cd
-shopt -s dirspell                   # correct dir spelling errors on completion
-shopt -s checkwinsize               # check winsize and update LINES + COLUMNS
-shopt -s lithist                    # save multi-line commands with newlines
-shopt -s progcomp                   # programmable completion
-#shopt -s no_empty_cmd_completion   # don't try to complete empty cmds
-set -o notify                       # report status of terminated bg jobs immediately
+function setup_keymapping() {
+    # ctrl + e - remove till last seperator (overwrites a keymapping to jump to line end)
+    bind '\C-e:unix-filename-rubout'
+}
 
-# ctrl+e - remove till last seperator
-bind '\C-e:unix-filename-rubout'
+function setup_shell() {
+    shopt -s autocd                     # if a command is a dir name, cd to it
+    shopt -s cdspell                    # correct dir spelling errors on cd
+    shopt -s checkjobs                  # print warning if jobs are running on shell exit
+    shopt -s checkwinsize               # check winsize and update LINES + COLUMNS
+    shopt -s dirspell                   # correct dir spelling errors on completion
+    shopt -s extglob                    # extended pattern matching features
+    shopt -s globstar                   # ** matches all files, dirs and subdirs
+    shopt -s lithist                    # save multi-line commands with newlines
+    shopt -s progcomp                   # programmable completion
+    shopt -u no_empty_cmd_completion    # don't try to complete empty cmds
+    set -o noclobber                    # do not overwrite files by redirect
+    set -o notify                       # report status of terminated bg jobs immediately
+}
 
-# }}}
+function stamp() {
+    date +%s%N | cut -b1-13
+}
 
-# application overwrites
-alias cp='cp -i -r'
-alias ls='LC_COLLATE=C ls --color=auto --group-directories-first -p'
-alias mkdir='mkdir -p'
-alias mv='mv -i'
-alias rm='rm -i'
-alias screen='screen -U'
-alias sudo='sudo '
-alias tmux='TERM=screen-256color-bce tmux'
-alias wget='wget -c'
+function bashrc() {
+    local status=0
 
+    verify_bash || return $?
+    setup_profile
+
+    setup_includes_and_path || status=$?
+    setup_history
+    setup_completion
+    setup_colors
+    setup_ssh
+    setup_x11
+    setup_applications
+    setup_keymapping
+    setup_shell
+
+    unset -f verify_bash setup_colors setup_completion setup_history \
+             setup_includes_and_path setup_ssh setup_x11 \
+             setup_applications
+
+    return $status
+}
+
+bashrc "$@" || return $?

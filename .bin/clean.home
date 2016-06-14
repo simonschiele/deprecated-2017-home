@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# ~/.bin/clean.home
+#
+# cleanup in $HOME
+#
+
+LANG=C
+
+function main() {
+    local SUDO="sudo "
+    local USERNAME="${SUDO_USER:USER}"
+
+    if [ -e "$HOME"/.bin/permissions.home ] ; then
+        "$HOME"/.bin/permissions.home
+    fi
+
+
+
+
+}
+
+main "$@"

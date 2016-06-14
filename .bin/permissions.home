@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# ~/.bin/permissions.home
+#
+# normalize permissions in $HOME
+#
+
+LANG=C
+
+function main() {
+    local SUDO="sudo "
+    local USERNAME="${SUDO_USER:USER}"
+}
+
+main "$@"

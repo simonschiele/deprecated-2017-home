@@ -30,6 +30,8 @@
 !/.inputrc
 !/.lib*
 !/.lib/**/*
+!/.playlists*
+!/.playlists/**/*
 !/.profile
 !/.psqlrc
 !/.ssh/README.rst
