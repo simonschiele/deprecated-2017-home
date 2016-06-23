@@ -60,6 +60,8 @@ function setup_includes_and_path() {
     for include in .bashrc.d/*.sh ; do
         . "$include" || echo "[WARNING] Error while including ${include}" >&2
     done
+
+    export CDPATH=".:~:repos"
 }
 
 function setup_history() {
@@ -109,7 +111,6 @@ function setup_colors() {
     export LESS_TERMCAP_so=$'\e[01;43;37m'
     export LESS_TERMCAP_ue=$'\e[0m'
     export LESS_TERMCAP_us=$'\e[01;32m'
-
     es_depends "colordiff" && alias diff='colordiff'
     es_depends "pacman" && alias pacman='pacman --color=auto'
 
