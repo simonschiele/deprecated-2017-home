@@ -1,0 +1,31 @@
+#!/bin/bash
+
+function main() {
+    local stash stash_id deli
+
+    if ( git rev-parse --is-inside-work-tree 2>/dev/null >&2 ) ; then
+        for stash in $( git stash list | cut -f'1' -d':' ) ; do
+            stash_id=$( echo "$stash" | grep -o '[0-9]*' )
+            (
+                deli=$( printf "%-$( tput cols )s" "=" )
+                echo "${deli// /=}"
+                echo
+                echo "stash $stash_id" | figlet
+                echo
+                git stash list --color=always | grep "$stash"
+                echo
+                # bug? --color makes behave like '-p' was given
+                # git stash show "$stash"
+                git stash show --stat --color=always "$stash"
+                echo
+                echo "${deli// /=}"
+                git stash show --color=always -p "$stash"
+            ) | less -M -R
+        done
+    else
+        echo "not inside git repo" >&2
+        exit 1
+    fi
+}
+
+main "$@"

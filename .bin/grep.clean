@@ -1,0 +1,7 @@
+#!/bin/bash
+
+grep --binary-files=without-match --color=always $* \
+    | sed "s|\t|    |g" \
+    | cut -c 1-"${COLUMNS:-$( tput cols )}" \
+    | grep -v -e "\.git/" -e "\.svn/" -e "\.hg/" \
+    | less --tilde -M -R -F -X
