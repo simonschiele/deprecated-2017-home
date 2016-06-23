@@ -1,0 +1,29 @@
+#!/bin/bash
+
+LANG=C
+
+function main() {
+    local container_dir="${1:-.}"
+    local mount_dirs=( /proc /sys /dev /dev/pts )
+
+    if [ ! -d "$container_dir" ] ; then
+        echo "'$container_dir' not found" >&2
+        exit 1
+    fi
+    
+    for dir in "${mount_dirs[@]}" ; do
+        local mnt="$container_dir/$dir"
+        local found=false
+
+        if [[ ! -d "$mnt" ]] && ! mountpoint -q "$mnt" ; then
+            mount -vt bind "$dir" "$mnt"
+            found=true
+        fi
+    done
+
+    if ! $found ; then
+        echo "No typical 
+    fi
+}
+
+main "$@"
