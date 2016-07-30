@@ -53,8 +53,7 @@ function main() {
 
     # todo: fix this construct (check modern way to launch
     #       window manager (maybe systemd?) and remove break
-    #       (would iterate after one closes regularly at the 
-    #       moment)
+    #       to iterate again after wm broke down
     log "starting window manager via dbus-launch"
     local window_managers="i3 awesome fluxbox gnome-session-classic"
     for wm in $window_managers ; do
