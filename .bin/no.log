@@ -1,4 +1,7 @@
 #!/bin/bash
+#
+#
+#
 
-echo "Stopping bash_history log"
-unset HISTFILE
+echo "Stopping logging: bash_history"
+set +o history

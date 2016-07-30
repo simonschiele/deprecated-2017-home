@@ -1,0 +1,3 @@
+#!/bin/bash
+export SSH_AGENT_PID=$( eval $(ssh-agent) 2>&1 | grep -o "[0-9]*" )
+ssh-add

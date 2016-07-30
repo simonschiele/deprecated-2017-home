@@ -413,16 +413,19 @@ function is.init_five() {
 
 # {{{ find.*
 
-alias find.dir='find . -type d'
-alias find.files='find . -type f'
-alias find.exec='find . ! -type d -executable'
-alias find.last_edited='find . -type f -printf "%T@ %T+ %p\n" | sort -n | tail -n 1000'
-alias find.last_edited_10k='find . -type f -printf "%T@ %T+ %p\n" | sort -n | tail -n 10000'
-alias find.repos='find . -name .git -or -name .svn -or -name .bzr -or -name .hg | while read dir ; do echo "$dir" | sed "s|\(.\+\)/\.\([a-z]\+\)$|\2: \1|g" ; done'
+alias find.dir='find -type d'
+alias find.files='find -type f'
+alias find.exec='find ! -type d -executable'
+alias find.last_edited='find -type f -printf "%T@ %T+ %p\n" | sort -n | tail -n 1000'
+alias find.last_edited_10k='find -type f -printf "%T@ %T+ %p\n" | sort -n | tail -n 10000'
+alias find.repos='find -name .git -or -name .svn -or -name .bzr -or -name .hg | while read dir ; do echo "$dir" | sed "s|\(.\+\)/\.\([a-z]\+\)$|\2: \1|g" ; done'
 alias find.comma='ls -r --format=commas'
 alias find.dead_links='find -L -type l'
 alias find.links='find -type l'
 alias find.links+dead='find.dead_links'
+alias find.bigger_10m='find -size +10M'
+alias find.bigger_100m='find -size +100M'
+alias find.bigger_1000m='find -size +1000M'
 
 function find.tree() {
     local dir="${1}"

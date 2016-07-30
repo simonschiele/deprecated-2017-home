@@ -1,0 +1,61 @@
+#!/bin/bash
+
+LANG=C
+
+function error_exit() {
+    local msg exit_code
+
+    msg="$1"
+    exit_code="${2:-1}"
+
+    echo -e "$1" >&2
+    exit "$exit_code"
+}
+
+function main() {
+    local directory infos mount_source mount_filesystem mount_options \
+          mount_source_uuid mount_in_fstab
+
+    directory="${1%/}"
+
+    if [ -z "$directory" ] ; then
+        error_exit "Usage Error: please call like this:\n\
+             > $( basename ${0} ) <active_mountpoint>"
+    elif [ ! -d "$directory" ] ; then
+        error_exit "Error: '$directory' is not a dir"
+    elif ! ( mountpoint "$directory" 2>/dev/null >&2 ) ; then
+        error_exit "Error: '$directory' not an active mountpoint"
+    fi
+
+    infos=$( findmnt -n "$directory" )
+    mount_source=$( awk '{print $2}' <<< $infos)
+    mount_filesystem=$( awk '{print $3}' <<< $infos)
+    mount_options=$( awk '{print $4$5$6$7$8$9}' <<< $infos)
+    mount_source_uuid=$( blkid -s UUID -o value $mount_source )
+
+    if ( grep -qi "$uuid\|$mount_source.*$directory" /etc/fstab ) ; then
+        mount_in_fstab=true
+    else
+        mount_in_fstab=false
+    fi
+   
+    if ( cryptsetup isLuks "$mount_source" ) ; then
+        mount_is_luks=true
+    else
+        mount_is_luks=false
+    fi
+
+    echo "$mount_source -> $directory"
+    echo "       source: $mount_source (uuid: ${mount_source_uuid:-unknown})"
+    echo "       target: $directory"
+    echo "   filesystem: $mount_filesystem"
+    echo "      options: $mount_options"
+    echo "     in fstab: $mount_in_fstab"
+    echo "      is luks: $mount_is_luks"
+    echo
+    echo " Active Usage:"
+    lsof "$directory" 2>/dev/null
+    echo
+}
+
+main "$@"

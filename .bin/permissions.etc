@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# ~/.bin/permissions.etc
+#
+# normalize permissions and cleanup in /etc/
+#
+
+LANG=C
+
+function main() {
+    local SUDO="sudo "
+
+    $SUDO chown -c root: /etc/sudoers /etc/sudoers.d/ -R
+    $SUDO chmod -c 550 /etc/sudoers /etc/sudoers.d/ -R
+
+    # check sec. relevant files (shadow, passwd, group)
+    # check if etckeeper is clean
+}
+
+main "$@"

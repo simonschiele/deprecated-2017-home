@@ -2,17 +2,17 @@
 
 export XSESSION_ERRORS="$HOME"/.xsession-errors
 
-function log_rotate() {
-    log "logfile rotated"
-    cat "$XSESSION_ERRORS" >> "$XSESSION_ERRORS".old
-    rm -f "$XSESSION_ERRORS"
-
-    log "logfile created"
-}
-  
 function log() {
     local msg=$1
     echo "[$( date )] $msg" >> "$XSESSION_ERRORS"
+}
+
+function log_rotate() {
+    log "rotating logfile"
+    gzip -c "$XSESSION_ERRORS" >> "$XSESSION_ERRORS".old
+    rm -f "$XSESSION_ERRORS"
+
+    log "logfile created"
 }
 
 function main() {
@@ -22,7 +22,7 @@ function main() {
     log "merging $HOME/.Xresources"
     xrdb -merge ~/.Xresources
 
-    #### replace this with systemd
+    #### replace this with systemd!
     # start polkit-gnome-authentication-agent + gnome-keyring-daemon
     #/usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
     log "starting gnome-keyring"
@@ -31,22 +31,30 @@ function main() {
     export GNOME_KEYRING_PID
     export GNOME_KEYRING_SOCKET
 
-    # java fixes for awesome/i3
+    log "setting fixes for java in i3/awesome/..."
     export DE=generic
     export AWT_TOOLKIT=XToolkit
     export _JAVA_AWT_WM_NONREPARENTING=1
 
-    # Disable DPMS turning off the screen
+    log "disabling dpms screen blank thingi"
     xset -dpms
     xset s off
 
-    # Disable bell
+    log "disabling bell"
     xset -b
 
-    # Enable zapping (C-A-<Bksp> kills X)
+    # work
+    if [[ "$HOSTNAME" =~ work ]] ; then
+        xrandr --output DP1 --left-of DP2
+    fi
+
+    # log "Enable zapping (C-A-<Bksp> kills X)"
     #setxkbmap -option terminate:ctrl_alt_bksp
 
-    # start window manager
+    # todo: fix this construct (check modern way to launch
+    #       window manager (maybe systemd?) and remove break
+    #       to iterate again after wm broke down
+    log "starting window manager via dbus-launch"
     local window_managers="i3 awesome fluxbox gnome-session-classic"
     for wm in $window_managers ; do
         log "trying to start window manager: $wm"
@@ -56,7 +64,6 @@ function main() {
         break
     done
 
-    # source bash_logout for cleanup purposes
     if [ -e "$HOME"/.bash_logout ] ; then
         log "executing $HOME/.bash_logout"
         . "$HOME"/.bash_logout

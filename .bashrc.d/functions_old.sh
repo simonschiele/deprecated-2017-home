@@ -246,7 +246,7 @@ function es_depends() {
 
     case "$depends_type" in
         bin|which|executable)
-            which $depends_name >/dev/null && available=true
+            which "$depends_name" >/dev/null && available=true
             ;;
 
         dpkg|deb|debian)
@@ -255,36 +255,43 @@ function es_depends() {
             ;;
 
         pip)
+            local pip_version pip_output
             es_depends pip || exit_error 'please install (python-)pip, to check depends via pip'
-            local pip_version=$( pip --version | awk {'print $2'} )
 
-            if ( es_check_version 1.3 $pip_version ) ; then
-                local pip_output=$( pip show $depends_name 2>/dev/null | xargs | awk {'print $3"=="$5'} | sed '/^==$/d' )
+            pip_version=$( pip --version | awk '{print $2}' )
+            if ( es_check_version 1.3 "$pip_version" ) ; then
+                pip_output=$( pip show "$depends_name" 2>/dev/null | xargs | awk '{print $3"=="$5}' | sed '/^==$/d' )
             else
-                local pip_output=$( pip freeze 2>/dev/null | grep "^${depends_name}=" )
+                pip_output=$( pip freeze 2>/dev/null | grep "^${depends_name}=" )
             fi
 
             [[ -n "$pip_output" ]] && available=true
             ;;
 
         *)
-            es_depends $depends_name bin && available=true
+            es_depends "$depends_name" bin && available=true
             ;;
     esac
 
-    return $( $available )
+    $available
+    return
 }
 
 function es_depends_first() {
-    local dep
+    local candidate candidate_cmd
+    local candidates="$*"
+    IFS=","
 
-    for dep in ${@} ; do
-        if es_depends "$dep" ; then
-            echo "$dep"
+    for candidate in $candidates ; do
+        candidate="${candidate##*( )}"
+        candidate="${candidate%%*( )}"
+        candidate_cmd=$( echo "$candidate" | cut -f'1' -d' ' )
+        if es_depends "$candidate_cmd" ; then
+            echo "$candidate"
             return 0
         fi
     done
-    
+
     return 1
 }
 
@@ -430,37 +437,34 @@ export EXTENSIONS_AUDIO='flac,mp1,mp2,mp3,ogg,wav,aac,ac3,dts,m4a,mid,midi,mka,m
 export EXTENSIONS_DOCUMENTS='asc,rtf,txt,abw,zabw,bzabw,chm,pdf,doc,docx,docm,odm,odt,ods,ots,sdw,stw,wpd,wps,pxl,sxc,xlsx,xlsm,odg,odp,pps,ppsx,ppt,pptm,pptx,sda,sdd,sxd,dot,dotm,dotx,mobi,prc,epub,pdb,prc,tpz,azw,azw1,azw3,azw4,kf8,lit,fb2,md'
 export EXTENSIONS_ARCHIVES='7z,s7z,ace,arj,bz,bz2,bzip,bzip2,gz,gzip,lha,lzh,rar,r0,r00,tar,taz,tbz,tbz2,tgz,zip,rpm,deb,xz'
 
-# find (real) user/home
-export ESSENTIALS_USER="${ESSENTIALS_USER:-${CONFIG['user']:-${SUDO_USER:-${USER}}}}"
-export ESSENTIALS_HOME="${ESSENTIALS_HOME:-${CONFIG['home']:-$( getent passwd ${ESSENTIALS_USER} | cut -d':' -f6 )}}"
-export ESSENTIALS_USER="${ESSENTIALS_USER:-${SUDO_USER:-${USER}}}"
-export ESSENTIALS_HOME="${ESSENTIALS_HOME:-$( getent passwd ${ESSENTIALS_USER} | cut -d':' -f6 )}"
+## find (real) user/home
+#export ESSENTIALS_USER="${ESSENTIALS_USER:-${CONFIG['user']:-${SUDO_USER:-${USER}}}}"
+#export ESSENTIALS_HOME="${ESSENTIALS_HOME:-${CONFIG['home']:-$( getent passwd ${ESSENTIALS_USER} | cut -d':' -f6 )}}"
+#export ESSENTIALS_USER="${ESSENTIALS_USER:-${SUDO_USER:-${USER}}}"
+#export ESSENTIALS_HOME="${ESSENTIALS_HOME:-$( getent passwd ${ESSENTIALS_USER} | cut -d':' -f6 )}"
 
-# essential settings
-export ESSENTIALS_DIR_PKGLISTS="${ESSENTIALS_HOME}/.packages"
-export ESSENTIALS_DIR_FONTS="${ESSENTIALS_HOME}/.fonts"
-export ESSENTIALS_DIR_WALLPAPERS="${ESSENTIALS_HOME}/.backgrounds"
-export ESSENTIALS_DIR_LOG="${ESSENTIALS_HOME}/.log"
-export ESSENTIALS_DIR_CACHE="${ESSENTIALS_HOME}/.cache"
-export ESSENTIALS_LOGFILE="${CONFIG['logfile']:-${ESSENTIALS_DIR_LOG}/essentials.log}"
-export ESSENTIALS_CACHEFILE="${ESSENTIALS_DIR_CACHE}/essentials.cache"
-export ESSENTIALS_DEBUG="${ESSENTIALS_DEBUG:-${CONFIG['debug']:-false}}"
-export ESSENTIALS_LOG="${ESSENTIALS_LOG:-${CONFIG['log']:-true}}"
-export ESSENTIALS_COLORS="${ESSENTIALS_COLORS:-${CONFIG['colors']:-true}}"
-export ESSENTIALS_UNICODE="${ESSENTIALS_UNICODE:-${CONFIG['unicode']:-true}}"
-export ESSENTIALS_VERSION=$( es_repo_version_date "$HOME" )
-export ESSENTIALS_VERSION_VIM=$( vim --version | grep -o "[0-9.]\+" | head -n 1 )
-export ESSENTIALS_VERSION_GIT=$( git --version | sed 's/git version //' )
-export ESSENTIALS_VERSION_HOME=$( es_repo_version_date ${ESSENTIALS_HOME} )
-export ESSENTIALS_IS_SUDO=$( pstree -s "$$" | grep -qi 'sudo' ; echo ${BOOLEAN[$?]} )
-export ESSENTIALS_IS_SUDO_UNLOCKED=$( sudo -n echo -n 2>/dev/null ; echo ${BOOLEAN[$?]} )
-export ESSENTIALS_IS_ROOT=$( [ $( id -u ) -eq 0 ] && ! ${ESSENTIALS_IS_SUDO} ; echo ${BOOLEAN[$?]} )
-export ESSENTIALS_IS_UID0=$( ${ESSENTIALS_IS_SUDO} || ${ESSENTIALS_IS_ROOT} ; echo ${BOOLEAN[$?]} )  # rename
-export ESSENTIALS_IS_SSH=$( pstree -s "$$" | grep -qi 'ssh' ; echo ${BOOLEAN[$?]} )
-export ESSENTIALS_IS_MOSH=$( pstree -s "$$" | grep -qi 'mosh' ; echo ${BOOLEAN[$?]} )
-export ESSENTIALS_IS_TMUX=$( pstree -s "$$" | grep -qi 'tmux' ; echo ${BOOLEAN[$?]} )
-export ESSENTIALS_IS_SCREEN=$( pstree -s "$$" | grep -qi 'screen' ; echo ${BOOLEAN[$?]} )
-export ESSENTIALS_HAS_SSHAGENT=$( [ -n "$( ps hp ${SSH_AGENT_PID} 2>/dev/null )" ] ; echo ${BOOLEAN[$?]} )
-
-[ -r ~/.bash_functions_old ] && . ~/.bash_functions_old
-
+## essential settings
+#export ESSENTIALS_DIR_PKGLISTS="${ESSENTIALS_HOME}/.packages"
+#export ESSENTIALS_DIR_FONTS="${ESSENTIALS_HOME}/.fonts"
+#export ESSENTIALS_DIR_WALLPAPERS="${ESSENTIALS_HOME}/.backgrounds"
+#export ESSENTIALS_DIR_LOG="${ESSENTIALS_HOME}/.log"
+#export ESSENTIALS_DIR_CACHE="${ESSENTIALS_HOME}/.cache"
+#export ESSENTIALS_LOGFILE="${CONFIG['logfile']:-${ESSENTIALS_DIR_LOG}/essentials.log}"
+#export ESSENTIALS_CACHEFILE="${ESSENTIALS_DIR_CACHE}/essentials.cache"
+#export ESSENTIALS_DEBUG="${ESSENTIALS_DEBUG:-${CONFIG['debug']:-false}}"
+#export ESSENTIALS_LOG="${ESSENTIALS_LOG:-${CONFIG['log']:-true}}"
+#export ESSENTIALS_COLORS="${ESSENTIALS_COLORS:-${CONFIG['colors']:-true}}"
+#export ESSENTIALS_UNICODE="${ESSENTIALS_UNICODE:-${CONFIG['unicode']:-true}}"
+#export ESSENTIALS_VERSION=$( es_repo_version_date "$HOME" )
+#export ESSENTIALS_VERSION_VIM=$( vim --version | grep -o "[0-9.]\+" | head -n 1 )
+#export ESSENTIALS_VERSION_GIT=$( git --version | sed 's/git version //' )
+#export ESSENTIALS_VERSION_HOME=$( es_repo_version_date ${ESSENTIALS_HOME} )
+#export ESSENTIALS_IS_SUDO=$( pstree -s "$$" | grep -qi 'sudo' ; echo ${BOOLEAN[$?]} )
+#export ESSENTIALS_IS_SUDO_UNLOCKED=$( sudo -n echo -n 2>/dev/null ; echo ${BOOLEAN[$?]} )
+#export ESSENTIALS_IS_ROOT=$( [ $( id -u ) -eq 0 ] && ! ${ESSENTIALS_IS_SUDO} ; echo ${BOOLEAN[$?]} )
+#export ESSENTIALS_IS_UID0=$( ${ESSENTIALS_IS_SUDO} || ${ESSENTIALS_IS_ROOT} ; echo ${BOOLEAN[$?]} )  # rename
+#export ESSENTIALS_IS_SSH=$( pstree -s "$$" | grep -qi 'ssh' ; echo ${BOOLEAN[$?]} )
+#export ESSENTIALS_IS_MOSH=$( pstree -s "$$" | grep -qi 'mosh' ; echo ${BOOLEAN[$?]} )
+#export ESSENTIALS_IS_TMUX=$( pstree -s "$$" | grep -qi 'tmux' ; echo ${BOOLEAN[$?]} )
+#export ESSENTIALS_IS_SCREEN=$( pstree -s "$$" | grep -qi 'screen' ; echo ${BOOLEAN[$?]} )
+#export ESSENTIALS_HAS_SSHAGENT=$( [ -n "$( ps hp ${SSH_AGENT_PID} 2>/dev/null )" ] ; echo ${BOOLEAN[$?]} )
