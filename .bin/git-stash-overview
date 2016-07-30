@@ -1,0 +1,20 @@
+#!/bin/bash
+
+function main() {
+    local stash stash_id deli
+
+    if ( git rev-parse --is-inside-work-tree 2>/dev/null >&2 ) ; then
+        (
+            for stash in $( git stash list | cut -f'1' -d':' ) ; do
+                git stash list --color=always | grep "$stash"
+                git stash show --stat --color=always "$stash" | sed 's|^|\t|g'
+                echo
+            done
+        ) | less -M -R
+    else
+        echo "not inside git repo" >&2
+        exit 1
+    fi
+}
+
+main "$@"
