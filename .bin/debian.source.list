@@ -1,0 +1,40 @@
+#!/bin/bash
+
+function debian_source_list() {
+    local progname dist
+    progname=$( basename "$0" )
+    dist=${1:-jessie}
+
+    declare -A DEBIAN
+    DEBIAN[oldstable]=wheezy
+    DEBIAN[stable]=jessie
+    DEBIAN[testing]=stretch
+    DEBIAN[unstable]=sid
+    DEBIAN[experimental]=experimental
+
+    if [[ "$@" =~ "-h" ]] || [[ "$@" =~ "help" ]] ; then
+        echo "$progname usage:" >&2
+        echo "> $progname <wheezy|jessie|stable|stetch|...>" >&2
+        exit
+    fi
+
+    echo
+    for 
+    exit 23
+
+    echo "deb http://ftp.de.debian.org/debian/ ${dist} main non-free contrib"
+    echo "deb-src http://ftp.de.debian.org/debian/ ${dist} main non-free contrib"
+    echo
+    echo "deb http://security.debian.org/ ${dist}/updates main contrib non-free"
+    echo "deb-src http://security.debian.org/ ${dist}/updates main contrib non-free"
+    echo
+    echo "# ${dist}-updates, previously known as 'volatile'"
+    echo "deb http://ftp.de.debian.org/debian/ ${dist}-updates main contrib non-free"
+    echo "deb-src http://ftp.de.debian.org/debian/ ${dist}-updates main contrib non-free"
+    echo
+    echo "# ${dist}-backports"
+    echo "deb http://ftp.de.debian.org/debian ${dist}-backports main contrib non-free"
+    echo "deb-src http://ftp.de.debian.org/debian ${dist}-backports main contrib non-free"
+}
+
+debian_source_list "$@"
