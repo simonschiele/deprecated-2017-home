@@ -1,0 +1,3 @@
+! bell as urgent
+URxvt.urgentOnBell:  true
+XTerm*bellIsUrgent:  true

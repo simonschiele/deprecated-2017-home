@@ -1,2 +1,7 @@
 #!/bin/bash
-terminator -T irssi -x mosh -- simon@psaux.de screen -x 2>/dev/null >&2
+if [[ "$( hostname -s )" == "secure" ]] ; then
+    screen -R
+else
+    # terminator -T irssi -x mosh -- simon@psaux.de screen -x 2>/dev/null >&2
+    ssh -t simon@secure.psaux.de -- screen -R
+fi

@@ -42,6 +42,7 @@
 !/.vim
 !/.vimrc
 !/.wgetrc
+!/.Xdefaults
+!/.Xresources
 !/.xscreensaver
 !/.xsession
-!/.Xresources

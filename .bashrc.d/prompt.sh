@@ -119,10 +119,10 @@ function es_prompt() {
     fi
 
     if ( ${PROMPT_CONTAINERS:-true} ) ; then
-        PS1chroot=${debian_chroot:+($( color.ps1 red "chroot:" )$debian_chroot)}
         PS1schroot=${SCHROOT_CHROOT_NAME:+($( color.ps1 red "schroot:" )$SCHROOT_CHROOT_NAME)}
+        PS1chroot=${debian_chroot:+($( color.ps1 red "chroot:" )$debian_chroot)}
         PS1virtualenv=${VIRTUAL_ENV:+($( color.ps1 red "venv:" )$VIRTUAL_ENV)}
-        PS1container="${PS1chroot}${PS1schroot}${PS1virtualenv}"
+        PS1container="${PS1schroot:-$PS1chroot}${PS1virtualenv}"
         PS1container="${PS1container:+ $PS1container}"
     fi
 

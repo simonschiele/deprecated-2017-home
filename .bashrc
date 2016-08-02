@@ -1,35 +1,5 @@
 #!/bin/bash
 
-echo "[running] ~/.bashrc" >&2
-
-already.imported () {
-    local this_file source_file found
-
-    found=0
-    this_file=$( readlink --canonicalize --no-newline "${BASH_SOURCE[0]}" )
-
-    i=0
-    for source_file in "${BASH_SOURCE[@]}"; do  # ${a[@]:1} ->
-        i=$(( i + 1 ))
-    done
-    
-    echo "[$this_file] checking if already imported ($i candidates) before doing anything else" >&2
-    echo "[$this_file] FN: ${!FUNCNAME[*]} | ${FUNCNAME[*]}" >&2
-    echo "[$this_file] B_S: ${!BASH_SOURCE[*]} | ${BASH_SOURCE[*]}" >&2
-    j="false"
-    for source_file in "${!BASH_SOURCE[@]}"; do  # ${a[@]:1} ->
-        echo "[$this_file] testing ${BASH_SOURCE[$source_file]}" >&2
-        if [[ "$this_file" == "${BASH_SOURCE[$source_file]}" ]] ; then
-            found=true
-        fi
-    done
-    echo "[$this_file] Found: $found" >&2
-
-    return 1
-}
-
-# already.imported && return
-
 function verify_bash() {
     # test if shell is bash
     if [[ -z "$PS1" ]] || [[ -z "$BASH_VERSION" ]] ; then
@@ -49,19 +19,27 @@ function setup_profile() {
     fi
 }
 
-function setup_includes_and_path() {
-    local possible_bins dir include
+function setup_path() {
+    local possible_bins dir
 
-    possible_bins=( .bin bin .private/bin/ .private/profitbricks/bin/ )
+    possible_bins=( .bin bin )
     for dir in "${possible_bins[@]}" ; do
         [ -d "$HOME"/"$dir" ] && PATH="${dir/#/${HOME}/}:${PATH}"
     done
 
-    for include in .bashrc.d/*.sh ; do
+    export CDPATH="~:repos"
+}
+
+function setup_includes() {
+    local include
+
+    for include in "$HOME"/.bashrc.d/*.sh "$HOME"/.private/bashrc ; do
+        if [[ ! -e "$include" ]] ; then
+            echo "[WARNING] include '$HOME/$include' not found" >&2
+            continue
+        fi
         . "$include" || echo "[WARNING] Error while including ${include}" >&2
     done
-
-    export CDPATH=".:~:repos"
 }
 
 function setup_history() {
@@ -239,7 +217,8 @@ function bashrc() {
     verify_bash || return $?
     setup_profile
 
-    setup_includes_and_path || status=$?
+    setup_path || status=$(( "$status" +1 ))
+    setup_includes || status=$(( "$status" + 1 ))
     setup_history
     setup_completion
     setup_colors
@@ -250,8 +229,8 @@ function bashrc() {
     setup_shell
 
     unset -f verify_bash setup_colors setup_completion setup_history \
-             setup_includes_and_path setup_ssh setup_x11 \
-             setup_applications
+             setup_includes setup_path setup_ssh setup_x11 \
+             setup_applications bashrc
 
     return $status
 }

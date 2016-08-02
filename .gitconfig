@@ -10,6 +10,7 @@
 [merge]
     tool = vimdiff
     ff = only
+    log = true
 [diff]
     renames = copies
 [diff "bin"]
@@ -42,4 +43,4 @@
     serve = daemon --base-path=. --export-all --enable=receive-pack --reuseaddr --informative-errors --verbose
     subupdate = submodule update --init --remote --recursive
 [include]
-    path = ~/.pb/gitconfig
+    path = ~/.private/work/gitconfig

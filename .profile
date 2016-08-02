@@ -6,8 +6,6 @@
 # in ~/.profile.d/*.sh
 #
 
-echo "[running] ~/.profile" >&2
-
 for config in "$HOME"/.profile.d/*.sh ; do
     [ -r "$config" ] && . "$config"
 done
