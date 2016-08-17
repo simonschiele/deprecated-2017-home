@@ -1,9 +1,10 @@
 #!/bin/bash
 
 function debian_source_list() {
-    local progname dist
+    local progname dist cache
     progname=$( basename "$0" )
     dist=${1:-jessie}
+    cache=
 
     declare -A DEBIAN
     DEBIAN[oldstable]=wheezy
@@ -12,29 +13,160 @@ function debian_source_list() {
     DEBIAN[unstable]=sid
     DEBIAN[experimental]=experimental
 
-    if [[ "$@" =~ "-h" ]] || [[ "$@" =~ "help" ]] ; then
+    if [[ "$@" == *"-h"* ]] || [[ "$@" == *"help"* ]] ; then
         echo "$progname usage:" >&2
-        echo "> $progname <wheezy|jessie|stable|stetch|...>" >&2
+        echo "> $progname [-c|--cache] <wheezy|jessie|stable|stetch|...>" >&2
         exit
     fi
 
-    echo
-    for 
-    exit 23
+    if [[ "$@" == *"-c"* ]] || [[ "$@" == *"--cache"* ]] ; then
+        cache="localhost:3142"
+        shift
+    fi
 
-    echo "deb http://ftp.de.debian.org/debian/ ${dist} main non-free contrib"
-    echo "deb-src http://ftp.de.debian.org/debian/ ${dist} main non-free contrib"
-    echo
-    echo "deb http://security.debian.org/ ${dist}/updates main contrib non-free"
-    echo "deb-src http://security.debian.org/ ${dist}/updates main contrib non-free"
-    echo
-    echo "# ${dist}-updates, previously known as 'volatile'"
-    echo "deb http://ftp.de.debian.org/debian/ ${dist}-updates main contrib non-free"
-    echo "deb-src http://ftp.de.debian.org/debian/ ${dist}-updates main contrib non-free"
-    echo
-    echo "# ${dist}-backports"
-    echo "deb http://ftp.de.debian.org/debian ${dist}-backports main contrib non-free"
-    echo "deb-src http://ftp.de.debian.org/debian ${dist}-backports main contrib non-free"
+    if [[ "$@" == *"commercial"*  || "$@" == *"third"*"party"* ]] ; then
+        echo "##"
+        echo "## Commercial and thirdparty sources.list entries"
+        echo "##"
+        echo "## Just put them in a file like /etc/apt/sources.list.d/commercial.list and"
+        echo "## if you are ever in need of one of them, just remove the comments and add"
+        echo "## the corresponding keys."
+        echo "##"
+        echo
+        echo "## Sonarr"
+        echo "#"
+        echo "#  * Newsgroup VCR for series"
+        echo "#  > apt-key adv --keyserver keyserver.ubuntu.com --recv-keys FDA5DFFC"
+        echo "#"
+        echo "# deb https://apt.sonarr.tv/ master main"
+        echo
+        echo "## Google"
+        echo "#"
+        echo "#  * http://www.google.com/linuxrepositories/"
+        echo "#  > wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add -"
+        echo "#"
+        echo "# Chrome"
+        echo "# deb http://dl.google.com/linux/chrome/deb/ stable main"
+        echo "#"
+        echo "# Google Earth"
+        echo "# deb http://dl.google.com/linux/earth/deb/ stable main"
+        echo "#"
+        echo "# Google Talk browser plugin - http://www.google.com/chat/video"
+        echo "# deb http://dl.google.com/linux/talkplugin/deb/ stable main"
+        echo "#"
+        echo "# Google's Music Manager - http://www.google.com/support/music/bin/answer.py?answer=1229970"
+        echo "# deb http://dl.google.com/linux/musicmanager/deb/ stable main"
+        echo "#"
+        echo "# Apache mod-pagespeed"
+        echo "# deb http://dl.google.com/linux/mod-pagespeed/deb/ stable main"
+        echo
+        echo "## Mono for Debian"
+        echo "#"
+        echo "#  * https://pkg-mono.alioth.debian.org/"
+        echo "#"
+        echo "# deb http://debian.meebey.net/pkg-mono ./            # testing/unstable"
+        echo "# deb http://debian.meebey.net/experimental/mono /    # experimental" 
+        echo
+        echo "## Opera"
+        echo "#"
+        echo "#  * http://deb.opera.com/"
+        echo "#  > wget -q -O - https://deb.opera.com/archive.key | apt-key add -"
+        echo "#"
+        echo "# deb http://deb.opera.com/opera/ stable non-free"
+        echo "# deb http://deb.opera.com/opera/ testing non-free"
+        echo "# deb http://deb.opera.com/opera/ unstable non-free"
+        echo "# deb http://deb.opera.com/opera/ sid non-free"
+        echo "#"
+        echo "# deb http://deb.opera.com/opera-beta/ stable non-free"
+        echo "# deb http://deb.opera.com/opera-beta/ testing non-free"
+        echo "# deb http://deb.opera.com/opera-beta/ unstable non-free"
+        echo "# deb http://deb.opera.com/opera-beta/ sid non-free"
+        echo
+        echo "## Samsung Unified Linux Driver Repository (SULDR)"
+        echo "#"
+        echo "#  * http://www.bchemnet.com/suldr/index.html"
+        echo "#  > wget -q http://www.bchemnet.com/suldr/pool/debian/extra/su/suldr-keyring_1_all.deb && dpkg -i suldr-keyring_1_all.deb"
+        echo "#"
+        echo "# deb http://www.bchemnet.com/suldr/ debian extra"
+        echo
+        echo "## Spotify"
+        echo "#"
+        echo "#  * https://www.spotify.com"
+        echo "#  > apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys D2C19886"
+        echo "#  > gpg --export 4E9CFF4E | apt-key add -"
+        echo "#"
+        echo "# deb http://repository.spotify.com stable non-free"
+        echo
+        echo "## Steam"
+        echo "#"
+        echo "#  * http://store.steampowered.com/about/"
+        echo "#  > apt-key adv --keyserver keyserver.ubuntu.com --recv-keys F24AEA9FB05498B7"
+        echo "#"
+        echo "# deb [arch=i386] http://repo.steampowered.com/steam/ precise steam"
+        echo
+        echo "## Tor Project"
+        echo "#"
+        echo "#  * http://www.torproject.org"
+        echo "#  > gpg --keyserver keys.gnupg.net --recv 886DDD89 gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | apt-key add -"
+        echo "#"
+        echo "# deb http://deb.torproject.org/torproject.org testing main"
+        echo "# deb-src http://deb.torproject.org/torproject.org testing main"
+        echo
+        echo "## PostgreSQL"
+        echo "#"
+        echo "#  * https://wiki.postgresql.org/wiki/Apt"
+        echo "#  > wget -q -O- https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -"
+        echo "#"
+        echo "# deb http://apt.postgresql.org/pub/repos/apt/ wheezy-pgdg main"
+        echo "# deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main"
+        echo "# deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main"
+        echo
+        echo "## Plex"
+        echo "#"
+        echo "#  * http://forums.plex.tv/discussion/51427/plex-media-server-for-debian"
+        echo "#  > wget -q -O- http://shell.ninthgate.se/packages/shell.ninthgate.se.gpg.key | apt-key add -"
+        echo "#"
+        echo "# deb http://shell.ninthgate.se/packages/debian wheezy main   # (sys-v-init)"
+        echo "# deb http://shell.ninthgate.se/packages/debian jessie main   # (systemd)"
+        echo
+        echo "## Jenkins CI"
+        echo "#"
+        echo "#  * http://pkg.jenkins-ci.org/debian/"
+        echo "#  * JDK and JRE required (openjdk-6-jre and openjdk-6-jdk suggested)"
+        echo "#  > wget -q -O- http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key | apt-key add -"
+        echo "#"
+        echo "# deb http://pkg.jenkins-ci.org/debian binary/"
+        echo
+        echo "## Phoronix Test Suite"
+        echo "#"
+        echo "# deb http://www.phoronix-test-suite.com/releases/repo pts.debian/"
+        echo
+        echo "## deb-multimedia"
+        echo "#"
+        echo "#  * http://www.deb-multimedia.org/"
+        echo "#  > pkg=\$( wget -q -O- http://www.deb-multimedia.org/pool/main/d/deb-multimedia-keyring/deb-multimedia-keyring | grep -o \"<[^>]*>\" | grep -o deb-multimedia-keyring_.*_all.deb )"
+        echo "#  > wget -q \"http://www.deb-multimedia.org/pool/main/d/deb-multimedia-keyring/\$pkg\" && dpkg -i \"\$pkg\""
+        echo "#"
+        echo "# deb http://www.deb-multimedia.org stretch main non-free"
+        echo "# deb-src http://www.deb-multimedia.org stretch main"
+        echo "#"
+        echo "# Backports"
+        echo "# deb http://www.deb-multimedia.org stretch-backports main"
+    else
+        echo "deb http://${cache:+${cache}/}ftp.de.debian.org/debian/ ${dist} main contrib non-free"
+        echo "deb-src http://${cache:+${cache}/}ftp.de.debian.org/debian/ ${dist} main contrib non-free"
+        echo
+        echo "deb http://${cache:+${cache}/}security.debian.org/ ${dist}/updates main contrib non-free"
+        echo "deb-src http://${cache:+${cache}/}security.debian.org/ ${dist}/updates main contrib non-free"
+        echo
+        echo "## ${dist}-updates, previously known as 'volatile'"
+        echo "deb http://${cache:+${cache}/}ftp.de.debian.org/debian/ ${dist}-updates main contrib non-free"
+        echo "deb-src http://${cache:+${cache}/}ftp.de.debian.org/debian/ ${dist}-updates main contrib non-free"
+        echo
+        echo "## ${dist}-backports"
+        echo "# deb http://${cache:+${cache}/}ftp.de.debian.org/debian ${dist}-backports main contrib non-free"
+        echo "# deb-src http://${cache:+${cache}/}ftp.de.debian.org/debian ${dist}-backports main contrib non-free"
+    fi
 }
 
 debian_source_list "$@"

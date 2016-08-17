@@ -19,6 +19,34 @@ function setup_profile() {
     fi
 }
 
+function setup_config() {
+    local directory
+
+    if [[ ! -d "$directory" ]] ; then
+        echo "[WARNING] Directory not found '$directory'" >&2
+    fi
+
+    for file in .bashrc bashrc ; do
+        echo "testing for $directory/$file"
+        if [[ -r "$directory/$file" ]] ; then
+            echo "found"
+            . "$directory/$file" \
+                || echo "[WARNING] Error while including '$directory/$file'"
+        fi
+    done
+
+    shopt -s nullglob
+    for include in "$directory"/.bashrc.d/*.{sh,bash,completion} \
+                   "$directory"/bashrc.d/*.{sh,bash,completion} ; do
+        if [[ ! -x "$include" ]] ; then
+            echo "[WARNING] include '$HOME/$include' not found or deactivated" >&2
+            continue
+        fi
+        . "$include" || echo "[WARNING] Error while including ${include}" >&2
+    done
+    shopt -u nullglob
+}
+
 function setup_path() {
     local possible_bins dir
 
@@ -27,7 +55,7 @@ function setup_path() {
         [ -d "$HOME"/"$dir" ] && PATH="${dir/#/${HOME}/}:${PATH}"
     done
 
-    export CDPATH="~:repos"
+    export CDPATH=".:~"
 }
 
 function setup_includes() {
@@ -43,17 +71,38 @@ function setup_includes() {
 }
 
 function setup_history() {
-    export HISTFILE="${HOME}/.bash_history"
-    export MYSQL_HISTFILE="${HOME}/.mysql_history"
-    export SQLITE_HISTFILE="${HOME}/.sqlite_history"
-
-    export HISTCONTROL="ignoreboth:erasedups"
-    export HISTSIZE=5000
-    export HISTFILESIZE=20000
-    export HISTIGNORE='&:clear:ls:[bf]g:exit:hist:history:tree:w: '
-    export HISTTIMEFORMAT='%F %T '
     shopt -s histappend
     shopt -s cmdhist        # combine multiline
+
+    export HISTSIZE=5000
+    export HISTFILESIZE=
+    export HISTCONTROL="ignoreboth:erasedups"
+    export HISTIGNORE='&:clear:ls:[bf]g:exit:hist:history:tree:w: '
+    export HISTTIMEFORMAT='%F %T '
+
+    if [[ -f ~/.history ]] ; then
+        mv -f ~/.history{,~}
+        mkdir -p ~/.history
+        mv -v ~/.history{~,/bash}
+    fi
+
+    if [[ ! -d ~/.history ]] && ! mkdir -p ~/.history 2>/dev/null ; then
+        echo "[WARNING] Couldn't create '$HOME/.history'" >&2
+        return 1
+    fi
+
+    local hist histories
+    histories=( bash less psql mysql sqlite )
+    for hist in ${histories[*]} ; do
+        cat ~/.*"${hist}"*h*st* >> ~/.history/"$hist" 2>/dev/null
+        rm -f ~/.*"${hist}"*h*st* 2>/dev/null
+    done
+
+    export HISTFILE="${HOME}/.history/bash"
+    export LESSHISTFILE="${HOME}/.history/less"
+    export PSQL_HISTORY="${HOME}/.history/psql"
+    export MYSQL_HISTFILE="${HOME}/.history/mysql"
+    export SQLITE_HISTFILE="${HOME}/.history/sqlite"
 
     # sync history between all terminals
     # export PROMPT_COMMAND="history -a;history -c;history -r;$PROMPT_COMMAND"
@@ -77,6 +126,9 @@ function setup_completion() {
 
     # display matches for ambiguous patterns at first tab press
     bind "set show-all-if-ambiguous on"
+
+    # lookup file for hostname completion
+    export HOSTFILE="$HOME/.history/hosts"
 }
 
 function setup_colors() {
@@ -136,7 +188,7 @@ function setup_x11() {
     # If $DISPLAY is not set, try to find running xserver and export it
     if [ -z "${DISPLAY}" ] ; then
         if ( pidof Xorg >/dev/null || pidof X >/dev/null ) ; then
-            DISPLAY=:$( ps ax | grep -i -e Xorg -e "/usr/bin/X" | grep -o " :[0-9]* " | head -n 1 | grep -o "[0-9]*" )
+            DISPLAY=$( pgrep -nfa Xorg 2>&1 | sed 's|.* \(:[0-9]\+\).*|\1|g' )
             DISPLAY=${DISPLAY:-:0}
             export DISPLAY
         fi
@@ -155,13 +207,16 @@ function setup_applications() {
     BROWSER="$( es_depends_first "$browser" )"
     MAILER="$( es_depends_first "$mailer" )"
     TERMINAL="$( es_depends_first "$terminals" )"
+    TZ="${TZ:-$( head -n1 /etc/timezone )}"
+    TZ="${TZ:-Europe/Berlin}"
+
     EDITOR="$( es_depends_first "$editors" )"
     VISUAL="$( es_depends_first "$x11_editors" )"
     SUDO_EDITOR="$EDITOR"
     GIT_EDITOR="$EDITOR"
     SVN_EDITOR="$EDITOR"
-    TZ="${TZ:-$( head -n1 /etc/timezone )}"
-    TZ="${TZ:-Europe/Berlin}"
+    PSQL_EDITOR="$EDITOR"
+    PSQL_EDITOR_LINENUMBER_ARG='+'
 
     if es_depends "less" ; then
         PAGER="less -i"
@@ -172,7 +227,8 @@ function setup_applications() {
     fi
 
     export OPEN BROWSER MAILER TERMINAL EDITOR VISUAL SUDO_EDITOR \
-           GIT_EDITOR SVN_EDITOR TZ PAGER MANPAGER
+           GIT_EDITOR SVN_EDITOR TZ PAGER MANPAGER PSQL_EDITOR \
+           PSQL_EDITOR_LINENUMBER_ARG
 
     alias cp='cp -i -r'
     alias grep='grep --color=auto'
@@ -203,8 +259,8 @@ function setup_shell() {
     shopt -s lithist                    # save multi-line commands with newlines
     shopt -s progcomp                   # programmable completion
     shopt -u no_empty_cmd_completion    # don't try to complete empty cmds
-    set -o noclobber                    # do not overwrite files by redirect
     set -o notify                       # report status of terminated bg jobs immediately
+    #set -o noclobber                   # do not overwrite files by redirect
 }
 
 function stamp() {
@@ -216,6 +272,10 @@ function bashrc() {
 
     verify_bash || return $?
     setup_profile
+
+    #setup_config "$HOME"/
+    #setup_config "$HOME"/.private/
+    #setup_config "$HOME"/.private/work/
 
     setup_path || status=$(( "$status" +1 ))
     setup_includes || status=$(( "$status" + 1 ))

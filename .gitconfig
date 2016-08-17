@@ -1,10 +1,12 @@
 [core]
     quotepath = off
     editor = vim
+    # pager = diff-highlight | diff-so-fancy | less --tabs=1,5 -R
     whitespace=-indent-with-non-tab,trailing-space,cr-at-eol,tab-in-indent
 [user]
     name = Simon Schiele
-    email = simon.codingmonkey@gmail.com
+    email = simon.schiele@profitbricks.com
+    #email = simon.codingmonkey@gmail.com
 [github]
     username = simonschiele
 [merge]
@@ -17,6 +19,8 @@
     textconv = hexdump -v -C
 [rerere]
     enabled = true
+[status]
+#    submodulesummary = true
 [push]
     default = current
 [color]

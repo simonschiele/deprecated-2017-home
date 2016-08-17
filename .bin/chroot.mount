@@ -1,0 +1,35 @@
+#!/bin/bash
+LANG=C
+
+function chroot_mount() {
+    local status chroot source target
+    status=0
+    chroot="$1"
+
+    if [[ -z "$chroot" || "$*" == *"-h"* || "$*" == *"help"* ]] ; then
+        echo "Please call like this:" >&2
+        echo "> chroot.mount <path/to/chroot/>" >&2
+        echo 0
+    elif ! [[ -d "$chroot" ]] ; then
+        echo "dir '$chroot' not found" >&2
+        echo 1
+    fi
+
+    for source in sys proc dev dev/pts ; do
+        target="$chroot/$source/"
+        source="/$source/"
+        echo -n " > mounting $source -> $target"
+        if ! [ -d "$target" ]; then
+            echo -e "\t[mountpoint not existing]"
+            continue
+        elif mountpoint -q "$target" ; then
+            echo -e "\t[already mounted]"
+            continue
+        fi
+        mount --bind "$source" "$target" \
+            && echo -e "\t[mounted]" \
+            || echo -e "\t[failed]"
+    done
+}
+
+chroot_mount "$@"

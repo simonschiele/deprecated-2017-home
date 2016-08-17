@@ -3,27 +3,22 @@
 LANG=C
 
 function main() {
-    local container_dir="${1:-.}"
-    local mount_dirs=( /proc /sys /dev /dev/pts )
+    local mount_dirs=( proc sys dev dev/pts )
+    local container_dir dir status
+    container_dir="${1:-.}"
+    status=0
 
     if [ ! -d "$container_dir" ] ; then
         echo "'$container_dir' not found" >&2
         exit 1
     fi
-    
-    for dir in "${mount_dirs[@]}" ; do
-        local mnt="$container_dir/$dir"
-        local found=false
 
-        if [[ ! -d "$mnt" ]] && ! mountpoint -q "$mnt" ; then
-            mount -vt bind "$dir" "$mnt"
-            found=true
-        fi
+    for dir in "${mount_dirs[@]}" ; do
+        mount -v --bind "$dir" "$container_dir/$dir" \
+            || status=$(( status + 1 ))
     done
 
-    if ! $found ; then
-        echo "No typical 
-    fi
+    exit $status
 }
 
 main "$@"

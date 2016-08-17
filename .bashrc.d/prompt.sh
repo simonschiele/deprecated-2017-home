@@ -98,7 +98,7 @@ function es_prompt() {
     IS_SUDO=$( pstree -s "$$" | grep -qi 'sudo' ; echo "${boolean[$?]}" )
     IS_ROOT=$( [[ "$( id -u )" == 0 ]] && ! ${IS_SUDO} ; echo "${boolean[$?]}" )
     IS_UID0=$( ${IS_SUDO} || ${IS_ROOT} ; echo "${boolean[$?]}" )
-    IS_SSH=$( pstree -s "$$" | grep -qi 'sshd' ; echo "${boolean[$?]}" )
+    IS_SSH=$( [[ -n "${SSH_CLIENT}${SSH_CONNECTION}${SSH_TTY}" ]] || pstree -s "$$" | grep -qi 'sshd' ; echo "${boolean[$?]}" )
 
     colors="${1:-true}"
     scriptname="$( readlink -f "${BASH_SOURCE[0]}" )"
@@ -133,7 +133,7 @@ function es_prompt() {
         gitret=$?
 
         if [ $gitret -eq 124 ] ; then
-            PS1git="($( color.ps1 red "git slow" ))"
+            PS1git=" ($( color.ps1 red "git slow" ))"
         fi
     fi
 

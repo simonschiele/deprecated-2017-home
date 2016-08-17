@@ -1,0 +1,2 @@
+#!/bin/bash
+sudo LANG=C apt-get --assume-no autoremove | grep "^  " | xargs | tr " " "\n" | sort

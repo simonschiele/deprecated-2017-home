@@ -468,3 +468,10 @@ export EXTENSIONS_ARCHIVES='7z,s7z,ace,arj,bz,bz2,bzip,bzip2,gz,gzip,lha,lzh,rar
 #export ESSENTIALS_IS_TMUX=$( pstree -s "$$" | grep -qi 'tmux' ; echo ${BOOLEAN[$?]} )
 #export ESSENTIALS_IS_SCREEN=$( pstree -s "$$" | grep -qi 'screen' ; echo ${BOOLEAN[$?]} )
 #export ESSENTIALS_HAS_SSHAGENT=$( [ -n "$( ps hp ${SSH_AGENT_PID} 2>/dev/null )" ] ; echo ${BOOLEAN[$?]} )
+
+REAL_UID=${SUDO_UID:-$UID}
+REAL_GID=${SUDO_GID:-$GID}
+REAL_USER="${SUDO_USER:-$USER}"
+REAL_HOME=$( getent passwd "$REAL_USER" | cut -d: -f6 )
+
+export REAL_UID REAL_GID REAL_USER REAL_HOME

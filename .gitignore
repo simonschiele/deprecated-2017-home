@@ -24,7 +24,6 @@
 !/.fonts-failover/**/*
 !/.gitconfig
 !/.gitmodules
-!/.i3
 !/.icc*
 !/.icc/**/*
 !/.inputrc
@@ -34,6 +33,7 @@
 !/.playlists/**/*
 !/.profile
 !/.psqlrc
+!/.screenrc
 !/.ssh/README.rst
 !/.ssh/config
 !/.ssh/tmp/.stub
@@ -46,3 +46,8 @@
 !/.Xresources
 !/.xscreensaver
 !/.xsession
+!/.packages_workstation
+!/.packages_workstation_pip
+!/.packages_workstation_npm
+!/.screenlayout*
+!/.screenlayout/**/*

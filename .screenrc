@@ -1,0 +1,29 @@
+# window list at bottom
+hardstatus off
+hardstatus alwayslastline
+hardstatus string '%{= kG}%{g}[%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}]%{g}[ %{B}%{G}%H %{g}]'
+
+# default shell ('-' means login-shell)
+shell -bash
+
+# use scrollback screen buffer
+termcapinfo xterm|xterms|xs|rxvt|rxvt-unicode ti@:te@
+
+# fix for editor redraw
+altscreen on
+
+# bell / notification
+vbell off
+vbell_msg "vmöp! vmöp!"
+bell_msg "möp! möp!"
+
+# self-explanatory
+msgwait 1
+msgminwait 1
+defutf8 on
+nonblock on
+term screen-256color
+startup_message off
+defscrollback 8192
+maptimeout 5
+mousetrack off
