@@ -1,10 +1,46 @@
 [global_config]
-  enabled_plugins = LaunchpadCodeURLHandler, APTURLHandler
+  enabled_plugins = ,
   focus = mouse
   inactive_color_offset = 0.69
 [keybindings]
+  broadcast_all = None
+  broadcast_group = None
+  broadcast_off = None
+  close_term = None
+  close_window = None
+  cycle_next = None
+  cycle_prev = None
+  go_down = None
+  go_left = None
+  go_next = None
+  go_prev = None
+  go_right = None
+  go_up = None
+  group_all = None
+  group_tab = None
+  help = None
+  hide_window = None
+  layout_launcher = None
+  move_tab_left = None
+  move_tab_right = None
+  new_tab = None
+  new_terminator = None
+  new_window = <Primary><Shift>n
   next_tab = None
   prev_tab = None
+  resize_down = None
+  resize_left = None
+  resize_right = None
+  resize_up = None
+  rotate_ccw = None
+  rotate_cw = None
+  scaled_zoom = None
+  search = <Primary>f
+  split_horiz = None
+  split_vert = None
+  toggle_zoom = None
+  ungroup_all = None
+  ungroup_tab = None
 [layouts]
   [[default]]
     [[[child1]]]
