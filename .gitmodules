@@ -4,9 +4,6 @@
 [submodule ".config/awesome"]
 	path = .config/awesome
 	url = https://github.com/simonschiele/awesome.git
-[submodule ".lib/powerline-fonts"]
-	path = .lib/powerline-fonts
-	url = https://github.com/Lokaltog/powerline-fonts.git
 [submodule ".lib/solarized"]
 	path = .lib/solarized
 	url = git://github.com/altercation/solarized.git
