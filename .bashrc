@@ -9,12 +9,12 @@ function verify_bash() {
 
     # test if file already included
     if [[ -n "$workflow_processed_bashrc" ]] ; then
-        return
+        return 1
     fi
 
     # test if interactive
     if [[ "$-" != *i* ]] ; then
-        return
+        return 1
     fi
 
     return 0
@@ -29,7 +29,7 @@ function verify_profile() {
 function bashrc() {
     local status=0
 
-    verify_bash || return $?
+    verify_bash || return 0
     workflow_processed_bashrc=true
 
     verify_profile || status=$(( status + 1 ))
