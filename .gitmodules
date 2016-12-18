@@ -1,27 +1,15 @@
 [submodule ".vim"]
-    path = .vim
-    url = https://github.com/simonschiele/dot.vim.git
+	path = .vim
+	url = https://github.com/simonschiele/dot.vim.git
 [submodule ".config/awesome"]
-    path = .config/awesome
-    url = https://github.com/simonschiele/awesome.git
+	path = .config/awesome
+	url = https://github.com/simonschiele/awesome.git
 [submodule ".lib/powerline-fonts"]
-    path = .lib/powerline-fonts
-    url = https://github.com/Lokaltog/powerline-fonts.git
-[submodule ".lib/vils-ng"]
-    path = .lib/vils-ng
-    url = https://github.com/simonschiele/vils-ng.git
-[submodule ".lib/dircolors-solarized"]
-	path = .lib/solarized-dircolors
-    url = https://github.com/seebi/dircolors-solarized.git
+	path = .lib/powerline-fonts
+	url = https://github.com/Lokaltog/powerline-fonts.git
 [submodule ".lib/solarized"]
-    path = .lib/solarized
-    url = git://github.com/altercation/solarized.git
-[submodule ".lib/gnome-terminal-colors-solarized"]
-	path = .lib/solarized-gnome-terminal-colors
-    url = https://github.com/sigurdga/gnome-terminal-colors-solarized.git
+	path = .lib/solarized
+	url = git://github.com/altercation/solarized.git
 [submodule ".lib/solarized-tmux"]
-    path = .lib/solarized-tmux
-    url = https://github.com/seebi/tmux-colors-solarized.git
-[submodule ".i3"]
-	path = .i3
-	url = https://github.com/simonschiele/dot.i3.git
+	path = .lib/solarized-tmux
+	url = https://github.com/seebi/tmux-colors-solarized.git
