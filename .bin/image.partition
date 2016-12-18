@@ -1,0 +1,24 @@
+#!/bin/bash
+LANG=C
+set -e
+
+DEVICE=$1
+DO() { parted $DEVICE $@ }
+
+# parted -a optimal ${1}
+
+DO mklabel gpt
+DO mkpart primary 1 3 unit MiB
+DO set 1 bios_grub on
+DO mkpart primary 3 256 
+DO mkpart primary 256 -1
+DO name 1 grub
+DO name 2 boot
+DO name 3 root
+
+if ( blockdev --getalignoff "$DEVICE" ) ; then
+    echo "aligned optimal"
+fi
+
+#parted -a optimal /dev/sda mkpart primary 0% 4096MB
+#parted -a optimal /dev/sda mkpart primary 0% 50%

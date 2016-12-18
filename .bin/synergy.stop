@@ -1,0 +1,8 @@
+#!/bin/bash
+
+function synergy_stop() {
+    pgrep -ix synergy[sc]* >/dev/null 2>&1 | xargs kill
+    pgrep -ix synergy[sc]* >/dev/null 2>&1
+}
+
+synergy_stop "$@"

@@ -1,0 +1,76 @@
+#!/bin/bash
+LANG=C
+
+SCRIPTNAME=$( basename "$0" )
+IMAGE="$1"
+
+function error_exit() {
+    local msg="$1"
+    
+    if [[ -n "$msg" ]] ; then
+        echo -e "ERROR: $msg" >&2
+    else
+        echo -e "Usage: $SCRIPTNAME <qcow-image-file>\n" 
+    fi
+    
+    exit 1
+}
+
+function mount_qcow() {
+    local IMAGE="$1"
+    local part
+
+    if ! ( which qemu-nbd >/dev/null 2>&1 ) ; then
+        error_exit "Please install the 'qemu-utils' package"
+    elif ! ( which parted >/dev/null 2>&1 ) ; then
+        error_exit "Please install the 'parted' package"
+    fi
+
+    # load kernel module
+    if ! ( lsmod | grep -q "^nbd[^\ ]*" ) ; then
+        $SUDO modprobe nbd max_part=32
+        [[ $? != 0 ]] && error_exit "Couldn't load nbd module"
+    fi
+    
+    # check if image is already bound to device
+    if ( ps aux | grep -q "qemu-nbd.*${IMAGE}$" ) ; then
+        error_exit "Image '$IMAGE' is already in use"
+    fi
+
+    # get free device
+    dev=$( ( ls /dev/nbd* 2>/dev/null | sed 's|/dev/||g' ; awk {'print $4'} /proc/partitions | grep "^nbd" ) | sort | uniq -c | grep " 1 nbd" | grep -o "nbd[0-9]*$" | shuf | head -n 1 )
+    $SUDO qemu-nbd -c /dev/$dev "$IMAGE" && $SUDO sync || error_exit "Couldn't bind image to device"
+    $SUDO partprobe /dev/$dev
+
+    echo "$IMAGE -> /dev/$dev"
+}
+
+function main() {
+    if [[ "$@" == '--help' ]] || [[ "$@" == '-h' ]] ; then
+        error_exit
+    elif [[ -z "$IMAGE" ]] ; then
+        error_exit "Usage error"
+    elif ! [[ -r "$IMAGE" ]] ; then
+        error_exit "Couldn't open image '${IMAGE}'"
+    elif [[ -n "$MOUNTPOINT" ]] && ! [[ -w "$MOUNTPOINT" ]] ; then
+        error_exit "Couldn't write to mountpoint '$MOUNTPOINT'"
+    elif [[ $( id -u ) != '0' ]] && ! ( sudo echo -n && SUDO='sudo' ) ; then
+        error_exit "please call as root or sudo"
+    fi
+
+    if [[ -z "$MOUNTPOINT" ]] ; then
+        MOUNTPOINT_TMP=$( mktemp -d "/tmp/$SCRIPTNAME.XXXXXX" )
+    fi
+
+    if [[ $( file "$IMAGE" ) =~ "QCOW" ]] ; then
+        mount_qcow "$IMAGE" "${MOUNTPOINT_TMP:-$MOUNTPOINT}"
+    else
+        error_exit "Couldn't detect image type for '$IMAGE'"
+    fi
+    
+    if [[ -z "$MOUNTPOINT" ]] ; then
+        echo "${MOUNTPOINT_TMP}"
+    fi
+}
+
+main "$@"

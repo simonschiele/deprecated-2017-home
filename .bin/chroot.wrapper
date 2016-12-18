@@ -1,0 +1,71 @@
+#!/bin/bash
+#
+#
+
+function help() {
+    echo
+    echo "> $( basename "$0" ) [options] <chroot_directory>"
+    echo
+    echo "Does bind mounts, fixes ischroot and blocks services."
+    echo "Also scripts cleans after exit"
+    echo
+    echo "  -h for help (this message)."
+    echo
+    exit 0
+}
+
+function chroot_cleanup() {
+    if [[ -e "$chroot"/usr/bin/ischroot.debianutils ]] ; then
+        chroot "$chroot" rm -f /usr/bin/ischroot
+        chroot "$chroot" dpkg-divert --rename --remove /usr/bin/ischroot >/dev/null
+    fi
+
+    rm -f "$chroot"/usr/sbin/policy-rc.d
+
+    for i in $( seq 1 3 ) ; do
+        umount "$chroot"/dev/pts >/dev/null 2>&1
+        umount "$chroot"/{dev,sys,proc} >/dev/null 2>&1
+    done
+
+    umount -l "$chroot"/dev/pts >/dev/null 2>&1
+    umount -l "$chroot"/{dev,sys,proc} >/dev/null 2>&1
+}
+
+function chroot_wrapper() {
+    local target source
+    chroot="$1"
+
+    while getopts "h" opt; do
+        case "$opt" in
+            h) help;;
+        esac
+    done
+
+    trap chroot_cleanup INT SIGHUP SIGINT SIGTERM EXIT
+
+    echo '#!/bin/sh' > "$chroot"/usr/sbin/policy-rc.d
+    echo 'exit 101' >> "$chroot"/usr/sbin/policy-rc.d
+    chmod a+x "$chroot"/usr/sbin/policy-rc.d
+
+    for source in sys proc dev dev/pts ; do
+        target="$chroot/$source/"
+        source="/$source/"
+        if ! [ -d "$target" ]; then
+            echo -n " > couldn't find $target" >&2
+            exit 1
+        elif mountpoint -q "$target" ; then
+            continue
+        fi
+        mount --bind "$source" "$target"
+    done
+
+    if [[ ! -e "$chroot"/usr/bin/ischroot.debianutils ]] ; then
+        chroot "$chroot" dpkg-divert --divert /usr/bin/ischroot.debianutils --rename /usr/bin/ischroot >/dev/null
+        chroot "$chroot" ln -s /bin/true /usr/bin/ischroot
+    fi
+
+    unset PROMPT_COMMAND
+    chroot "$chroot"
+}
+
+chroot_wrapper "$@"

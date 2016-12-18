@@ -1,0 +1,33 @@
+#!/bin/bash
+
+function sync_new_data_storage() {
+    local sync_host sync_dir verbose
+    sync_host="${SYNC_HOSTNAME:-cinema}"
+    sync_dir="${SYNC_DIR:-new_data_store}"
+
+    if ( echo "$@" | grep -iq "\-h" ) ; then
+       echo
+       echo "$0 [-v] [-h]" 
+       echo
+       echo "  -h | this helptext"
+       echo "  -v | verbose"
+       echo
+       exit 0
+    elif ( echo "$@" | grep -iq "\-v" ) ; then
+       verbose="v"
+    fi
+
+    cd "$HOME"
+    if ! rsync -ra${verbose} "$sync_dir" "$sync_host":~/ ; then
+        echo "Error while pushing updates to host $sync_host" >&2
+        exit 1
+    fi
+
+    if ! rsync -ra${verbose} $sync_host:~/"$sync_dir" . ; then
+        echo "Error while fetching updates from host $sync_host" >&2
+        exit 1
+    fi
+    cd "$OLDPWD"
+}
+
+sync_new_data_storage $@

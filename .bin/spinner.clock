@@ -1,0 +1,48 @@
+#!/bin/bash
+
+function error_exit() {
+    echo "$@" >&2
+    exit 1
+}
+
+function cleanup() {
+    echo
+    echo
+}
+
+function spinner() {
+    for i in ${1} ; do
+        echo -en "\r $i "
+        sleep 0.3
+    done
+}
+
+function spinner_animation() {
+    local animation animations
+    animation="${0##*.}"
+
+    declare -A animations
+    animations[basic]="\| / -- \ "
+    animations[block]="▙ ▛ ▜ ▟"
+    animations[gray]="▤ ▧ ▥ ▨"
+    animations[triangle]="◩ ◪"
+    animations[quarter]="◰ ◱ ◲ ◳"
+    animations[circle]="◐ ◓ ◑ ◒"
+    animations[miniclock]="◴ ◵ ◶ ◷"
+    animations[clock]="🕐 🕜 🕑 🕝 🕒 🕞 🕓 🕟 🕔 🕠 🕕 🕡 🕖 🕢 🕗 🕣 🕘 🕤 🕙 🕥 🕚 🕦 🕛 🕧"
+
+    if [[ -z "${animations[${animation}]}" ]] ; then
+        error_exit "Unknown spinner animation: $animation"
+    fi
+
+    trap cleanup EXIT
+    spinner "${animations[$animation]}" &
+
+    while read pipe ; do
+        echo "$pipe" > pipe
+    done
+
+    sleep 0.3
+}
+
+spinner_animation "$@"

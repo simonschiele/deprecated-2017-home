@@ -1,0 +1,1 @@
+# root@name:/home# qemu-img convert -f qcow2 /home/your_current_image.qcow2 -O raw /home/your_new_image.raw

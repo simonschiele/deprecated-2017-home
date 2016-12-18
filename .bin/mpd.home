@@ -1,0 +1,99 @@
+#!/bin/bash
+#
+# mpd.[home|usb|share|system|stop|...]
+#
+
+function error_exit() {
+    echo "$@" >&2
+    exit 1
+}
+
+function start_mpd_client() {
+    local players player
+    players=( ncmpc ncmpcpp )
+
+
+    for player in ${players[*]} ; do
+        if ( which "$player" >/dev/null ) ; then
+            echo "> Starting client '$player'"
+            $player ; exit 0
+        fi
+    done
+
+    echo "> No player found"
+}
+
+function start_mpd_update() {
+    echo "> Updating DB"
+    which mpc && mpc update
+}
+
+function start_mpd_system() {
+    local mpd_user mpd_directories
+    mpd_user=$( grep "^[[:space:]]*user" /etc/mpd.conf )
+    mpd_directories=$( grep '^[^#]*_file' /etc/mpd.conf | cut -f2 -d'"' | xargs -L1 dirname | sort -u | xargs )
+
+    echo "> Fixing permissions for mpd user '$mpd_user'"
+    sudo chown: "${mpd_user:-mpd}:" ${mpd_directories:-/run/mpd /var/lib/mpd /var/log/mpd} -R
+
+    stop_mpd
+
+    sudo /etc/init.d/mpd restart
+    start_mpd_update
+    start_mpd_client
+}
+
+function start_mpd_home() {
+    echo "> Preparing MPD for '$1'"
+    sed -i "s|^[[:space:]]*music_directory.*|music_directory    \"${1}\"|g" "$HOME"/.mpd/mpd.conf
+
+    stop_mpd
+
+    echo "> Starting MPD"
+    mpd "$HOME"/.mpd/mpd.conf >/dev/null 2>&1
+
+    start_mpd_update
+    start_mpd_client
+
+    exit 0
+}
+
+function stop_mpd() {
+    echo "> Shutting down old MPD instances"
+    sudo /etc/init.d/mpd stop >/dev/null 2>&1
+    sudo systemctl stop mpd.service >/dev/null 2>&1
+    sudo systemctl stop mpd.socket >/dev/null 2>&1
+    sudo killall -9 mpd >/dev/null 2>&1
+}
+
+function mpd_custom() {
+    local callname dir music_library music_libraries
+    callname=$( basename "$0" )
+    callname=${callname#*.}
+    library_names=( mucke music musik audio )
+
+    declare -A music_libraries
+    music_libraries[home]='/home/simon'
+    music_libraries[usb]='/media/simon/4F12FE9156707673'
+    music_libraries[share]='/share'
+
+    if [[ "$callname" == "stop" ]] ; then
+        stop_mpd
+    elif [[ "$callname" == "system" ]] ; then
+        start_mpd_system
+    else
+        [[ -d "$HOME"/.mpd ]] || error_exit "mpd config dir '$HOME/.mpd' not found"
+
+        music_library=${music_libraries[$callname]}
+        for dir in ${library_names[*]} ; do
+            [[ -d "$music_library/$dir" ]] && start_mpd_home "$music_library/$dir"
+            [[ -d "${music_library}/${dir^}" ]] && start_mpd_home "${music_library}/${dir^}"
+            [[ -d "${music_library}/${dir^^}" ]] && start_mpd_home "${music_library}/${dir^^}"
+        done
+
+        error_exit "No music library found in '${music_libraries[$callname]}'"
+    fi
+
+}
+
+mpd_custom "$@"

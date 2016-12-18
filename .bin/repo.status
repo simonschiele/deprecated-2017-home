@@ -1,0 +1,65 @@
+#!/bin/bash
+
+function error_exit() {
+    echo "$@" >&2
+    exit 1
+}
+
+function repo_status_git() {
+    local ssep sep repo repopath GIT origin branch reponame \
+          stash untracked untracked_files modified
+
+    ssep="\t\t"
+    sep="\t\t\t"
+
+    repo="$1"
+    repopath=$( readlink -f "$repo" )
+    GIT="git --no-pager --git-dir=$repopath/.git"
+
+    origin=$( $GIT config remote.origin.url )
+    branch=$( $GIT symbolic-ref -q --short HEAD )
+
+    if [[ -n "$origin" ]] ; then
+        reponame=$( basename "$origin" | sed 's|\.git$||g' )
+    else
+        reponame=$( basename "$( $GIT rev-parse --show-toplevel )" )
+    fi
+
+    echo -e "repo:$sep$reponame"
+    echo -e "path:$sep$repopath"
+    echo -e "url:$sep${origin:-- No remote origin -}"
+
+    echo -ne "Updating... ⏱  "
+    $GIT fetch -q
+    mapfile -t stash < <( $GIT stash list )
+    mapfile -t untracked < <( $GIT ls-files --other --exclude-standard --directory )
+    mapfile -t untracked_files < <( $GIT ls-files --other --exclude-standard )
+    mapfile -t modified < <( $GIT ls-files -m )
+    size=$( du -s $repopath | awk '{print $1}' )
+    size_human=$( du -sh $repopath | awk '{print $1}' )
+
+    echo -e "\rbranch:        $ssep$branch"
+    echo -e "modified:$ssep${#modified[*]}"
+    echo -e "stashes:$ssep${#stash[*]}"
+    echo -e "untracked:$ssep${#untracked_files[*]}"
+}
+
+function repo_status() {
+    local repo="${1:-}"
+
+    if [[ -z "$repo" ]] ; then
+        error_exit "Please call like: ./$( basename "$0" ) path/to/a/repo"
+    elif [[ ! -d "$repo" ]] ; then
+        error_exit "Repo '$1' not found"
+    fi
+
+    if [[ -e "$repo"/.git ]] ; then
+        repo_status_git "$repo" || status=$?
+    else
+        error_exit "Only git supported for now"
+    fi
+
+    exit $status
+}
+
+repo_status "$@"

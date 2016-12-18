@@ -1,0 +1,97 @@
+#!/bin/bash
+LANG=C
+
+# parted -> partprobe                
+# else: kpartx, hdparm -z /dev/disk, blockdev –rereadpt /dev/disk 
+# best: echo 1 > /sys/block/sdc/device/rescan
+
+# raw
+# root@name:/home# sfdisk -l
+
+#Disk /dev/sda: 19457 cylinders, 255 heads, 63 sectors/track
+#Warning: extended partition does not start at a cylinder boundary.
+#DOS and Linux will interpret the contents differently.
+#Units = cylinders of 8225280 bytes, blocks of 1024 bytes, counting from 0
+
+#Device Boot Start     End   #cyls    #blocks   Id  System
+#/dev/sda1          0+  19456   19457- 156288321    5  Extended
+#NOTE: This disk shows ", blocks of 1024 bytes,"
+# root@name:/home# mount -o loop,offset=$((63*1024)) /home/your_new_image.raw /mnt/your_mount_point
+
+SCRIPTNAME=$( basename "$0" )
+IMAGE="$1"
+MOUNTPOINT="${2}  # :-$( get_mountpoint )}"
+SUDO=
+
+function error_exit() {
+    local msg="$1"
+    
+    if [[ -n "$msg" ]] ; then
+        echo -e "ERROR: $msg" >&2
+    else
+        echo -e "Usage: $SCRIPTNAME <qcow-image-file> [<mountpoint>]\n" 
+    fi
+    
+    exit 1
+}
+
+function mount_qcow() {
+    local IMAGE="$1"
+    local MOUNTPOINT="$2"
+    local part
+
+    if ! ( which qemu-nbd >/dev/null 2>&1 ) ; then
+        error_exit "Please install the 'qemu-utils' package"
+    fi
+
+    # load kernel module
+    if ! ( lsmod | grep -q "^nbd[^\ ]*" ) ; then
+        $SUDO modprobe nbd max_part=32
+        [[ $? != 0 ]] && error_exit "Couldn't load nbd module"
+    fi
+    
+    # check if image is already bound to device
+    if ( ps aux | grep -q "qemu-nbd.*${IMAGE}$" ) ; then
+        error_exit "Image '$IMAGE' is already in use"
+    fi
+
+    # get free device
+    dev=$( ( ls /dev/nbd* 2>/dev/null | sed 's|/dev/||g' ; awk {'print $4'} /proc/partitions | grep "^nbd" ) | sort | uniq -c | grep " 1 nbd" | grep -o "nbd[0-9]*$" | shuf | head -n 1 )
+    $SUDO qemu-nbd -c /dev/$dev "$IMAGE" || error_exit "Couldn't bind image to device"
+   
+    # mount available partitions
+    for part in $( grep -o "nbd0p[0-9]*$" /proc/partitions ) ; do
+        $SUDO mkdir "$MOUNTPOINT"/$( echo $part | grep -o '[0-9]*$' )
+        $SUDO mount /dev/$part "$MOUNTPOINT"/$( echo $part | grep -o '[0-9]*$' ) 
+    done
+}
+
+function main() {
+    if [[ "$@" == '--help' ]] || [[ "$@" == '-h' ]] ; then
+        error_exit
+    elif [[ -z "$IMAGE" ]] ; then
+        error_exit "Usage error"
+    elif ! [[ -r "$IMAGE" ]] ; then
+        error_exit "Couldn't open image '${IMAGE}'"
+    elif [[ -n "$MOUNTPOINT" ]] && ! [[ -w "$MOUNTPOINT" ]] ; then
+        error_exit "Couldn't write to mountpoint '$MOUNTPOINT'"
+    elif [[ $( id -u ) != '0' ]] && ! ( sudo echo -n && SUDO='sudo' ) ; then
+        error_exit "please call as root or sudo"
+    fi
+
+    if [[ -z "$MOUNTPOINT" ]] ; then
+        MOUNTPOINT_TMP=$( mktemp -d "/tmp/$SCRIPTNAME.XXXXXX" )
+    fi
+
+    if [[ $( file "$IMAGE" ) =~ "QCOW" ]] ; then
+        mount_qcow "$IMAGE" "${MOUNTPOINT_TMP:-$MOUNTPOINT}"
+    else
+        error_exit "Couldn't detect image type for '$IMAGE'"
+    fi
+    
+    if [[ -z "$MOUNTPOINT" ]] ; then
+        echo "${MOUNTPOINT_TMP}"
+    fi
+}
+
+main "$@"

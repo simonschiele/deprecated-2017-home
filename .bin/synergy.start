@@ -1,0 +1,33 @@
+#!/bin/bash
+
+function find_config() {
+    for config in $* ; do
+        config=$( sed "s|^\([^/]\)|$HOME/\1|g" <<< $config )
+        [[ -e "$config" ]] && echo "$config"
+    done
+}
+
+function synergy_client() {
+    local config_paths config
+
+    config_paths=( .config/Synergy/synergyc_$(hostname -s).conf \
+                   .synergyc.conf .synergy.conf /etc/synergyc.conf \
+                   /etc/synergy.conf )
+    config=$( find_config "${config_paths[*]}" )
+    [[ -n "$config" ]] && synergyc -c "$config"
+}
+
+function synergy_server() {
+    local config_paths config
+
+    config_paths=( .config/Synergy/synergys_$(hostname -s).conf \
+                   .synergys.conf .synergy.conf /etc/synergys.conf \
+                   /etc/synergy.conf )
+    config=$( find_config "${config_paths[*]}" )
+    [[ -n "$config" ]] && synergys -c "$config" \
+                                   -l /var/log/synergy/synergys.log
+}
+
+synergy.stop
+synergy_server "$@"
+synergy_client "$@"

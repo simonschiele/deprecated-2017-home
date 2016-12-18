@@ -1,0 +1,16 @@
+#!/bin/bash
+
+function schroot_umount() {
+    mount | grep schroot | awk '{print $3}' | sort -n | xargs -r -L1 sudo umount
+}
+
+function schroots_umount() {
+    seq 1 5 | while read counter ; do
+        umount_run >/dev/null 2>&1
+    done
+    umount_run
+
+    mount | grep -q schroot
+}
+
+schroots_umount "$@"

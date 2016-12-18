@@ -1,0 +1,117 @@
+#!/bin/bash
+#
+# # kommentarstil vom pythonguru angucken
+
+
+
+LANG=C
+
+IMAGETYPE='raw'
+SIZE='2G'
+SPARSE=true
+VERBOSE=false
+QUIET=false
+STATUS=0
+
+function usage() {
+    echo ""
+    echo "usage: $0 [-t <type>] [-s <size>] [-c] [<filename>]"
+    echo ""
+    echo "options:"
+    echo "  -t <type>   set the image type"
+    echo "              supported: raw, qcow"
+    echo "              default: raw"
+    echo "  -s <size>   size of the image"
+    echo "              use format like: 4G, 3000M, ..."
+    echo "              default: 2G"
+    echo "  -v          be verbose"
+    echo "  -q          be quiet (overwrites verbose)"
+    echo "  -n          try not to create sparse image"
+    echo "  -h          print this help text"
+}
+
+function output() {
+    ( $QUIET ) || echo "$@"
+}
+
+
+function verbose() {
+    ( $VERBOSE ) && output "$@"
+}
+
+function next_filename() {
+    shopt -s extglob  
+    local latest=$( ls image_+([0-9]).img 2>/dev/null | grep -o "[0-9]*" | sort -n | tail -n 1 )
+    echo "image_$(( ${latest:-0} + 1 )).img"
+}
+
+function verify_filename() {
+    if [ -e "$FILENAME" ] ; then
+        output "'$FILENAME' already existing" >&2
+        exit 1
+    fi
+
+    if ! ( touch "$FILENAME" && rm -f "$FILENAME" ) ; then
+        output "couldn't create '$FILENAME' - please check permissions" >&2
+        exit 1
+    fi
+}
+
+function verify_size() {
+    if ! ( echo "$SIZE" | grep -q "^[0-9]*[KkMGT]$" ) ; then
+        output "size in wrong format. use K, M, G or T as suffix" >&2 
+        exit 1
+    fi
+}
+
+while getopts t:s:hvqn option ; do
+    case "$option" in
+        h)
+            usage 
+            exit 0
+            ;;
+        t)
+            IMAGETYPE="$OPTARG"
+            ;;
+        s)
+            SIZE="$OPTARG"
+            ;;
+        n)
+            SPARSE=false
+            ;;
+        v)
+            VERBOSE=true
+            ;;
+        ?)
+            exit 1
+            ;;
+    esac
+done
+shift $(( $OPTIND - 1 ))
+
+FILENAME=${@:-$( next_filename )}
+
+verbose "filename: $FILENAME"
+verbose "imagetype: $IMAGETYPE"
+verbose "size: $SIZE"
+verbose "sparse: $SPARSE"
+
+verify_filename
+verify_size
+
+case "$IMAGETYPE" in
+    qcow*)
+        ( $SPARSE ) && sparse="-o preallocation=metadata"
+        qemu-img create -f qcow2 $sparse "$FILENAME" "$SIZE"
+        ;;
+    raw)
+        qemu-img create $sparse "$FILENAME" "$SIZE"
+        ;;
+    *)
+        echo "Unknown or unsupported imagetype '$IMAGETYPE'"
+        exit 1
+        ;;
+esac
+    
+exit $STATUS
+

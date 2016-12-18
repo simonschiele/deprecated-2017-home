@@ -11,7 +11,8 @@ function main() {
     local SUDO="sudo "
 
     $SUDO chown -c root: /etc/sudoers /etc/sudoers.d/ -R
-    $SUDO chmod -c 550 /etc/sudoers /etc/sudoers.d/ -R
+    $SUDO chmod -c 600 /etc/sudoers
+    $SUDO chmod -c 700 /etc/sudoers.d/
 
     # check sec. relevant files (shadow, passwd, group)
     # check if etckeeper is clean

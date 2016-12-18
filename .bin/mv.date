@@ -1,0 +1,26 @@
+#!/bin/bash
+
+rename_date() {
+    local MV status today input file extension
+    MV="mv -i"
+    status=0
+    today=$( date "+%Y-%m-%d" )
+
+    for input in "$@" ; do
+        if [[ ! -e "$input" ]] ; then
+            echo "Error: '$input' not found" >&2
+            status=$(( status + 1 ))
+            continue
+        fi
+
+        if [[ -d "$input" ]] ; then
+            $MV "${input%/}{,_$today}"
+        else
+            file="${input%%.*}"
+            extension="${input#*.}"
+            $MV "${file}"{,_$today}"${extension:+.$extension}"
+        fi
+    done
+}
+
+rename_date "$@"

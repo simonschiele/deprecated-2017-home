@@ -1,0 +1,2 @@
+#!/bin/bash
+sensors $@ | grep "C" | grep -v "+0.0°C"

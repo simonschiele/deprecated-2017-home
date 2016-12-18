@@ -8,8 +8,22 @@
 LANG=C
 
 function main() {
-    local SUDO="sudo "
-    local USERNAME="${SUDO_USER:USER}"
+    local SUDO user home
+    SUDO="sudo "
+
+    # unlock sudo
+    $SUDO echo -n
+
+    for home in /home/* /root ; do
+        user=$( getent passwd | grep "$home" | cut -d: -f1 )
+
+        echo "> Cleaning ${user:-unknown user}s home directory ($home)"
+        $SUDO chown "${user}:" "$home" -R
+        $SUDO chmod 700 "$home"
+        $SUDO chmod 700 "$home"/{.history,.credentials,.ssh,.ssh/tmp,.private,.secure} 2>/dev/null
+        $SUDO chmod -R 600 "$home"/{.my.cnf,.pgpass,.history/*,.credentials/*,.ssh/*} 2>/dev/null
+        #$SUDO chmod -R 600 "$home"/{.private,.*secure*} 2>/dev/null
+    done
 }
 
 main "$@"

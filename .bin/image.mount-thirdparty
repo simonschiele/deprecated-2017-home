@@ -1,0 +1,21 @@
+#!/bin/sh
+
+start () {
+    mapfile="$1"
+    device=$(losetup -fv "$mapfile" | awk '{print $NF}')
+    kpartx -av $device
+    # write the device name back to the controlling "with" instance
+    printf >&$WITH_FD $device
+}
+
+stop () {
+    mapfile="$1"
+    device="$WITH_DATA"
+    kpartx -dv $device
+    losetup -d $device
+}
+
+case "$WITH_MODE" in
+    start)  start "$@";;
+    stop)   stop "$@";;
+esac

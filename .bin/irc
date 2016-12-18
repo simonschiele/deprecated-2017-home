@@ -1,7 +1,19 @@
 #!/bin/bash
-if [[ "$( hostname -s )" == "secure" ]] ; then
-    screen -R
-else
-    # terminator -T irssi -x mosh -- simon@psaux.de screen -x 2>/dev/null >&2
-    ssh -t simon@secure.psaux.de -- screen -R
-fi
+
+function irc() {
+    local terminal=
+
+    if [[ "$( hostname -s )" == "secure" ]] ; then
+        screen -R
+    else
+        if ( ! pstree -s $$ | grep -iq termi ) ; then
+            terminal=${TERMINAL:-terminator}
+        fi
+
+        # terminator -T irssi -x mosh -- simon@psaux.de screen -x 2>/dev/null >&2
+        # ${terminal:+$terminal -T irssi -x } ssh -t simon@secure.psaux.de -- screen -R
+        ssh -t simon@secure.psaux.de -- screen -R
+    fi
+}
+
+irc "$*"

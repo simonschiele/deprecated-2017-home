@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Step1: check depends
+# Step2: update software + databases
+
+function update() {
+    echo "Updating youtube-dl"
+    out=$( youtube-dl -U )
+
+    echo "Updating usbids"
+    out=$( sudo update-usbids )
+
+}
+
+update "$@"

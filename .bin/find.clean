@@ -1,0 +1,6 @@
+#!/bin/bash
+find . $@ | grep -iv \
+    -e "/.hg/" \
+    -e "/.git/" \
+    -e "/CVS/" \
+    -e ".pyc$"
