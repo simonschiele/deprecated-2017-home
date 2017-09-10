@@ -5,8 +5,6 @@
     whitespace=-indent-with-non-tab,trailing-space,cr-at-eol,tab-in-indent
 [user]
     name = Simon Schiele
-    email = simon.schiele@profitbricks.com
-    #email = simon.codingmonkey@gmail.com
 [github]
     username = simonschiele
 [merge]
@@ -37,7 +35,7 @@
     whitespace = red reverse
 [alias]
     contributors = shortlog --summary --numbered
-    filelog = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat 
+    filelog = log --pretty=format:"%C(yellow)%h%Cred%d\\ %Creset%s%Cblue\\ [%cn]" --decorate --numstat
     graphviz = "!echo 'digraph git {' ; git log --pretty='format:  %h -> { %p }' \"$@\" | sed 's/[0-9a-f][0-9a-f]*/\"&\"/g' ; echo '}';"
     ignored = ls-files --others -i --exclude-standard
     lastlog = log --color -n 20 --pretty=tformat:\"%h - %an, %ar : %s\" HEAD^1..HEAD
@@ -47,4 +45,7 @@
     serve = daemon --base-path=. --export-all --enable=receive-pack --reuseaddr --informative-errors --verbose
     subupdate = submodule update --init --remote --recursive
 [include]
-    path = ~/.private/work/gitconfig
+    path = ~/.private/.gitconfig
+    path = ~/.private/gitconfig
+    path = ~/.work/.gitconfig
+    path = ~/.work/gitconfig
